@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title id="metaTitle">載入中 - IvyLife 艾薇生活</title>
+<meta name="description" id="metaDesc" content="">
+<meta property="og:title" id="ogTitle" content="">
+<meta property="og:type" content="article">
+<meta property="og:url" id="ogUrl" content="">
+<link rel="canonical" id="canonical" href="">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<nav class="nav"><div class="nav-inner"><a class="nav-logo" href="/">Ivy<span>Life</span></a>
+<ul class="nav-links" id="navLinks">
+<li><a href="/category.html?cat=tastyfood">美食餐廳</a></li>
+<li><a href="/category.html?cat=hotel">飯店民宿</a></li>
+<li><a href="/category.html?cat=beauty">醫學美容</a></li>
+<li><a href="/category.html?cat=renovation">宅修清潔</a></li>
+<li><a href="/category.html?cat=furniture">設計推薦</a></li>
+<li><a href="/about.html">關於艾薇</a></li>
+</ul>
+<div class="nav-hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')"><span></span><span></span><span></span></div>
+</div></nav>
+<div id="loadingState" style="min-height:50vh;display:flex;align-items:center;justify-content:center">
+<div class="loading-state"><div class="loading-spinner"></div><p>載入文章中⋯</p></div>
+</div>
+<div id="articleContent" style="display:none">
+<nav class="breadcrumb">
+<a href="/">首頁</a><span>›</span>
+<a href="#" id="breadcrumbCat">分類</a><span>›</span>
+<span id="breadcrumbTitle" style="color:var(--text-mid)"></span>
+</nav>
+<div class="article-layout">
+<main>
+<header class="article-header">
+<span class="article-category-tag" id="articleCat"></span>
+<h1 class="article-title" id="articleTitle"></h1>
+<div class="article-meta"><span id="articleDate"></span><span>・</span><span>IvyLife 艾薇生活</span></div>
+</header>
+<div class="article-cover" id="articleCover"></div>
+<article class="article-content" id="articleBody"></article>
+<div style="margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border);text-align:center">
+<p style="font-size:0.875rem;color:var(--text-light)">喜歡這篇文章嗎？歡迎分享給朋友 ✨</p>
+<div style="display:flex;justify-content:center;gap:1rem;margin-top:1rem">
+<a href="/" class="btn-outline" style="font-size:0.875rem">← 回首頁</a>
+</div></div>
+</main>
+<aside class="sidebar">
+<div class="sidebar-card">
+<h4>✦ 關於艾薇</h4>
+<p style="font-size:0.875rem;color:var(--text-light)">熱愛生活的女孩，喜歡探索美食、旅遊、居家設計的各種可能性。</p>
+<a href="/about.html" class="btn-primary" style="margin-top:1rem;display:inline-block;font-size:0.8rem;padding:8px 20px">認識艾薇</a>
+</div>
+<div class="sidebar-card"><h4>探索分類</h4><ul class="sidebar-list" id="sidebarCats"></ul></div>
+<div class="sidebar-card"><h4>最新文章</h4><ul class="sidebar-list" id="sidebarRecent"></ul></div>
+</aside>
+</div>
+</div>
+<div id="errorState" style="display:none;min-height:50vh;align-items:center;justify-content:center">
+<div class="error-state"><h2>文章不存在</h2><p>找不到這篇文章，可能已移除或網址有誤。</p><a href="/" class="btn-primary" style="margin-top:1.5rem;display:inline-block">回首頁</a></div>
+</div>
+<footer class="footer"><div class="footer-inner">
+<div class="footer-brand"><a class="nav-logo" href="/">Ivy<span>Life</span></a><p>艾薇的生活分享平台，記錄每一個值得珍藏的美好時刻。</p></div>
+<div><h5>分類</h5><ul><li><a href="/category.html?cat=tastyfood">美食餐廳</a></li><li><a href="/category.html?cat=hotel">飯店民宿</a></li><li><a href="/category.html?cat=beauty">醫學美容</a></li></ul></div>
+<div><h5>關於</h5><ul><li><a href="/about.html">關於艾薇</a></li><li><a href="/sitemap.xml">網站地圖</a></li></ul></div>
+</div><div class="footer-bottom"><p>© 2024 IvyLife 艾薇生活</p></div></footer>
+<script src="/js/supabase.js"></script>
+<script>
+async function loadArticle(){
+  const slug=new URLSearchParams(window.location.search).get('slug');
+  if(!slug){showError();return;}
+  try{
+    const a=await getArticleBySlug(slug);
+    if(!a){showError();return;}
+    const title=a.meta_title||(a.title+' - IvyLife 艾薇生活');
+    const desc=a.meta_description||a.synopsis||'';
+    const url='https://ivylife.com.tw/'+slug+'.html';
+    document.getElementById('metaTitle').textContent=title;
+    document.querySelector('[name="description"]').content=desc;
+    document.getElementById('ogTitle').content=title;
+    document.getElementById('ogUrl').content=url;
+    document.getElementById('canonical').href=url;
+    const sd={"@context":"https://schema.org","@type":"BlogPosting","headline":a.title,"description":a.synopsis||'','url':url,"datePublished":a.created_at,"author":{"@type":"Person","name":"艾薇 Ivy"}};
+    const se=document.createElement('script');se.type='application/ld+json';se.textContent=JSON.stringify(sd);document.head.appendChild(se);
+    const cn=a.ivy_categories?.name||'生活';const cs=a.ivy_categories?.slug||'';
+    document.getElementById('articleCat').textContent=cn;
+    document.getElementById('articleTitle').textContent=a.title;
+    document.getElementById('articleDate').textContent=formatDate(a.created_at);
+    const bc=document.getElementById('breadcrumbCat');bc.textContent=cn;bc.href='/category.html?cat='+cs;
+    document.getElementById('breadcrumbTitle').textContent=a.title;
+    const cv=document.getElementById('articleCover');
+    if(a.cover_image){cv.innerHTML='<img src="'+a.cover_image+'" alt="'+a.title+'" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius)">';cv.style.background='none';}
+    else cv.textContent=categoryIcon(cn);
+    document.getElementById('articleBody').innerHTML=a.content||'<p>文章內容準備中⋯</p>';
+    document.getElementById('loadingState').style.display='none';
+    document.getElementById('articleContent').style.display='block';
+    loadSidebar();
+  }catch(e){showError(e.message);}
+}
+function showError(m){
+  document.getElementById('loadingState').style.display='none';
+  const e=document.getElementById('errorState');e.style.display='flex';
+  if(m)e.querySelector('p').textContent=m;
+}
+async function loadSidebar(){
+  try{
+    const[cats,recent]=await Promise.all([getCategories(),getArticles({limit:5})]);
+    document.getElementById('sidebarCats').innerHTML=cats.map(c=>'<li><a href="/category.html?cat='+c.slug+'">'+(c.icon||'')+' '+c.name+'</a></li>').join('');
+    document.getElementById('sidebarRecent').innerHTML=recent.map(a=>'<li><a href="/'+a.slug+'.html">'+a.title+'</a></li>').join('');
+  }catch{}
+}
+loadArticle();
+</script>
+</body></html>
