@@ -6,10 +6,7 @@
 <title>IvyLife 後台管理</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Noto Sans TC',sans-serif;background:#f8f4f5;color:#2d2020;min-height:100vh}
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&display=swap');
-
-/* LOGIN */
+body{font-family:'Noto Sans TC',system-ui,sans-serif;background:#f8f4f5;color:#2d2020;min-height:100vh}
 #loginPage{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#fff0f2,#fde8d8)}
 .login-box{background:white;border-radius:16px;padding:2.5rem;width:360px;box-shadow:0 8px 32px rgba(212,105,122,0.15);text-align:center}
 .login-logo{font-size:1.8rem;font-weight:600;color:#d4697a;margin-bottom:0.3rem}
@@ -17,200 +14,155 @@ body{font-family:'Noto Sans TC',sans-serif;background:#f8f4f5;color:#2d2020;min-
 .login-sub{color:#a08085;font-size:0.85rem;margin-bottom:2rem}
 .login-box input{width:100%;padding:10px 14px;border:1px solid rgba(212,105,122,0.2);border-radius:8px;font-size:0.95rem;margin-bottom:1rem;outline:none;font-family:inherit}
 .login-box input:focus{border-color:#d4697a}
-.btn-primary{width:100%;padding:11px;background:#d4697a;color:white;border:none;border-radius:50px;font-size:0.95rem;cursor:pointer;transition:all 0.2s}
+.btn-primary{width:100%;padding:11px;background:#d4697a;color:white;border:none;border-radius:50px;font-size:0.95rem;cursor:pointer}
 .btn-primary:hover{background:#f2a5b0}
 .login-err{color:#d4697a;font-size:0.82rem;margin-top:0.5rem;display:none}
-
-/* LAYOUT */
 #adminPage{display:none;min-height:100vh}
-.sidebar{position:fixed;left:0;top:0;width:220px;height:100vh;background:#2d2020;color:white;padding:1.5rem 0;z-index:10}
+.sidebar{position:fixed;left:0;top:0;width:220px;height:100vh;background:#2d2020;color:white;padding:1.5rem 0;z-index:10;display:flex;flex-direction:column}
 .sidebar-logo{padding:0 1.5rem 1.5rem;border-bottom:1px solid rgba(255,255,255,0.1);font-size:1.2rem;font-weight:600;color:#f2a5b0}
 .sidebar-logo span{color:#c9996a;font-style:italic}
-.sidebar-menu{list-style:none;padding:1rem 0}
-.sidebar-menu li a{display:flex;align-items:center;gap:0.7rem;padding:0.7rem 1.5rem;color:rgba(255,255,255,0.7);text-decoration:none;font-size:0.88rem;transition:all 0.2s}
+.sidebar-menu{list-style:none;padding:1rem 0;flex:1}
+.sidebar-menu li a{display:flex;align-items:center;gap:0.7rem;padding:0.7rem 1.5rem;color:rgba(255,255,255,0.7);text-decoration:none;font-size:0.88rem;transition:all 0.2s;cursor:pointer}
 .sidebar-menu li a:hover,.sidebar-menu li a.active{background:rgba(242,165,176,0.15);color:white}
-.sidebar-menu li a .icon{font-size:1rem;width:20px;text-align:center}
-.sidebar-footer{position:absolute;bottom:1rem;left:0;right:0;padding:0 1.5rem}
+.sidebar-footer{padding:1rem 1.5rem;border-top:1px solid rgba(255,255,255,0.1)}
 .sidebar-footer button{width:100%;padding:8px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);border:none;border-radius:8px;cursor:pointer;font-size:0.82rem}
-
-.main{margin-left:220px;padding:2rem}
-.page-header{margin-bottom:2rem;display:flex;align-items:center;justify-content:space-between}
+.sidebar-footer button:hover{background:rgba(255,255,255,0.2);color:white}
+.main{margin-left:220px;padding:2rem;min-height:100vh}
+.page-header{margin-bottom:2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
 .page-header h1{font-size:1.4rem;font-weight:500}
 .btn{padding:8px 20px;border-radius:50px;font-size:0.85rem;cursor:pointer;border:none;transition:all 0.2s;font-family:inherit}
-.btn-rose{background:#d4697a;color:white}.btn-rose:hover{background:#f2a5b0}
+.btn-rose{background:#d4697a;color:white}.btn-rose:hover{background:#c05a6a}
 .btn-outline{background:transparent;color:#d4697a;border:1px solid #d4697a}.btn-outline:hover{background:#fff0f2}
-.btn-sm{padding:5px 12px;font-size:0.78rem}
+.btn-sm{padding:5px 14px;font-size:0.78rem}
 .btn-danger{background:#e74c3c;color:white}.btn-danger:hover{background:#c0392b}
-.btn-success{background:#27ae60;color:white}
-
-/* STATS */
+.btn-success{background:#27ae60;color:white}.btn-success:hover{background:#219a52}
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
 .stat-card{background:white;border-radius:12px;padding:1.2rem 1.5rem;border:1px solid rgba(212,105,122,0.1)}
 .stat-num{font-size:2rem;font-weight:500;color:#d4697a}
 .stat-label{font-size:0.8rem;color:#a08085;margin-top:0.2rem}
-
-/* TABLE */
 .card{background:white;border-radius:12px;border:1px solid rgba(212,105,122,0.1);overflow:hidden;margin-bottom:1.5rem}
-.card-header{padding:1rem 1.5rem;border-bottom:1px solid rgba(212,105,122,0.1);display:flex;align-items:center;justify-content:space-between;font-size:0.9rem;font-weight:500}
-.card-body{padding:0}
+.card-header{padding:1rem 1.5rem;border-bottom:1px solid rgba(212,105,122,0.08);display:flex;align-items:center;justify-content:space-between;font-size:0.9rem;font-weight:500}
 table{width:100%;border-collapse:collapse;font-size:0.85rem}
-th{padding:0.7rem 1.2rem;text-align:left;background:#fdf8f4;color:#a08085;font-weight:400;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}
-td{padding:0.8rem 1.2rem;border-top:1px solid rgba(212,105,122,0.08);vertical-align:middle}
+th{padding:0.7rem 1.2rem;text-align:left;background:#fdf8f4;color:#a08085;font-weight:400;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap}
+td{padding:0.75rem 1.2rem;border-top:1px solid rgba(212,105,122,0.08);vertical-align:middle}
 tr:hover td{background:#fdf8f4}
-.badge{display:inline-block;padding:2px 10px;border-radius:50px;font-size:0.72rem;font-weight:400}
+.badge{display:inline-block;padding:2px 10px;border-radius:50px;font-size:0.72rem}
 .badge-green{background:#e8f5e9;color:#2e7d32}
 .badge-gray{background:#f5f5f5;color:#757575}
-.actions{display:flex;gap:0.5rem;flex-wrap:wrap}
-
-/* EDITOR */
-.editor-form{padding:1.5rem;display:flex;flex-direction:column;gap:1rem}
+.actions{display:flex;gap:0.4rem;flex-wrap:wrap}
+.editor-form{padding:1.5rem;display:flex;flex-direction:column;gap:1.2rem}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 .form-group{display:flex;flex-direction:column;gap:0.4rem}
-.form-group label{font-size:0.8rem;color:#a08085}
-.form-group input,.form-group select,.form-group textarea{padding:9px 12px;border:1px solid rgba(212,105,122,0.2);border-radius:8px;font-size:0.9rem;font-family:inherit;outline:none;transition:border-color 0.2s;background:white}
-.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#d4697a}
-.form-group textarea{min-height:200px;resize:vertical;line-height:1.6}
+.form-group label{font-size:0.8rem;color:#a08085;font-weight:400}
+.form-group input,.form-group select,.form-group textarea{padding:9px 12px;border:1px solid rgba(212,105,122,0.2);border-radius:8px;font-size:0.9rem;font-family:inherit;outline:none;transition:border-color 0.2s;background:white;color:#2d2020}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#d4697a;box-shadow:0 0 0 3px rgba(212,105,122,0.1)}
+.form-group textarea{min-height:220px;resize:vertical;line-height:1.7}
 .form-actions{display:flex;gap:0.8rem;padding-top:0.5rem}
-.toast{position:fixed;bottom:2rem;right:2rem;padding:12px 20px;background:#2d2020;color:white;border-radius:8px;font-size:0.85rem;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none}
+.toast{position:fixed;bottom:2rem;right:2rem;padding:12px 20px;background:#2d2020;color:white;border-radius:8px;font-size:0.85rem;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;max-width:300px}
 .toast.show{opacity:1}
-
-/* PANELS */
 .panel{display:none}.panel.active{display:block}
-.search-bar{display:flex;gap:0.5rem;margin-bottom:1rem}
-.search-bar input{flex:1;padding:8px 14px;border:1px solid rgba(212,105,122,0.2);border-radius:50px;font-size:0.85rem;outline:none;font-family:inherit}
-.search-bar input:focus{border-color:#d4697a}
+.toolbar{display:flex;gap:0.8rem;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
+.toolbar input,.toolbar select{padding:8px 14px;border:1px solid rgba(212,105,122,0.2);border-radius:50px;font-size:0.85rem;outline:none;font-family:inherit;background:white}
+.toolbar input{min-width:200px}.toolbar input:focus,.toolbar select:focus{border-color:#d4697a}
+.empty-state{text-align:center;padding:3rem;color:#a08085;font-size:0.9rem}
+.check-row{display:flex;align-items:center;gap:0.5rem}
+.check-row input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:#d4697a}
+.check-row label{font-size:0.9rem;color:#2d2020;cursor:pointer}
+@media(max-width:768px){.stats-grid{grid-template-columns:repeat(2,1fr)}.form-row{grid-template-columns:1fr}.sidebar{width:180px}.main{margin-left:180px}}
 </style>
 </head>
 <body>
 
-<!-- LOGIN PAGE -->
 <div id="loginPage">
 <div class="login-box">
   <div class="login-logo">Ivy<span>Life</span></div>
   <div class="login-sub">後台管理系統</div>
-  <input type="password" id="pwInput" placeholder="請輸入管理密碼" onkeydown="if(event.key==='Enter')doLogin()">
+  <input type="password" id="pwInput" placeholder="請輸入管理密碼">
   <button class="btn-primary" onclick="doLogin()">登入</button>
-  <div class="login-err" id="loginErr">密碼錯誤，請再試</div>
+  <div class="login-err" id="loginErr">密碼錯誤，請再試一次</div>
 </div>
 </div>
 
-<!-- ADMIN PAGE -->
 <div id="adminPage">
 <nav class="sidebar">
   <div class="sidebar-logo">Ivy<span>Life</span> 後台</div>
   <ul class="sidebar-menu">
-    <li><a href="#" class="active" onclick="showPanel('dashboard',this)"><span class="icon">📊</span>總覽</a></li>
-    <li><a href="#" onclick="showPanel('articles',this)"><span class="icon">📝</span>文章管理</a></li>
-    <li><a href="#" onclick="showPanel('new',this)"><span class="icon">✏️</span>新增文章</a></li>
-    <li><a href="#" onclick="showPanel('categories',this)"><span class="icon">🏷️</span>分類管理</a></li>
+    <li><a class="active" onclick="showPanel('dashboard',this)">📊 總覽</a></li>
+    <li><a onclick="showPanel('articles',this)">📝 文章管理</a></li>
+    <li><a onclick="showPanel('new',this)">✏️ 新增文章</a></li>
+    <li><a onclick="showPanel('categories',this)">🏷️ 分類管理</a></li>
   </ul>
   <div class="sidebar-footer">
-    <button onclick="goFront()">← 前往前台</button>
+    <button onclick="window.open('/','_blank')">↗ 前往前台</button>
   </div>
 </nav>
 
 <main class="main">
 
-<!-- DASHBOARD -->
 <div id="panel-dashboard" class="panel active">
-  <div class="page-header"><h1>📊 網站總覽</h1></div>
+  <div class="page-header"><h1>📊 網站總覽</h1><span style="font-size:0.8rem;color:#a08085" id="lastUpdate"></span></div>
   <div class="stats-grid">
-    <div class="stat-card"><div class="stat-num" id="statArticles">-</div><div class="stat-label">篇文章</div></div>
-    <div class="stat-card"><div class="stat-num" id="statPublished">-</div><div class="stat-label">已發布</div></div>
-    <div class="stat-card"><div class="stat-num" id="statDraft">-</div><div class="stat-label">草稿</div></div>
-    <div class="stat-card"><div class="stat-num" id="statCats">-</div><div class="stat-label">個分類</div></div>
+    <div class="stat-card"><div class="stat-num" id="s1">-</div><div class="stat-label">篇文章</div></div>
+    <div class="stat-card"><div class="stat-num" id="s2">-</div><div class="stat-label">已發布</div></div>
+    <div class="stat-card"><div class="stat-num" id="s3">-</div><div class="stat-label">草稿</div></div>
+    <div class="stat-card"><div class="stat-num" id="s4">-</div><div class="stat-label">個分類</div></div>
   </div>
   <div class="card">
-    <div class="card-header">最新文章</div>
-    <div class="card-body"><table><thead><tr><th>標題</th><th>分類</th><th>狀態</th><th>日期</th></tr></thead><tbody id="dashRecent"></tbody></table></div>
+    <div class="card-header">最新 10 篇文章<button class="btn btn-sm btn-rose" onclick="showPanel('new',document.querySelector('.sidebar-menu li:nth-child(3) a'))">+ 新增</button></div>
+    <table><thead><tr><th>標題</th><th>分類</th><th>狀態</th><th>日期</th></tr></thead><tbody id="dashRecent"></tbody></table>
   </div>
 </div>
 
-<!-- ARTICLES LIST -->
 <div id="panel-articles" class="panel">
   <div class="page-header">
     <h1>📝 文章管理</h1>
     <button class="btn btn-rose" onclick="showPanel('new',document.querySelector('.sidebar-menu li:nth-child(3) a'))">+ 新增文章</button>
   </div>
-  <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="搜尋文章標題⋯" oninput="filterArticles()">
-    <select id="filterCat" onchange="filterArticles()" style="padding:8px 12px;border:1px solid rgba(212,105,122,0.2);border-radius:50px;font-size:0.85rem;outline:none;font-family:inherit">
-      <option value="">全部分類</option>
-    </select>
+  <div class="toolbar">
+    <input type="text" id="searchQ" placeholder="搜尋標題或 slug⋯" oninput="filterList()">
+    <select id="filterCat" onchange="filterList()"><option value="">全部分類</option></select>
+    <select id="filterPub" onchange="filterList()"><option value="">全部狀態</option><option value="true">已發布</option><option value="false">草稿</option></select>
   </div>
   <div class="card">
-    <div class="card-body"><table><thead><tr><th>標題</th><th>分類</th><th>Slug</th><th>狀態</th><th>日期</th><th>操作</th></tr></thead><tbody id="articlesList"></tbody></table></div>
+    <table><thead><tr><th>標題</th><th>分類</th><th>Slug</th><th>狀態</th><th>日期</th><th>操作</th></tr></thead>
+    <tbody id="artList"></tbody></table>
   </div>
 </div>
 
-<!-- NEW/EDIT ARTICLE -->
 <div id="panel-new" class="panel">
   <div class="page-header">
-    <h1 id="editorTitle">✏️ 新增文章</h1>
-    <button class="btn btn-outline" onclick="cancelEdit()">取消</button>
+    <h1 id="edTitle">✏️ 新增文章</h1>
+    <button class="btn btn-outline" onclick="resetForm()">× 取消</button>
   </div>
   <div class="card">
     <div class="editor-form">
-      <input type="hidden" id="editId">
-      <div class="form-group">
-        <label>文章標題 *</label>
-        <input type="text" id="editTitle" placeholder="請輸入文章標題">
-      </div>
+      <input type="hidden" id="edId">
+      <div class="form-group"><label>文章標題 *</label><input type="text" id="edTitleInput" placeholder="例：台南必吃美食推薦｜10家私藏餐廳"></div>
       <div class="form-row">
-        <div class="form-group">
-          <label>Slug（網址）*</label>
-          <input type="text" id="editSlug" placeholder="tastyfood01">
-        </div>
-        <div class="form-group">
-          <label>分類</label>
-          <select id="editCat"></select>
-        </div>
+        <div class="form-group"><label>Slug（網址）* <span style="color:#d4697a;font-size:0.75rem">— 對應舊網址如 tastyfood01</span></label><input type="text" id="edSlug" placeholder="tastyfood01"></div>
+        <div class="form-group"><label>分類</label><select id="edCat"><option value="">-- 選擇分類 --</option></select></div>
       </div>
-      <div class="form-group">
-        <label>摘要</label>
-        <textarea id="editSynopsis" rows="3" placeholder="文章摘要，顯示在列表頁"></textarea>
-      </div>
-      <div class="form-group">
-        <label>內文（HTML）</label>
-        <textarea id="editContent" rows="12" placeholder="&lt;p&gt;文章內容...&lt;/p&gt;"></textarea>
-      </div>
+      <div class="form-group"><label>摘要（顯示在列表頁）</label><textarea id="edSynopsis" rows="3" placeholder="一段簡短描述，吸引讀者點閱⋯"></textarea></div>
+      <div class="form-group"><label>文章內文（HTML 格式）</label><textarea id="edContent" rows="14" placeholder="&lt;p&gt;大家好，我是艾薇！&lt;/p&gt;&#10;&lt;h2&gt;小標題&lt;/h2&gt;&#10;&lt;p&gt;內文...&lt;/p&gt;"></textarea></div>
       <div class="form-row">
-        <div class="form-group">
-          <label>SEO 標題（選填）</label>
-          <input type="text" id="editMetaTitle" placeholder="留空則自動使用文章標題">
-        </div>
-        <div class="form-group">
-          <label>封面圖片網址（選填）</label>
-          <input type="text" id="editCover" placeholder="https://...">
-        </div>
+        <div class="form-group"><label>封面圖片網址（選填）</label><input type="text" id="edCover" placeholder="https://..."></div>
+        <div class="form-group"><label>SEO 標題（選填，留空自動帶入標題）</label><input type="text" id="edMetaT" placeholder="SEO 用標題"></div>
       </div>
-      <div class="form-group">
-        <label>SEO 描述（選填）</label>
-        <input type="text" id="editMetaDesc" placeholder="留空則自動使用摘要">
-      </div>
-      <div class="form-row" style="align-items:center">
-        <div class="form-group" style="flex-direction:row;align-items:center;gap:0.5rem">
-          <input type="checkbox" id="editPublished" checked style="width:auto;padding:0">
-          <label style="color:#2d2020;font-size:0.9rem">立即發布</label>
-        </div>
-      </div>
+      <div class="form-group"><label>SEO 描述（選填，留空自動帶入摘要）</label><input type="text" id="edMetaD" placeholder="搜尋引擎顯示的描述文字"></div>
+      <div class="check-row"><input type="checkbox" id="edPub" checked><label for="edPub">立即發布（取消勾選則存為草稿）</label></div>
       <div class="form-actions">
-        <button class="btn btn-rose" onclick="saveArticle()">💾 儲存文章</button>
-        <button class="btn btn-outline" onclick="cancelEdit()">取消</button>
+        <button class="btn btn-rose" onclick="saveArt()">💾 儲存文章</button>
+        <button class="btn btn-outline" onclick="resetForm()">取消</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- CATEGORIES -->
 <div id="panel-categories" class="panel">
-  <div class="page-header"><h1>🏷️ 分類管理</h1></div>
+  <div class="page-header"><h1>🏷️ 分類管理</h1><span style="font-size:0.82rem;color:#a08085">分類目前需透過 Supabase 管理</span></div>
   <div class="card">
-    <div class="card-body">
-      <table><thead><tr><th>圖示</th><th>名稱</th><th>Slug</th><th>說明</th><th>排序</th><th>文章數</th></tr></thead>
-      <tbody id="catsList"></tbody>
-      </table>
-    </div>
+    <table><thead><tr><th>圖示</th><th>名稱</th><th>Slug</th><th>說明</th><th>排序</th><th>文章數</th></tr></thead>
+    <tbody id="catList"></tbody></table>
   </div>
 </div>
 
@@ -220,15 +172,25 @@ tr:hover td{background:#fdf8f4}
 <div class="toast" id="toast"></div>
 
 <script>
-const SB_URL = 'https://zsebcpfblecwumbaxeaz.supabase.co';
-const SB_KEY = 'sb_publishable_L2DOfeM0cAJqwlVCr1LwtA_jE9MBNDn';
-const ADMIN_PASS = 'ivy2024admin';
+const SB = 'https://zsebcpfblecwumbaxeaz.supabase.co';
+const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZWJjcGZibGVjd3VtYmF4ZWF6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc5NTMyNywiZXhwIjoyMDg5MzcxMzI3fQ.g0rsqNO6cItp8Qw3ybveVwX2afjTSWtS7WFHL_320jQ';
+const PASS = 'ivy2024admin';
+let arts = [], cats = [];
 
-let allArticles = [], allCats = [];
+async function sb(path, opt) {
+  opt = opt || {};
+  const r = await fetch(SB + '/rest/v1/' + path, Object.assign({}, opt, {
+    headers: Object.assign({
+      'apikey': KEY, 'Authorization': 'Bearer ' + KEY,
+      'Content-Type': 'application/json', 'Prefer': 'return=representation'
+    }, opt.headers || {})
+  }));
+  if (!r.ok) { const e = await r.text(); throw new Error(e); }
+  try { return await r.json(); } catch { return []; }
+}
 
 function doLogin() {
-  const pw = document.getElementById('pwInput').value;
-  if (pw === ADMIN_PASS) {
+  if (document.getElementById('pwInput').value === PASS) {
     document.getElementById('loginPage').style.display = 'none';
     document.getElementById('adminPage').style.display = 'block';
     loadAll();
@@ -236,154 +198,144 @@ function doLogin() {
     document.getElementById('loginErr').style.display = 'block';
   }
 }
-
-async function sbFetch(path, opts) {
-  const r = await fetch(SB_URL + '/rest/v1/' + path, {
-    ...opts,
-    headers: {
-      'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY,
-      'Content-Type': 'application/json', 'Prefer': 'return=representation',
-      ...(opts && opts.headers)
-    }
-  });
-  if (!r.ok) { const e = await r.text(); throw new Error(e); }
-  const ct = r.headers.get('content-type');
-  return ct && ct.includes('json') ? r.json() : [];
-}
+document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
 async function loadAll() {
   try {
-    allCats = await sbFetch('ivy_categories?order=sort_order.asc');
-    allArticles = await sbFetch('ivy_articles?select=*,ivy_categories(name,slug)&order=created_at.desc');
-    renderDashboard();
-    renderArticles(allArticles);
-    renderCats();
-    populateCatSelects();
-  } catch(e) { toast('載入失敗: ' + e.message, true); }
+    [cats, arts] = await Promise.all([
+      sb('ivy_categories?order=sort_order.asc'),
+      sb('ivy_articles?select=*,ivy_categories(name,slug)&order=created_at.desc')
+    ]);
+    renderDash(); renderArts(arts); renderCats(); fillCatOpts();
+    document.getElementById('lastUpdate').textContent = '更新於 ' + new Date().toLocaleTimeString('zh-TW');
+  } catch(e) { toast('載入失敗: ' + e.message, 1); }
 }
 
-function renderDashboard() {
-  document.getElementById('statArticles').textContent = allArticles.length;
-  document.getElementById('statPublished').textContent = allArticles.filter(a => a.published).length;
-  document.getElementById('statDraft').textContent = allArticles.filter(a => !a.published).length;
-  document.getElementById('statCats').textContent = allCats.length;
-  const recent = allArticles.slice(0, 8);
-  document.getElementById('dashRecent').innerHTML = recent.map(a =>
-    '<tr><td>' + a.title + '</td><td>' + (a.ivy_categories ? a.ivy_categories.name : '-') + '</td><td>' +
-    (a.published ? '<span class="badge badge-green">已發布</span>' : '<span class="badge badge-gray">草稿</span>') +
-    '</td><td>' + new Date(a.created_at).toLocaleDateString('zh-TW') + '</td></tr>'
-  ).join('');
+function renderDash() {
+  document.getElementById('s1').textContent = arts.length;
+  document.getElementById('s2').textContent = arts.filter(a => a.published).length;
+  document.getElementById('s3').textContent = arts.filter(a => !a.published).length;
+  document.getElementById('s4').textContent = cats.length;
+  document.getElementById('dashRecent').innerHTML = arts.slice(0,10).map(a =>
+    '<tr><td><strong>' + esc(a.title) + '</strong></td><td>' + (a.ivy_categories ? a.ivy_categories.name : '-') + '</td><td>' +
+    badge(a.published) + '</td><td>' + fmtDate(a.created_at) + '</td></tr>'
+  ).join('') || '<tr><td colspan="4" class="empty-state">暫無文章</td></tr>';
 }
 
-function renderArticles(list) {
-  document.getElementById('articlesList').innerHTML = list.map(a =>
-    '<tr><td><strong>' + a.title + '</strong></td>' +
+function renderArts(list) {
+  document.getElementById('artList').innerHTML = list.map(a =>
+    '<tr><td><strong>' + esc(a.title) + '</strong></td>' +
     '<td>' + (a.ivy_categories ? a.ivy_categories.name : '-') + '</td>' +
-    '<td><code style="font-size:0.78rem;color:#a08085">' + a.slug + '</code></td>' +
-    '<td>' + (a.published ? '<span class="badge badge-green">已發布</span>' : '<span class="badge badge-gray">草稿</span>') + '</td>' +
-    '<td>' + new Date(a.created_at).toLocaleDateString('zh-TW') + '</td>' +
+    '<td><code style="font-size:0.75rem;color:#a08085">' + a.slug + '</code></td>' +
+    '<td>' + badge(a.published) + '</td>' +
+    '<td>' + fmtDate(a.created_at) + '</td>' +
     '<td><div class="actions">' +
-    '<button class="btn btn-sm btn-outline" onclick="editArticle(' + a.id + ')">編輯</button>' +
-    '<button class="btn btn-sm ' + (a.published ? 'btn-outline' : 'btn-success') + '" onclick="togglePublish(' + a.id + ',' + a.published + ')">' + (a.published ? '下架' : '發布') + '</button>' +
-    '<button class="btn btn-sm btn-danger" onclick="deleteArticle(' + a.id + ',\'' + a.title.replace(/'/g, '') + '\')">刪除</button>' +
+      '<button class="btn btn-sm btn-outline" onclick="editArt(' + a.id + ')">編輯</button>' +
+      '<button class="btn btn-sm ' + (a.published ? 'btn-outline' : 'btn-success') + '" onclick="togglePub(' + a.id + ',' + a.published + ')">' + (a.published ? '下架' : '發布') + '</button>' +
+      '<button class="btn btn-sm btn-danger" onclick="delArt(' + a.id + ',\'' + a.title.replace(/'/g,'').substring(0,20) + '\')">刪除</button>' +
     '</div></td></tr>'
-  ).join('');
+  ).join('') || '<tr><td colspan="6" class="empty-state">暫無文章</td></tr>';
 }
 
 function renderCats() {
-  document.getElementById('catsList').innerHTML = allCats.map(c => {
-    const cnt = allArticles.filter(a => a.category_id === c.id).length;
-    return '<tr><td style="font-size:1.5rem">' + (c.icon || '') + '</td><td><strong>' + c.name + '</strong></td><td><code>' + c.slug + '</code></td><td>' + (c.description || '') + '</td><td>' + c.sort_order + '</td><td>' + cnt + '</td></tr>';
+  document.getElementById('catList').innerHTML = cats.map(c => {
+    const cnt = arts.filter(a => a.category_id === c.id).length;
+    return '<tr><td style="font-size:1.4rem">' + (c.icon||'') + '</td><td><strong>' + c.name + '</strong></td>' +
+      '<td><code>' + c.slug + '</code></td><td style="color:#a08085">' + (c.description||'') + '</td>' +
+      '<td style="text-align:center">' + c.sort_order + '</td><td style="text-align:center"><strong>' + cnt + '</strong></td></tr>';
   }).join('');
 }
 
-function populateCatSelects() {
-  const opts = allCats.map(c => '<option value="' + c.id + '">' + (c.icon || '') + ' ' + c.name + '</option>').join('');
-  document.getElementById('editCat').innerHTML = '<option value="">-- 選擇分類 --</option>' + opts;
+function fillCatOpts() {
+  const opts = cats.map(c => '<option value="' + c.id + '">' + (c.icon||'') + ' ' + c.name + '</option>').join('');
+  document.getElementById('edCat').innerHTML = '<option value="">-- 選擇分類 --</option>' + opts;
   document.getElementById('filterCat').innerHTML = '<option value="">全部分類</option>' +
-    allCats.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join('');
+    cats.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join('');
 }
 
-function filterArticles() {
-  const q = document.getElementById('searchInput').value.toLowerCase();
+function filterList() {
+  const q = document.getElementById('searchQ').value.toLowerCase();
   const cat = document.getElementById('filterCat').value;
-  let list = allArticles;
+  const pub = document.getElementById('filterPub').value;
+  let list = arts;
   if (q) list = list.filter(a => a.title.toLowerCase().includes(q) || a.slug.includes(q));
   if (cat) list = list.filter(a => String(a.category_id) === cat);
-  renderArticles(list);
+  if (pub !== '') list = list.filter(a => String(a.published) === pub);
+  renderArts(list);
 }
 
-function editArticle(id) {
-  const a = allArticles.find(x => x.id === id);
+function editArt(id) {
+  const a = arts.find(x => x.id === id);
   if (!a) return;
-  document.getElementById('editId').value = a.id;
-  document.getElementById('editTitle').value = a.title;
-  document.getElementById('editSlug').value = a.slug;
-  document.getElementById('editCat').value = a.category_id || '';
-  document.getElementById('editSynopsis').value = a.synopsis || '';
-  document.getElementById('editContent').value = a.content || '';
-  document.getElementById('editMetaTitle').value = a.meta_title || '';
-  document.getElementById('editMetaDesc').value = a.meta_description || '';
-  document.getElementById('editCover').value = a.cover_image || '';
-  document.getElementById('editPublished').checked = a.published;
-  document.getElementById('editorTitle').textContent = '✏️ 編輯文章';
+  document.getElementById('edId').value = a.id;
+  document.getElementById('edTitleInput').value = a.title || '';
+  document.getElementById('edSlug').value = a.slug || '';
+  document.getElementById('edCat').value = a.category_id || '';
+  document.getElementById('edSynopsis').value = a.synopsis || '';
+  document.getElementById('edContent').value = a.content || '';
+  document.getElementById('edCover').value = a.cover_image || '';
+  document.getElementById('edMetaT').value = a.meta_title || '';
+  document.getElementById('edMetaD').value = a.meta_description || '';
+  document.getElementById('edPub').checked = !!a.published;
+  document.getElementById('edTitle').textContent = '✏️ 編輯文章';
   showPanel('new', document.querySelector('.sidebar-menu li:nth-child(3) a'));
+  window.scrollTo(0,0);
 }
 
-function cancelEdit() {
-  document.getElementById('editId').value = '';
-  document.getElementById('editTitle').value = '';
-  document.getElementById('editSlug').value = '';
-  document.getElementById('editContent').value = '';
-  document.getElementById('editSynopsis').value = '';
-  document.getElementById('editorTitle').textContent = '✏️ 新增文章';
+function resetForm() {
+  document.getElementById('edId').value = '';
+  ['edTitleInput','edSlug','edSynopsis','edContent','edCover','edMetaT','edMetaD'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('edCat').value = '';
+  document.getElementById('edPub').checked = true;
+  document.getElementById('edTitle').textContent = '✏️ 新增文章';
   showPanel('articles', document.querySelector('.sidebar-menu li:nth-child(2) a'));
 }
 
-async function saveArticle() {
-  const id = document.getElementById('editId').value;
-  const title = document.getElementById('editTitle').value.trim();
-  const slug = document.getElementById('editSlug').value.trim();
-  if (!title || !slug) { toast('請填寫標題和 Slug', true); return; }
+async function saveArt() {
+  const id = document.getElementById('edId').value;
+  const title = document.getElementById('edTitleInput').value.trim();
+  const slug = document.getElementById('edSlug').value.trim().replace(/[^a-zA-Z0-9一-鿿-_]/g, '');
+  if (!title) { toast('請填寫文章標題', 1); return; }
+  if (!slug) { toast('請填寫 Slug（網址）', 1); return; }
   const data = {
     title, slug,
-    synopsis: document.getElementById('editSynopsis').value.trim() || null,
-    content: document.getElementById('editContent').value.trim() || null,
-    category_id: document.getElementById('editCat').value || null,
-    meta_title: document.getElementById('editMetaTitle').value.trim() || null,
-    meta_description: document.getElementById('editMetaDesc').value.trim() || null,
-    cover_image: document.getElementById('editCover').value.trim() || null,
-    published: document.getElementById('editPublished').checked,
+    synopsis: document.getElementById('edSynopsis').value.trim() || null,
+    content: document.getElementById('edContent').value.trim() || null,
+    category_id: document.getElementById('edCat').value || null,
+    cover_image: document.getElementById('edCover').value.trim() || null,
+    meta_title: document.getElementById('edMetaT').value.trim() || null,
+    meta_description: document.getElementById('edMetaD').value.trim() || null,
+    published: document.getElementById('edPub').checked,
     updated_at: new Date().toISOString()
   };
   try {
     if (id) {
-      await sbFetch('ivy_articles?id=eq.' + id, { method: 'PATCH', body: JSON.stringify(data) });
+      await sb('ivy_articles?id=eq.' + id, { method: 'PATCH', body: JSON.stringify(data) });
       toast('✅ 文章已更新！');
     } else {
-      await sbFetch('ivy_articles', { method: 'POST', body: JSON.stringify(data) });
+      await sb('ivy_articles', { method: 'POST', body: JSON.stringify(data) });
       toast('✅ 文章已新增！');
     }
     await loadAll();
-    cancelEdit();
-  } catch(e) { toast('儲存失敗: ' + e.message, true); }
+    resetForm();
+  } catch(e) { toast('儲存失敗: ' + e.message, 1); }
 }
 
-async function togglePublish(id, current) {
+async function togglePub(id, cur) {
   try {
-    await sbFetch('ivy_articles?id=eq.' + id, { method: 'PATCH', body: JSON.stringify({ published: !current }) });
-    toast(current ? '文章已下架' : '✅ 文章已發布！');
+    await sb('ivy_articles?id=eq.' + id, { method: 'PATCH', body: JSON.stringify({ published: !cur }) });
+    toast(cur ? '文章已下架' : '✅ 文章已發布！');
     await loadAll();
-  } catch(e) { toast('操作失敗: ' + e.message, true); }
+  } catch(e) { toast('操作失敗: ' + e.message, 1); }
 }
 
-async function deleteArticle(id, title) {
-  if (!confirm('確定要刪除「' + title + '」嗎？此操作無法還原。')) return;
+async function delArt(id, title) {
+  if (!confirm('確定刪除「' + title + '⋯」？此動作無法還原。')) return;
   try {
-    await sbFetch('ivy_articles?id=eq.' + id, { method: 'DELETE' });
+    await sb('ivy_articles?id=eq.' + id, { method: 'DELETE' });
     toast('文章已刪除');
     await loadAll();
-  } catch(e) { toast('刪除失敗: ' + e.message, true); }
+  } catch(e) { toast('刪除失敗: ' + e.message, 1); }
 }
 
 function showPanel(name, el) {
@@ -398,12 +350,13 @@ function toast(msg, isErr) {
   t.textContent = msg;
   t.style.background = isErr ? '#e74c3c' : '#2d2020';
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-function goFront() { window.open('/', '_blank'); }
-
-document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+function badge(pub) { return pub ? '<span class="badge badge-green">已發布</span>' : '<span class="badge badge-gray">草稿</span>'; }
+function fmtDate(s) { return s ? new Date(s).toLocaleDateString('zh-TW') : '-'; }
+function esc(s) { return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
 </script>
 </body>
 </html>
