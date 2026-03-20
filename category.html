@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title id="metaTitle">分類文章 - IvyLife</title>
+<meta name="description" id="metaDesc" content="艾薇生活分類文章">
+<link rel="canonical" id="canonical" href="">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<nav class="nav"><div class="nav-inner"><a class="nav-logo" href="/">Ivy<span>Life</span></a>
+<ul class="nav-links" id="navLinks">
+<li><a href="/category.html?cat=tastyfood">美食餐廳</a></li>
+<li><a href="/category.html?cat=hotel">飯店民宿</a></li>
+<li><a href="/category.html?cat=beauty">醫學美容</a></li>
+<li><a href="/category.html?cat=renovation">宅修清潔</a></li>
+<li><a href="/category.html?cat=furniture">設計推薦</a></li>
+<li><a href="/about.html">關於艾薇</a></li>
+</ul>
+<div class="nav-hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')"><span></span><span></span><span></span></div>
+</div></nav>
+<div style="background:linear-gradient(135deg,var(--blush),var(--peach));padding:50px 5% 40px;text-align:center">
+<p class="hero-eyebrow" id="catIcon" style="font-size:2.5rem;margin-bottom:1rem"></p>
+<h1 id="catTitle">分類文章</h1>
+<p id="catDesc" style="color:var(--text-mid);max-width:480px;margin:0 auto"></p>
+</div>
+<nav class="breadcrumb"><a href="/">首頁</a><span>›</span><span id="breadCat" style="color:var(--text-mid)"></span></nav>
+<div class="section">
+<div id="articleGrid" class="articles-grid">
+<div class="loading-state" style="grid-column:1/-1"><div class="loading-spinner"></div><p>載入中⋯</p></div>
+</div>
+<div class="pagination" id="pagination"></div>
+</div>
+<footer class="footer"><div class="footer-inner">
+<div class="footer-brand"><a class="nav-logo" href="/">Ivy<span>Life</span></a><p>艾薇的生活分享平台</p></div>
+<div><h5>分類</h5><ul><li><a href="/category.html?cat=tastyfood">美食餐廳</a></li><li><a href="/category.html?cat=hotel">飯店民宿</a></li><li><a href="/category.html?cat=beauty">醫學美容</a></li></ul></div>
+<div><h5>關於</h5><ul><li><a href="/about.html">關於艾薇</a></li><li><a href="/sitemap.xml">網站地圖</a></li></ul></div>
+</div><div class="footer-bottom"><p>© 2024 IvyLife 艾薇生活</p></div></footer>
+<script src="/js/supabase.js"></script>
+<script>
+const PAGE_SIZE=12;let pg=0;
+async function loadPage(p=0){
+  const params=new URLSearchParams(window.location.search);
+  const catSlug=params.get('cat')||'';
+  try{
+    const cats=await getCategories();
+    const c=cats.find(x=>x.slug===catSlug);
+    if(c){
+      document.title=c.name+' - IvyLife';
+      document.getElementById('metaTitle').textContent=c.name+' - IvyLife';
+      document.getElementById('metaDesc').content=c.description||'';
+      document.getElementById('canonical').href='https://ivylife.com.tw/category.html?cat='+catSlug;
+      document.getElementById('catIcon').textContent=c.icon||'';
+      document.getElementById('catTitle').textContent=c.name;
+      document.getElementById('catDesc').textContent=c.description||'';
+      document.getElementById('breadCat').textContent=c.name;
+    }
+    const as=await getArticles({categorySlug:catSlug,limit:PAGE_SIZE,offset:p*PAGE_SIZE});
+    const g=document.getElementById('articleGrid');
+    if(!as.length&&p===0){g.innerHTML='<p style="grid-column:1/-1;text-align:center;color:var(--text-light);padding:3rem">此分類尚無文章</p>';return;}
+    g.innerHTML=as.map(a=>'<a class="article-card fade-in" href="/'+a.slug+'.html" style="text-decoration:none;color:inherit"><div class="card-img">'+categoryIcon(a.ivy_categories?.name||'')+'</div><div class="card-body"><span class="card-category">'+(a.ivy_categories?.name||'')+'</span><h3 class="card-title">'+a.title+'</h3><p class="card-synopsis">'+(a.synopsis||'')+'</p><span class="card-meta">'+formatDate(a.created_at)+'</span></div></a>').join('');
+    let pag='';
+    if(p>0)pag+='<a href="#" onclick="changePage('+(p-1)+')">‹</a>';
+    pag+='<span class="active">'+(p+1)+'</span>';
+    if(as.length===PAGE_SIZE)pag+='<a href="#" onclick="changePage('+(p+1)+')">›</a>';
+    document.getElementById('pagination').innerHTML=pag;
+  }catch(e){document.getElementById('articleGrid').innerHTML='<p style="grid-column:1/-1">'+e.message+'</p>';}
+}
+function changePage(p){pg=p;window.scrollTo(0,0);loadPage(p);return false;}
+loadPage();
+</script>
+</body></html>
