@@ -1,1169 +1,409 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<!-- admin v3 built:2026-03-20T05:48:47.998Z -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>後台管理 — 漫途</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<title>IvyLife 後台管理</title>
 <style>
-:root{
-  --bg:#0f0e0d;--surface:#1a1815;--surface2:#222018;--border:#2e2c28;--border2:#3a3830;
-  --text:#e8e0d0;--text2:#a89880;--text3:#6b6055;
-  --accent:#c4956a;--accent2:#e8b98a;--green:#6a9e7a;--red:#c47a6a;
-  --font-serif:'Cormorant Garamond',serif;--font-sans:'Noto Sans TC',sans-serif;
-}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:14px;min-height:100vh}
+body{font-family:'Noto Sans TC',sans-serif;background:#f8f4f5;color:#2d2020;min-height:100vh}
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&display=swap');
 
 /* LOGIN */
-#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg)}
-.login-box{background:var(--surface);border:1px solid var(--border);padding:2.5rem;width:360px}
-.login-logo{font-family:var(--font-serif);font-size:1.8rem;color:var(--accent);text-align:center;margin-bottom:0.3rem}
-.login-sub{font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text3);text-align:center;margin-bottom:2rem}
-.login-box input{width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:0.8rem 1rem;font-size:0.85rem;font-family:var(--font-sans);outline:none;margin-bottom:0.8rem}
-.login-box input:focus{border-color:var(--accent)}
-.login-btn{width:100%;background:var(--accent);color:#1a1410;border:none;padding:0.8rem;font-size:0.82rem;letter-spacing:0.1em;font-family:var(--font-sans);cursor:pointer;font-weight:500}
-.login-err{font-size:0.72rem;color:var(--red);text-align:center;min-height:1.2em;margin-bottom:0.5rem}
+#loginPage{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#fff0f2,#fde8d8)}
+.login-box{background:white;border-radius:16px;padding:2.5rem;width:360px;box-shadow:0 8px 32px rgba(212,105,122,0.15);text-align:center}
+.login-logo{font-size:1.8rem;font-weight:600;color:#d4697a;margin-bottom:0.3rem}
+.login-logo span{color:#c9996a;font-style:italic}
+.login-sub{color:#a08085;font-size:0.85rem;margin-bottom:2rem}
+.login-box input{width:100%;padding:10px 14px;border:1px solid rgba(212,105,122,0.2);border-radius:8px;font-size:0.95rem;margin-bottom:1rem;outline:none;font-family:inherit}
+.login-box input:focus{border-color:#d4697a}
+.btn-primary{width:100%;padding:11px;background:#d4697a;color:white;border:none;border-radius:50px;font-size:0.95rem;cursor:pointer;transition:all 0.2s}
+.btn-primary:hover{background:#f2a5b0}
+.login-err{color:#d4697a;font-size:0.82rem;margin-top:0.5rem;display:none}
 
 /* LAYOUT */
-#app{display:none}
-header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.header-logo{font-family:var(--font-serif);font-size:1.3rem;color:var(--accent)}
-.header-right{display:flex;align-items:center;gap:1rem}
-.btn-logout{background:none;border:1px solid var(--border2);color:var(--text2);padding:0.35rem 0.8rem;font-size:0.72rem;letter-spacing:0.08em;cursor:pointer;font-family:var(--font-sans)}
-.btn-logout:hover{border-color:var(--accent);color:var(--accent)}
+#adminPage{display:none;min-height:100vh}
+.sidebar{position:fixed;left:0;top:0;width:220px;height:100vh;background:#2d2020;color:white;padding:1.5rem 0;z-index:10}
+.sidebar-logo{padding:0 1.5rem 1.5rem;border-bottom:1px solid rgba(255,255,255,0.1);font-size:1.2rem;font-weight:600;color:#f2a5b0}
+.sidebar-logo span{color:#c9996a;font-style:italic}
+.sidebar-menu{list-style:none;padding:1rem 0}
+.sidebar-menu li a{display:flex;align-items:center;gap:0.7rem;padding:0.7rem 1.5rem;color:rgba(255,255,255,0.7);text-decoration:none;font-size:0.88rem;transition:all 0.2s}
+.sidebar-menu li a:hover,.sidebar-menu li a.active{background:rgba(242,165,176,0.15);color:white}
+.sidebar-menu li a .icon{font-size:1rem;width:20px;text-align:center}
+.sidebar-footer{position:absolute;bottom:1rem;left:0;right:0;padding:0 1.5rem}
+.sidebar-footer button{width:100%;padding:8px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);border:none;border-radius:8px;cursor:pointer;font-size:0.82rem}
 
-.main-layout{display:flex;min-height:calc(100vh - 56px)}
-nav{width:200px;background:var(--surface);border-right:1px solid var(--border);padding:1.5rem 0;flex-shrink:0}
-.nav-item{display:flex;align-items:center;gap:0.7rem;padding:0.65rem 1.5rem;font-size:0.8rem;color:var(--text2);cursor:pointer;transition:all 0.15s;letter-spacing:0.05em}
-.nav-item:hover,.nav-item.active{color:var(--text);background:var(--surface2)}
-.nav-item.active{border-left:2px solid var(--accent);padding-left:calc(1.5rem - 2px)}
-.nav-icon{font-size:1rem;width:18px;text-align:center}
-
-main{flex:1;padding:2rem;overflow-y:auto}
-.page{display:none}
-.page.active{display:block}
-
-/* PAGE HEADER */
-.page-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.8rem}
-.page-title{font-family:var(--font-serif);font-size:1.6rem;color:var(--text)}
-.btn-primary{background:var(--accent);color:#1a1410;border:none;padding:0.55rem 1.2rem;font-size:0.78rem;letter-spacing:0.08em;cursor:pointer;font-family:var(--font-sans);font-weight:500}
-.btn-primary:hover{background:var(--accent2)}
-.btn-secondary{background:none;border:1px solid var(--border2);color:var(--text2);padding:0.5rem 1rem;font-size:0.75rem;cursor:pointer;font-family:var(--font-sans)}
-.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+.main{margin-left:220px;padding:2rem}
+.page-header{margin-bottom:2rem;display:flex;align-items:center;justify-content:space-between}
+.page-header h1{font-size:1.4rem;font-weight:500}
+.btn{padding:8px 20px;border-radius:50px;font-size:0.85rem;cursor:pointer;border:none;transition:all 0.2s;font-family:inherit}
+.btn-rose{background:#d4697a;color:white}.btn-rose:hover{background:#f2a5b0}
+.btn-outline{background:transparent;color:#d4697a;border:1px solid #d4697a}.btn-outline:hover{background:#fff0f2}
+.btn-sm{padding:5px 12px;font-size:0.78rem}
+.btn-danger{background:#e74c3c;color:white}.btn-danger:hover{background:#c0392b}
+.btn-success{background:#27ae60;color:white}
 
 /* STATS */
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
-.stat-card{background:var(--surface);border:1px solid var(--border);padding:1.2rem}
-.stat-lbl{font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text3);margin-bottom:0.5rem}
-.stat-val{font-family:var(--font-serif);font-size:2rem;color:var(--text);line-height:1}
-.stat-sub{font-size:0.7rem;color:var(--text3);margin-top:0.3rem}
+.stat-card{background:white;border-radius:12px;padding:1.2rem 1.5rem;border:1px solid rgba(212,105,122,0.1)}
+.stat-num{font-size:2rem;font-weight:500;color:#d4697a}
+.stat-label{font-size:0.8rem;color:#a08085;margin-top:0.2rem}
 
 /* TABLE */
-.tbl-wrap{background:var(--surface);border:1px solid var(--border);overflow:hidden}
-.tbl-toolbar{padding:0.8rem 1rem;border-bottom:1px solid var(--border);display:flex;gap:0.5rem;align-items:center}
-.tbl-search{background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:0.45rem 0.8rem;font-size:0.78rem;font-family:var(--font-sans);outline:none;width:220px}
-.tbl-search:focus{border-color:var(--accent)}
-.filter-btn{background:none;border:1px solid var(--border2);color:var(--text3);padding:0.4rem 0.8rem;font-size:0.72rem;cursor:pointer;font-family:var(--font-sans)}
-.filter-btn.active{border-color:var(--accent);color:var(--accent)}
-table{width:100%;border-collapse:collapse}
-th{background:var(--surface2);padding:0.65rem 1rem;text-align:left;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);font-weight:400;border-bottom:1px solid var(--border)}
-td{padding:0.75rem 1rem;font-size:0.8rem;border-bottom:1px solid var(--border);vertical-align:middle}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:var(--surface2)}
-.badge{display:inline-block;padding:0.15rem 0.55rem;font-size:0.66rem;letter-spacing:0.08em}
-.badge-pub{background:#1a2e1f;color:#6a9e7a;border:1px solid #2a4a2f}
-.badge-draft{background:#2a2218;color:#8a7a5a;border:1px solid #3a3228}
-.tbl-actions{display:flex;gap:0.4rem}
-.act-btn{background:none;border:none;color:var(--text3);cursor:pointer;padding:0.3rem;font-size:0.8rem;transition:color 0.15s}
-.act-btn:hover{color:var(--accent)}
-.act-btn.del:hover{color:var(--red)}
-.empty-state{text-align:center;padding:3rem;color:var(--text3);font-size:0.85rem}
+.card{background:white;border-radius:12px;border:1px solid rgba(212,105,122,0.1);overflow:hidden;margin-bottom:1.5rem}
+.card-header{padding:1rem 1.5rem;border-bottom:1px solid rgba(212,105,122,0.1);display:flex;align-items:center;justify-content:space-between;font-size:0.9rem;font-weight:500}
+.card-body{padding:0}
+table{width:100%;border-collapse:collapse;font-size:0.85rem}
+th{padding:0.7rem 1.2rem;text-align:left;background:#fdf8f4;color:#a08085;font-weight:400;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em}
+td{padding:0.8rem 1.2rem;border-top:1px solid rgba(212,105,122,0.08);vertical-align:middle}
+tr:hover td{background:#fdf8f4}
+.badge{display:inline-block;padding:2px 10px;border-radius:50px;font-size:0.72rem;font-weight:400}
+.badge-green{background:#e8f5e9;color:#2e7d32}
+.badge-gray{background:#f5f5f5;color:#757575}
+.actions{display:flex;gap:0.5rem;flex-wrap:wrap}
 
-/* MODAL */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;overflow-y:auto;padding:2rem 1rem}
-.modal-bg.open{display:flex;align-items:flex-start;justify-content:center}
-.modal{background:var(--surface);border:1px solid var(--border);width:100%;max-width:780px;margin:auto}
-.modal-hd{padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.modal-title{font-family:var(--font-serif);font-size:1.2rem;color:var(--accent)}
-.modal-close{background:none;border:none;color:var(--text3);font-size:1.2rem;cursor:pointer;line-height:1}
-.modal-close:hover{color:var(--text)}
-.modal-body{padding:1.5rem}
-.modal-ft{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:0.6rem}
+/* EDITOR */
+.editor-form{padding:1.5rem;display:flex;flex-direction:column;gap:1rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.form-group{display:flex;flex-direction:column;gap:0.4rem}
+.form-group label{font-size:0.8rem;color:#a08085}
+.form-group input,.form-group select,.form-group textarea{padding:9px 12px;border:1px solid rgba(212,105,122,0.2);border-radius:8px;font-size:0.9rem;font-family:inherit;outline:none;transition:border-color 0.2s;background:white}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#d4697a}
+.form-group textarea{min-height:200px;resize:vertical;line-height:1.6}
+.form-actions{display:flex;gap:0.8rem;padding-top:0.5rem}
+.toast{position:fixed;bottom:2rem;right:2rem;padding:12px 20px;background:#2d2020;color:white;border-radius:8px;font-size:0.85rem;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none}
+.toast.show{opacity:1}
 
-/* FORM */
-.fg{margin-bottom:1.1rem}
-.fl{display:block;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);margin-bottom:0.4rem}
-.req{color:var(--accent)}
-.fi{width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:0.65rem 0.9rem;font-size:0.83rem;font-family:var(--font-sans);outline:none}
-.fi:focus{border-color:var(--accent)}
-.fta{width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:0.65rem 0.9rem;font-size:0.83rem;font-family:var(--font-sans);outline:none;resize:vertical;min-height:80px}
-.fta:focus{border-color:var(--accent)}
-.fsel{width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:0.65rem 0.9rem;font-size:0.83rem;font-family:var(--font-sans);outline:none;appearance:none;cursor:pointer}
-.fsel:focus{border-color:var(--accent)}
-.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-.fg-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
-
-/* RICH EDITOR */
-.editor-toolbar{background:var(--surface2);border:1px solid var(--border2);border-bottom:none;padding:0.4rem 0.5rem;display:flex;gap:0.2rem;flex-wrap:wrap}
-.ed-btn{background:none;border:1px solid transparent;color:var(--text2);padding:0.25rem 0.5rem;font-size:0.78rem;cursor:pointer;font-family:var(--font-sans)}
-.ed-btn:hover{border-color:var(--border2);color:var(--text)}
-.ed-btn.active{background:var(--border2);color:var(--text)}
-#f-content-editor{width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:0.8rem;font-size:0.85rem;font-family:var(--font-sans);outline:none;min-height:200px;line-height:1.8}
-#f-content-editor:focus{border-color:var(--accent)}
-#f-content-editor h2{font-family:var(--font-serif);font-size:1.3rem;color:var(--accent);margin:1rem 0 0.5rem}
-#f-content-editor h3{font-family:var(--font-serif);font-size:1.1rem;color:var(--text2);margin:0.8rem 0 0.4rem}
-#f-content-editor p{margin-bottom:0.6rem}
-#f-content-editor a{color:var(--accent2)}
-#f-content-editor ul,#f-content-editor ol{padding-left:1.5rem;margin-bottom:0.6rem}
-#f-content-editor blockquote{border-left:3px solid var(--accent);padding-left:1rem;color:var(--text2);margin:0.5rem 0}
-
-/* IMAGE UPLOAD */
-#img-upload-area{border:2px dashed var(--border2);padding:1.5rem;text-align:center;cursor:pointer;transition:border-color 0.2s;background:var(--surface2)}
-#img-upload-area:hover{border-color:var(--accent)}
-#img-upload-area p{font-size:0.78rem;color:var(--text3);margin-top:0.4rem}
-.img-preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:0.5rem;margin-top:0.8rem}
-.img-preview-item{position:relative;aspect-ratio:1;overflow:hidden;background:var(--surface2)}
-.img-preview-item img{width:100%;height:100%;object-fit:cover}
-.img-preview-item .img-del{position:absolute;top:3px;right:3px;background:rgba(0,0,0,0.7);border:none;color:#fff;width:20px;height:20px;font-size:0.7rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.img-preview-item .img-insert{position:absolute;bottom:3px;left:3px;background:rgba(196,149,106,0.85);border:none;color:#fff;font-size:0.6rem;padding:2px 5px;cursor:pointer}
-
-/* KEYWORDS */
-.kw-tags{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.5rem}
-.kw-tag{background:var(--surface2);border:1px solid var(--border2);padding:0.2rem 0.6rem;font-size:0.72rem;display:flex;align-items:center;gap:0.3rem}
-.kw-tag button{background:none;border:none;color:var(--text3);cursor:pointer;font-size:0.8rem;padding:0;line-height:1}
-.kw-tag button:hover{color:var(--red)}
-
-/* EMOJI PICKER */
-.emoji-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:0.4rem}
-.emoji-btn{background:var(--surface2);border:2px solid transparent;font-size:1.4rem;padding:0.4rem;cursor:pointer;transition:all 0.15s;line-height:1;text-align:center}
-.emoji-btn:hover,.emoji-btn.selected{border-color:var(--accent);background:var(--border)}
-.emoji-preview{background:var(--surface2);border:1px solid var(--border2);padding:0.6rem;display:flex;align-items:center;gap:0.8rem;margin-top:0.6rem}
-.emoji-preview span{font-size:2rem}
-.emoji-preview input{flex:1;background:none;border:none;color:var(--text);font-size:0.85rem;font-family:var(--font-sans);outline:none}
-
-/* VIDEO PREVIEW */
-.video-preview{margin-top:0.6rem;background:var(--surface2);border:1px solid var(--border2);padding:0.8rem;font-size:0.78rem;color:var(--text2)}
-.video-embed-preview{margin-top:0.5rem;aspect-ratio:16/9;background:#000}
-.video-embed-preview iframe{width:100%;height:100%;border:none}
-
-/* TOAST */
-#toast{position:fixed;bottom:2rem;right:2rem;background:var(--surface);border:1px solid var(--border2);padding:0.8rem 1.2rem;font-size:0.8rem;z-index:9999;display:none;max-width:300px}
-#toast.ok{border-left:3px solid var(--green)}
-#toast.err{border-left:3px solid var(--red)}
-
-
-/* ── MOBILE RESPONSIVE ───────────────────────────────────────────────────── */
-.mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:200;padding:0.3rem 0 env(safe-area-inset-bottom,0.3rem)}
-.mobile-nav-inner{display:flex;justify-content:space-around;align-items:center}
-.mnav-btn{display:flex;flex-direction:column;align-items:center;gap:0.15rem;padding:0.35rem 0.8rem;background:none;border:none;color:var(--text3);cursor:pointer;font-family:var(--font-sans);font-size:0.56rem;letter-spacing:0.04em;transition:color 0.15s}
-.mnav-btn.active{color:var(--accent)}
-.mnav-icon{font-size:1.15rem;line-height:1;display:block}
-.mnav-add{background:var(--accent);color:#1a1410;border-radius:50%;width:42px;height:42px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:0.1rem}
-
-@media(max-width:768px){
-  header{padding:0 1rem}
-  .header-right span{display:none}
-  .main-layout nav{display:none}
-  .main-layout{flex-direction:column}
-  main{padding:1rem;padding-bottom:80px}
-  .mobile-nav{display:block}
-  .stats-grid{grid-template-columns:1fr 1fr;gap:0.7rem}
-  .stat-card{padding:0.9rem}
-  .stat-val{font-size:1.5rem}
-  .tbl-wrap{overflow-x:auto}
-  table{min-width:580px}
-  .modal-bg{padding:0;align-items:flex-end}
-  .modal{max-width:100%;max-height:92vh;overflow-y:auto}
-  .modal-body{padding:1rem}
-  .modal-hd{padding:1rem}
-  .modal-ft{padding:0.8rem 1rem;position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--border)}
-  .fg-row,.fg-row3{grid-template-columns:1fr}
-  #page-ai>div{grid-template-columns:1fr!important}
-  .page-hd{flex-wrap:wrap;gap:0.5rem}
-  .page-title{font-size:1.3rem}
-  .tbl-toolbar{flex-wrap:wrap;gap:0.4rem}
-  .tbl-search{width:100%}
-  .fi,.fsel,.fta{font-size:16px}
-  #f-content-editor{font-size:16px}
-  .btn-primary,.btn-secondary{padding:0.75rem 1rem}
-  #img-upload-area{padding:1.5rem 1rem}
-  .editor-toolbar{flex-wrap:wrap}
-}
-/* SCROLLBAR */
-::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--border2)}
+/* PANELS */
+.panel{display:none}.panel.active{display:block}
+.search-bar{display:flex;gap:0.5rem;margin-bottom:1rem}
+.search-bar input{flex:1;padding:8px 14px;border:1px solid rgba(212,105,122,0.2);border-radius:50px;font-size:0.85rem;outline:none;font-family:inherit}
+.search-bar input:focus{border-color:#d4697a}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="login-screen">
-  <div class="login-box">
-    <div class="login-logo">漫途</div>
-    <div class="login-sub">後台管理系統</div>
-    <div class="login-err" id="login-err"></div>
-    <input type="password" id="pw-input" placeholder="輸入密碼" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="login-btn" onclick="doLogin()">進入後台</button>
+<!-- LOGIN PAGE -->
+<div id="loginPage">
+<div class="login-box">
+  <div class="login-logo">Ivy<span>Life</span></div>
+  <div class="login-sub">後台管理系統</div>
+  <input type="password" id="pwInput" placeholder="請輸入管理密碼" onkeydown="if(event.key==='Enter')doLogin()">
+  <button class="btn-primary" onclick="doLogin()">登入</button>
+  <div class="login-err" id="loginErr">密碼錯誤，請再試</div>
+</div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div id="adminPage">
+<nav class="sidebar">
+  <div class="sidebar-logo">Ivy<span>Life</span> 後台</div>
+  <ul class="sidebar-menu">
+    <li><a href="#" class="active" onclick="showPanel('dashboard',this)"><span class="icon">📊</span>總覽</a></li>
+    <li><a href="#" onclick="showPanel('articles',this)"><span class="icon">📝</span>文章管理</a></li>
+    <li><a href="#" onclick="showPanel('new',this)"><span class="icon">✏️</span>新增文章</a></li>
+    <li><a href="#" onclick="showPanel('categories',this)"><span class="icon">🏷️</span>分類管理</a></li>
+  </ul>
+  <div class="sidebar-footer">
+    <button onclick="goFront()">← 前往前台</button>
+  </div>
+</nav>
+
+<main class="main">
+
+<!-- DASHBOARD -->
+<div id="panel-dashboard" class="panel active">
+  <div class="page-header"><h1>📊 網站總覽</h1></div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-num" id="statArticles">-</div><div class="stat-label">篇文章</div></div>
+    <div class="stat-card"><div class="stat-num" id="statPublished">-</div><div class="stat-label">已發布</div></div>
+    <div class="stat-card"><div class="stat-num" id="statDraft">-</div><div class="stat-label">草稿</div></div>
+    <div class="stat-card"><div class="stat-num" id="statCats">-</div><div class="stat-label">個分類</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header">最新文章</div>
+    <div class="card-body"><table><thead><tr><th>標題</th><th>分類</th><th>狀態</th><th>日期</th></tr></thead><tbody id="dashRecent"></tbody></table></div>
   </div>
 </div>
 
-<!-- APP -->
-<div id="app">
-  <header>
-    <div class="header-logo">漫途 · 後台</div>
-    <div class="header-right">
-      <span id="hd-stats" style="font-size:0.72rem;color:var(--text3)"></span>
-      <button onclick="openKeyModal()" style="background:none;border:1px solid var(--border2);color:var(--text2);padding:0.35rem 0.8rem;font-size:0.72rem;letter-spacing:0.08em;cursor:pointer;font-family:var(--ff-sans)" id="key-status-dot">⚙ API Key</button>
-      <a href="https://journeylift.com.tw/articles" target="_blank" style="font-size:0.72rem;color:var(--text2);border:1px solid var(--border2);padding:0.35rem 0.8rem;letter-spacing:0.08em;text-decoration:none">查看前台 ↗</a>
-      <button class="btn-logout" onclick="doLogout()">登出</button>
+<!-- ARTICLES LIST -->
+<div id="panel-articles" class="panel">
+  <div class="page-header">
+    <h1>📝 文章管理</h1>
+    <button class="btn btn-rose" onclick="showPanel('new',document.querySelector('.sidebar-menu li:nth-child(3) a'))">+ 新增文章</button>
+  </div>
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="搜尋文章標題⋯" oninput="filterArticles()">
+    <select id="filterCat" onchange="filterArticles()" style="padding:8px 12px;border:1px solid rgba(212,105,122,0.2);border-radius:50px;font-size:0.85rem;outline:none;font-family:inherit">
+      <option value="">全部分類</option>
+    </select>
+  </div>
+  <div class="card">
+    <div class="card-body"><table><thead><tr><th>標題</th><th>分類</th><th>Slug</th><th>狀態</th><th>日期</th><th>操作</th></tr></thead><tbody id="articlesList"></tbody></table></div>
+  </div>
+</div>
+
+<!-- NEW/EDIT ARTICLE -->
+<div id="panel-new" class="panel">
+  <div class="page-header">
+    <h1 id="editorTitle">✏️ 新增文章</h1>
+    <button class="btn btn-outline" onclick="cancelEdit()">取消</button>
+  </div>
+  <div class="card">
+    <div class="editor-form">
+      <input type="hidden" id="editId">
+      <div class="form-group">
+        <label>文章標題 *</label>
+        <input type="text" id="editTitle" placeholder="請輸入文章標題">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Slug（網址）*</label>
+          <input type="text" id="editSlug" placeholder="tastyfood01">
+        </div>
+        <div class="form-group">
+          <label>分類</label>
+          <select id="editCat"></select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>摘要</label>
+        <textarea id="editSynopsis" rows="3" placeholder="文章摘要，顯示在列表頁"></textarea>
+      </div>
+      <div class="form-group">
+        <label>內文（HTML）</label>
+        <textarea id="editContent" rows="12" placeholder="&lt;p&gt;文章內容...&lt;/p&gt;"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>SEO 標題（選填）</label>
+          <input type="text" id="editMetaTitle" placeholder="留空則自動使用文章標題">
+        </div>
+        <div class="form-group">
+          <label>封面圖片網址（選填）</label>
+          <input type="text" id="editCover" placeholder="https://...">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>SEO 描述（選填）</label>
+        <input type="text" id="editMetaDesc" placeholder="留空則自動使用摘要">
+      </div>
+      <div class="form-row" style="align-items:center">
+        <div class="form-group" style="flex-direction:row;align-items:center;gap:0.5rem">
+          <input type="checkbox" id="editPublished" checked style="width:auto;padding:0">
+          <label style="color:#2d2020;font-size:0.9rem">立即發布</label>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-rose" onclick="saveArticle()">💾 儲存文章</button>
+        <button class="btn btn-outline" onclick="cancelEdit()">取消</button>
+      </div>
     </div>
-  </header>
-  <div class="main-layout">
-    <nav>
-      <div class="nav-item active" onclick="showPage('articles')" id="nav-articles">
-        <span class="nav-icon">📝</span>文章管理
-      </div>
-      <div class="nav-item" onclick="showPage('ai')" id="nav-ai">
-        <span class="nav-icon">✨</span>AI 開箱文
-      </div>
-      <div class="nav-item" onclick="showPage('settings')" id="nav-settings">
-        <span class="nav-icon">⚙️</span>分類設定
-      </div>
-    </nav>
-    <main>
-
-      <!-- ARTICLES PAGE -->
-      <div class="page active" id="page-articles">
-        <div class="page-hd">
-          <div class="page-title">文章管理</div>
-          <button class="btn-primary" onclick="openAddArt()">＋ 新增文章</button>
-        </div>
-        <div class="stats-grid">
-          <div class="stat-card"><div class="stat-lbl">總文章數</div><div class="stat-val" id="st-total">0</div><div class="stat-sub">篇文章</div></div>
-          <div class="stat-card"><div class="stat-lbl">已發布</div><div class="stat-val" id="st-pub">0</div><div class="stat-sub">篇文章</div></div>
-          <div class="stat-card"><div class="stat-lbl">草稿</div><div class="stat-val" id="st-draft">0</div><div class="stat-sub">篇文章</div></div>
-          <div class="stat-card"><div class="stat-lbl">城市數</div><div class="stat-val" id="st-cities">0</div><div class="stat-sub">個城市</div></div>
-        </div>
-        <div class="tbl-wrap">
-          <div class="tbl-toolbar">
-            <input class="tbl-search" id="art-search" placeholder="搜尋文章..." oninput="filterArts()">
-            <button class="filter-btn active" onclick="setFilter('all',this)">全部</button>
-            <button class="filter-btn" onclick="setFilter('published',this)">已發布</button>
-            <button class="filter-btn" onclick="setFilter('draft',this)">草稿</button>
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th>封面</th><th>標題</th><th>城市</th><th>分類</th><th>狀態</th><th>發布時間</th><th>操作</th>
-              </tr>
-            </thead>
-            <tbody id="art-tbody"></tbody>
-          </table>
-          <div class="empty-state" id="art-empty" style="display:none">尚無文章，點擊「新增文章」開始創作</div>
-        </div>
-      </div>
-
-
-      <!-- AI PAGE -->
-      <div class="page" id="page-ai">
-        <div class="page-hd"><div class="page-title">✨ AI 開箱文</div></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start">
-          <div>
-            <div style="background:var(--surface);border:1px solid var(--border);padding:1.5rem;margin-bottom:1rem">
-              <div style="font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem">店家資料</div>
-              <div class="fg"><label class="fl">店家名稱 <span class="req">*</span></label><input class="fi" id="ai-name" placeholder="例：珈琲時光"></div>
-              <div class="fg-row">
-                <div class="fg"><label class="fl">城市</label><input class="fi" id="ai-city" placeholder="例：台南"></div>
-                <div class="fg"><label class="fl">類型</label><select class="fsel" id="ai-type"><option value="咖啡廳">☕ 咖啡廳</option><option value="餐廳">🍽️ 餐廳</option><option value="甜點">🍰 甜點</option><option value="景點">🏔️ 景點</option><option value="住宿">🏠 住宿</option><option value="酒吧">🍸 酒吧</option></select></div>
-              </div>
-              <div class="fg"><label class="fl">招牌品項 / 特色亮點</label><input class="fi" id="ai-feature" placeholder="例：手沖咖啡、老屋改造"></div>
-              <div class="fg"><label class="fl">個人體驗心得</label><textarea class="fta" id="ai-note" placeholder="你的感受..." style="min-height:80px"></textarea></div>
-              <div class="fg-row">
-                <div class="fg"><label class="fl">評分</label><select class="fsel" id="ai-rating"><option value="5">⭐⭐⭐⭐⭐ 極力推薦</option><option value="4">⭐⭐⭐⭐ 推薦</option><option value="3">⭐⭐⭐ 還不錯</option></select></div>
-                <div class="fg"><label class="fl">價位</label><select class="fsel" id="ai-price"><option value="$">$ 平價</option><option value="$">$ 中價</option><option value="$$">$$ 高價</option></select></div>
-              </div>
-              <div class="fg">
-                <label class="fl">上傳圖片（AI 分析用）</label>
-                <div class="fg">
-                <label class="fl">封面圖（單張，顯示於文章列表）</label>
-                <div id="ai-cover-area" style="border:2px dashed var(--border2);padding:0.8rem;text-align:center;cursor:pointer;background:var(--surface2);font-size:0.78rem;color:var(--text3)" onclick="document.getElementById('ai-cover-file').click()">
-                  🖼️ 點擊上傳封面圖
-                </div>
-                <img id="ai-cover-preview" style="display:none;width:100%;max-height:120px;object-fit:cover;margin-top:0.5rem;border-radius:4px">
-                <input type="file" id="ai-cover-file" accept="image/*" style="display:none" onchange="handleAiCover(event)">
-              </div>
-              <div id="ai-img-area" style="border:2px dashed var(--border2);padding:1rem;text-align:center;cursor:pointer;background:var(--surface2);font-size:0.78rem;color:var(--text3)" onclick="document.getElementById('ai-img-file').click()">📷 點擊上傳圖片（可多張）</div>
-                <input type="file" id="ai-img-file" accept="image/*" multiple style="display:none" onchange="handleAiImgs(event)">
-                <div id="ai-img-previews" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem"></div>
-              </div>
-              
-              <div style="border-top:1px solid var(--border2);margin:1rem 0;padding-top:1rem">
-                <div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent2);margin-bottom:0.8rem">店家資訊（選填，發布後顯示在文末）</div>
-                <div class="fg-row">
-                  <div class="fg"><label class="fl">地址</label><input class="fi" id="ai-shop-address" placeholder="例：南投縣仁愛鄉..."></div>
-                  <div class="fg"><label class="fl">電話</label><input class="fi" id="ai-shop-phone" placeholder="049-123456"></div>
-                </div>
-                <div class="fg-row">
-                  <div class="fg"><label class="fl">營業時間</label><input class="fi" id="ai-shop-hours" placeholder="例：11:00-21:00（週二公休）"></div>
-                  <div class="fg"><label class="fl">消費備註</label><input class="fi" id="ai-shop-price-note" placeholder="例：平均消費 $200-400"></div>
-                </div>
-                <div class="fg-row">
-                  <div class="fg"><label class="fl">停車資訊</label><input class="fi" id="ai-shop-parking" placeholder="例：門口有停車場"></div>
-                  <div class="fg"><label class="fl">官網</label><input class="fi" id="ai-shop-website" placeholder="https://..."></div>
-                </div>
-                <div class="fg-row">
-                  <div class="fg"><label class="fl">Google Maps 連結</label><input class="fi" id="ai-shop-maps" placeholder="https://maps.google.com/..."></div>
-                  <div class="fg"><label class="fl">Facebook</label><input class="fi" id="ai-shop-fb" placeholder="https://fb.com/..."></div>
-                </div>
-                <div class="fg-row">
-                  <div class="fg"><label class="fl">Instagram</label><input class="fi" id="ai-shop-ig" placeholder="https://instagram.com/..."></div>
-                  <div class="fg"><label class="fl">LINE</label><input class="fi" id="ai-shop-line" placeholder="https://line.me/..."></div>
-                </div>
-              </div>
-<div id="ai-key-warn" style="display:none;font-size:0.72rem;color:var(--red);margin-bottom:0.8rem">⚠️ 請先設定 Anthropic API Key</div>
-              <button class="btn-primary" id="ai-gen-btn" onclick="genAiArticle()" style="width:100%">✨ AI 生成開箱文</button>
-            </div>
-          </div>
-          <div>
-            <div style="background:var(--surface);border:1px solid var(--border);padding:1.5rem;margin-bottom:1rem">
-              <div style="font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;display:flex;justify-content:space-between">
-                <span>生成結果</span><span id="ai-status" style="color:var(--text3);font-size:0.68rem;letter-spacing:0">等待生成...</span>
-              </div>
-              <div id="ai-title-preview" style="font-family:var(--font-serif);font-size:1.2rem;color:var(--accent2);margin-bottom:0.8rem;min-height:1.5em"></div>
-              <div id="ai-body-preview" contenteditable="true" style="min-height:200px;font-size:0.82rem;line-height:1.9;color:var(--text2);white-space:pre-wrap;outline:none;border:1px dashed var(--border2);padding:0.5rem"></div>
-            </div>
-            <div style="background:var(--surface);border:1px solid var(--border);padding:1.5rem" id="ai-publish-panel">
-              <div style="font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem">發布設定</div>
-              <div class="fg-row">
-                <div class="fg"><label class="fl">城市</label><select class="fsel" id="ai-pub-city"></select></div>
-                <div class="fg"><label class="fl">分類</label><select class="fsel" id="ai-pub-cat"></select></div>
-              </div>
-              <div class="fg"><label class="fl">摘要</label><textarea class="fta" id="ai-pub-excerpt" style="min-height:56px" placeholder="簡短描述..."></textarea></div>
-              <div class="fg-row">
-                <div class="fg"><label class="fl">狀態</label><select class="fsel" id="ai-pub-status"><option value="published">✅ 立即發布</option><option value="draft">📝 存為草稿</option></select></div>
-                <div class="fg"><label class="fl">發布時間</label><input class="fi" type="datetime-local" id="ai-pub-time"></div>
-              </div>
-              <button class="btn-primary" id="ai-pub-btn" onclick="publishAiArticle()" style="width:100%;margin-top:0.5rem">🚀 發布到前台</button>
-              <div id="ai-pub-msg" style="font-size:0.78rem;margin-top:0.8rem;min-height:1em"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SETTINGS PAGE -->
-      <div class="page" id="page-settings">
-  <div class="page-hd">
-    <div class="page-title">分類設定</div>
-    <button class="btn-primary" onclick="openAddCat()">＋ 新增分類</button>
   </div>
-  <div id="cat-list" style="display:flex;flex-direction:column;gap:1rem;margin-top:1.5rem"></div>
 </div>
+
+<!-- CATEGORIES -->
+<div id="panel-categories" class="panel">
+  <div class="page-header"><h1>🏷️ 分類管理</h1></div>
+  <div class="card">
+    <div class="card-body">
+      <table><thead><tr><th>圖示</th><th>名稱</th><th>Slug</th><th>說明</th><th>排序</th><th>文章數</th></tr></thead>
+      <tbody id="catsList"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 </main>
-  </div>
 </div>
 
-<!-- ARTICLE MODAL -->
-<div class="modal-bg" id="art-modal">
-  <div class="modal">
-    <div class="modal-hd">
-      <div class="modal-title" id="art-modal-title">新增文章</div>
-      <button class="modal-close" onclick="closeArtModal()">✕</button>
-    </div>
-    <div class="modal-body">
-
-      <div class="fg">
-        <label class="fl">文章標題 <span class="req">*</span></label>
-        <input class="fi" id="f-title" placeholder="輸入文章標題...">
-      </div>
-
-      <div class="fg-row">
-        <div class="fg">
-          <label class="fl">城市 <span class="req">*</span></label>
-          <select class="fsel" id="f-city"></select>
-        </div>
-        <div class="fg">
-          <label class="fl">分類 <span class="req">*</span></label>
-          <select class="fsel" id="f-cat"></select>
-        </div>
-      </div>
-
-      <div class="fg">
-        <label class="fl">摘要（SEO description）</label>
-        <textarea class="fta" id="f-excerpt" placeholder="簡短描述這篇文章..." style="min-height:60px"></textarea>
-      </div>
-
-      <div class="fg">
-        <label class="fl">SEO 關鍵字</label>
-        <div class="kw-tags" id="art-kw-tags"></div>
-        <input class="fi" id="f-kw-input" placeholder="輸入關鍵字後按 Enter..." onkeydown="addArtKw(event)">
-      </div>
-
-      <div class="fg">
-        <label class="fl">文章內容</label>
-        <div class="editor-toolbar">
-          <button class="ed-btn" onclick="execCmd('bold')" title="粗體"><b>B</b></button>
-          <button class="ed-btn" onclick="execCmd('italic')" title="斜體"><i>I</i></button>
-          <button class="ed-btn" onclick="execCmd('underline')" title="底線"><u>U</u></button>
-          <span style="color:var(--border2);padding:0 0.2rem">|</span>
-          <button class="ed-btn" onclick="execFmt('h2')" title="H2">H2</button>
-          <button class="ed-btn" onclick="execFmt('h3')" title="H3">H3</button>
-          <button class="ed-btn" onclick="execCmd('formatBlock','p')" title="段落">¶</button>
-          <span style="color:var(--border2);padding:0 0.2rem">|</span>
-          <button class="ed-btn" onclick="execCmd('insertUnorderedList')" title="清單">• 清單</button>
-          <button class="ed-btn" onclick="execCmd('insertOrderedList')" title="編號">1. 清單</button>
-          <button class="ed-btn" onclick="execFmt('blockquote')" title="引用">❝</button>
-          <span style="color:var(--border2);padding:0 0.2rem">|</span>
-          <button class="ed-btn" onclick="insertLink()" title="連結">🔗</button>
-          <button class="ed-btn" onclick="triggerImgInsert()" title="插入圖片">🖼</button>
-        </div>
-        <div id="f-content-editor" contenteditable="true" onpaste="handlePaste(event)"></div>
-      </div>
-
-      <div class="fg">
-        <label class="fl">圖片上傳</label>
-        <div id="img-upload-area" onclick="document.getElementById('img-file-input').click()">
-          <div style="font-size:1.5rem">📷</div>
-          <p>點擊或拖曳上傳圖片（可多張）</p>
-          <p style="font-size:0.68rem;margin-top:0.2rem">上傳後可插入文章或設為封面</p>
-        </div>
-        <input type="file" id="img-file-input" accept="image/*" multiple style="display:none" onchange="handleImgUpload(event)">
-        <div class="img-preview-grid" id="img-preview-grid"></div>
-      </div>
-
-      <div class="fg">
-        <label class="fl">嵌入影片（YouTube / Vimeo URL）</label>
-        <input class="fi" id="f-video" placeholder="https://www.youtube.com/watch?v=..." oninput="previewVideo(this.value)">
-        <div id="video-preview-box" style="display:none" class="video-preview">
-          <div style="font-size:0.75rem;color:var(--text2);margin-bottom:0.4rem">預覽：</div>
-          <div class="video-embed-preview" id="video-embed-preview"></div>
-        </div>
-      </div>
-
-      <div class="fg-row3">
-        <div class="fg">
-          <label class="fl">封面 Emoji</label>
-          <div class="emoji-grid" id="emoji-grid"></div>
-          <div class="emoji-preview">
-            <span id="emoji-sel-display">✍️</span>
-            <input id="f-emoji-custom" placeholder="自訂 emoji..." oninput="setEmoji(this.value)" maxlength="2">
-          </div>
-        </div>
-        <div class="fg">
-          <label class="fl">發布狀態</label>
-          <select class="fsel" id="f-status">
-            <option value="draft">📝 草稿</option>
-            <option value="published">✅ 已發布</option>
-          </select>
-        </div>
-        <div class="fg">
-          <label class="fl">發布時間</label>
-          <input class="fi" type="datetime-local" id="f-published-at">
-          <div style="font-size:0.68rem;color:var(--text3);margin-top:0.3rem">可設定過去或未來的時間</div>
-        </div>
-      </div>
-
-    </div>
-    <div class="modal-ft">
-      <button class="btn-secondary" onclick="closeArtModal()">取消</button>
-      <button class="btn-primary" id="save-btn" onclick="saveArt()">儲存文章</button>
-    </div>
-  </div>
-</div>
-
-<div id="toast"></div>
+<div class="toast" id="toast"></div>
 
 <script>
-// ── SUPABASE ───────────────────────────────────────────────────────────────
-const SUPA_URL = 'https://zsebcpfblecwumbaxeaz.supabase.co';
-const SUPA_KEY = 'sb_publishable_L2DOfeM0cAJqwlVCr1LwtA_jE9MBNDn';
-const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+const SB_URL = 'https://zsebcpfblecwumbaxeaz.supabase.co';
+const SB_KEY = 'sb_publishable_L2DOfeM0cAJqwlVCr1LwtA_jE9MBNDn';
+const ADMIN_PASS = 'ivy2024admin';
 
-// ── CONFIG ─────────────────────────────────────────────────────────────────
-const ADMIN_PW = '@2Irirdlai';
-const EMOJIS = ['✍️','🌸','🏔️','🌅','🏮','⛩️','🚢','🌊','🏝️','🎋','🌺','🖼️','✈️','🚂','🌄','🎑','🌙','📸','🍵','🍜','🏯','🎭'];
+let allArticles = [], allCats = [];
 
-let allArts = [];
-let artKws = [];
-let artImages = [];
-let editingId = null;
-let selectedEmoji = '✍️';
-let filterStatus = 'all';
-let cities = [], cats = [];
-
-// ── AUTH ───────────────────────────────────────────────────────────────────
-function doLogin(){
-  const v = document.getElementById('pw-input').value;
-  if(v === ADMIN_PW){
-    sessionStorage.setItem('mantu_auth','1');
-    document.getElementById('login-screen').style.display='none';
-    document.getElementById('app').style.display='block';
-    init();
+function doLogin() {
+  const pw = document.getElementById('pwInput').value;
+  if (pw === ADMIN_PASS) {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('adminPage').style.display = 'block';
+    loadAll();
   } else {
-    document.getElementById('login-err').textContent='密碼錯誤，請再試一次';
-    document.getElementById('pw-input').value='';
+    document.getElementById('loginErr').style.display = 'block';
   }
 }
-function doLogout(){
-  sessionStorage.removeItem('mantu_auth');
-  location.reload();
-}
-if(sessionStorage.getItem('mantu_auth')==='1'){
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('app').style.display='block';
-}
 
-// ── INIT ───────────────────────────────────────────────────────────────────
-async function init(){
-  loadSettings();
-  renderEmojiGrid();
-  setupDragDrop();
-  await loadArticles();
-}
-
-function loadSettings(){
-  cities = JSON.parse(localStorage.getItem('mantu-cities')||'["台南","台北","高雄","台中","花蓮","宜蘭"]');
-  cats = JSON.parse(localStorage.getItem('mantu-cats')||'["咖啡廳","餐廳","景點","住宿","小吃","伴手禮"]');
-  renderCitySelect(); renderCatSelect();
-  renderCitiesList(); renderCatsList();
-}
-
-// ── ARTICLES ───────────────────────────────────────────────────────────────
-async function loadArticles(){
-  const {data,error} = await sb.from('articles').select('*').order('created_at',{ascending:false});
-  if(error){ toast('載入失敗：'+error.message,'err'); return; }
-  allArts = data||[];
-  renderArts();
-  updateStats();
-}
-
-function updateStats(){
-  const pub = allArts.filter(a=>a.status==='published');
-  const draft = allArts.filter(a=>a.status==='draft');
-  const citySet = new Set(allArts.map(a=>a.city).filter(Boolean));
-  document.getElementById('st-total').textContent = allArts.length;
-  document.getElementById('st-pub').textContent = pub.length;
-  document.getElementById('st-draft').textContent = draft.length;
-  document.getElementById('st-cities').textContent = citySet.size;
-  document.getElementById('hd-stats').textContent = `${pub.length} 篇已發布`;
-}
-
-function renderArts(){
-  const q = document.getElementById('art-search').value.toLowerCase();
-  let list = allArts.filter(a=>{
-    if(filterStatus!=='all' && a.status!==filterStatus) return false;
-    if(q && !a.title?.toLowerCase().includes(q) && !a.city?.includes(q)) return false;
-    return true;
+async function sbFetch(path, opts) {
+  const r = await fetch(SB_URL + '/rest/v1/' + path, {
+    ...opts,
+    headers: {
+      'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY,
+      'Content-Type': 'application/json', 'Prefer': 'return=representation',
+      ...(opts && opts.headers)
+    }
   });
-  const tbody = document.getElementById('art-tbody');
-  if(!list.length){
-    tbody.innerHTML='';
-    document.getElementById('art-empty').style.display='block';
-    return;
-  }
-  document.getElementById('art-empty').style.display='none';
-  tbody.innerHTML = list.map(a=>`
-    <tr>
-      <td style="font-size:1.4rem;width:50px">${a.emoji||'✍️'}</td>
-      <td><div style="font-weight:500;color:var(--text)">${a.title}</div><div style="font-size:0.7rem;color:var(--text3);margin-top:2px">${a.excerpt||''}</div></td>
-      <td>${a.city||'—'}</td>
-      <td>${a.category||'—'}</td>
-      <td><span class="badge ${a.status==='published'?'badge-pub':'badge-draft'}">${a.status==='published'?'已發布':'草稿'}</span></td>
-      <td style="font-size:0.75rem;color:var(--text3)">${a.published_at?new Date(a.published_at).toLocaleString('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}):'—'}</td>
-      <td>
-        <div class="tbl-actions">
-          <button class="act-btn" onclick="openEditArt(${a.id})" title="編輯">✏️</button>
-          <button class="act-btn" onclick="togglePub(${a.id},'${a.status}')" title="${a.status==='published'?'下線':'發布'}">${a.status==='published'?'⬇️':'🚀'}</button>
-          <button class="act-btn del" onclick="delArt(${a.id})" title="刪除">🗑️</button>
-        </div>
-      </td>
-    </tr>`).join('');
+  if (!r.ok) { const e = await r.text(); throw new Error(e); }
+  const ct = r.headers.get('content-type');
+  return ct && ct.includes('json') ? r.json() : [];
 }
 
-function filterArts(){ renderArts(); }
-function setFilter(s,el){
-  filterStatus=s;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  renderArts();
+async function loadAll() {
+  try {
+    allCats = await sbFetch('ivy_categories?order=sort_order.asc');
+    allArticles = await sbFetch('ivy_articles?select=*,ivy_categories(name,slug)&order=created_at.desc');
+    renderDashboard();
+    renderArticles(allArticles);
+    renderCats();
+    populateCatSelects();
+  } catch(e) { toast('載入失敗: ' + e.message, true); }
 }
 
-async function togglePub(id,cur){
-  const newStatus = cur==='published'?'draft':'published';
-  const upd = {status:newStatus};
-  if(newStatus==='published' && !allArts.find(a=>a.id===id)?.published_at){
-    upd.published_at = new Date().toISOString();
-  }
-  const {error} = await sb.from('articles').update(upd).eq('id',id);
-  if(error){ toast('更新失敗','err'); return; }
-  toast(newStatus==='published'?'🚀 文章已發布！':'文章已下線');
-  await loadArticles();
-}
-
-async function delArt(id){
-  if(!confirm('確定要刪除這篇文章？')) return;
-  const {error} = await sb.from('articles').delete().eq('id',id);
-  if(error){ toast('刪除失敗','err'); return; }
-  toast('文章已刪除');
-  await loadArticles();
-}
-
-// ── ARTICLE MODAL ──────────────────────────────────────────────────────────
-function openAddArt(){
-  editingId=null; artKws=[]; artImages=[];
-  document.getElementById('art-modal-title').textContent='新增文章';
-  document.getElementById('f-title').value='';
-  document.getElementById('f-excerpt').value='';
-  document.getElementById('f-video').value='';
-  document.getElementById('video-preview-box').style.display='none';
-  document.getElementById('f-status').value='draft';
-  document.getElementById('f-published-at').value=fmtDateLocal(new Date());
-  setEmoji('✍️');
-  setEditorContent('');
-  renderArtKws();
-  renderImgPreviews();
-  document.getElementById('art-modal').classList.add('open');
-}
-
-function openEditArt(id){
-  const a = allArts.find(x=>x.id===id);
-  if(!a) return;
-  editingId=id;
-  artKws = Array.isArray(a.keywords) ? [...a.keywords] : (a.keywords||'').split(',').filter(Boolean);
-  artImages=[];
-  document.getElementById('art-modal-title').textContent='編輯文章';
-  document.getElementById('f-title').value=a.title||'';
-  document.getElementById('f-excerpt').value=a.excerpt||'';
-  document.getElementById('f-video').value=a.video_url||'';
-  document.getElementById('f-status').value=a.status||'draft';
-  document.getElementById('f-published-at').value=a.published_at?fmtDateLocal(new Date(a.published_at)):fmtDateLocal(new Date());
-  if(a.city) document.getElementById('f-city').value=a.city;
-  if(a.category) document.getElementById('f-cat').value=a.category;
-  setEmoji(a.emoji||'✍️');
-  setEditorContent(a.content||'');
-  previewVideo(a.video_url||'');
-  renderArtKws();
-  renderImgPreviews();
-  document.getElementById('art-modal').classList.add('open');
-}
-
-function closeArtModal(){
-  document.getElementById('art-modal').classList.remove('open');
-}
-
-async function saveArt(){
-  const title = document.getElementById('f-title').value.trim();
-  const city = document.getElementById('f-city').value;
-  const cat = document.getElementById('f-cat').value;
-  if(!title){ toast('請填寫文章標題','err'); return; }
-  if(!city){ toast('請選擇城市','err'); return; }
-
-  const btn = document.getElementById('save-btn');
-  btn.disabled=true; btn.textContent='儲存中...';
-
-  const slug = editingId
-    ? allArts.find(a=>a.id===editingId)?.slug
-    : title.replace(/[^\u4e00-\u9fff\w\s-]/g,'').trim().replace(/[\s_]+/g,'-').substring(0,60).toLowerCase() + '-' + Date.now();
-
-  const pubAt = document.getElementById('f-published-at').value;
-  const data = {
-    title,
-    slug: slug||title,
-    city,
-    category: cat,
-    excerpt: document.getElementById('f-excerpt').value.trim(),
-    content: getEditorContent(),
-    keywords: artKws,
-    emoji: selectedEmoji,
-    video_url: document.getElementById('f-video').value.trim()||null,
-    status: document.getElementById('f-status').value,
-    published_at: pubAt ? new Date(pubAt).toISOString() : null
-  };
-
-  let error;
-  if(editingId){
-    ({error} = await sb.from('articles').update(data).eq('id',editingId));
-  } else {
-    ({error} = await sb.from('articles').insert(data));
-  }
-
-  btn.disabled=false; btn.textContent='儲存文章';
-  if(error){ toast('儲存失敗：'+error.message,'err'); return; }
-  toast(editingId?'文章已更新 ✅':'文章已建立 ✅');
-  closeArtModal();
-  await loadArticles();
-}
-
-// ── EDITOR ─────────────────────────────────────────────────────────────────
-function execCmd(cmd,val=null){
-  document.getElementById('f-content-editor').focus();
-  document.execCommand(cmd,false,val);
-}
-function execFmt(tag){
-  document.getElementById('f-content-editor').focus();
-  document.execCommand('formatBlock',false,tag);
-}
-function insertLink(){
-  const url = prompt('輸入連結網址：');
-  if(url){ execCmd('createLink',url); }
-}
-function getEditorContent(){ return document.getElementById('f-content-editor').innerHTML; }
-function setEditorContent(html){ document.getElementById('f-content-editor').innerHTML=html||''; }
-function handlePaste(e){
-  e.preventDefault();
-  const text = e.clipboardData.getData('text/plain');
-  document.execCommand('insertText',false,text);
-}
-function triggerImgInsert(){
-  document.getElementById('img-file-input').click();
-}
-
-// ── IMAGE UPLOAD ───────────────────────────────────────────────────────────
-function setupDragDrop(){
-  const area = document.getElementById('img-upload-area');
-  area.addEventListener('dragover',e=>{e.preventDefault();area.style.borderColor='var(--accent)'});
-  area.addEventListener('dragleave',()=>area.style.borderColor='var(--border2)');
-  area.addEventListener('drop',e=>{
-    e.preventDefault();
-    area.style.borderColor='var(--border2)';
-    handleImgUpload({target:{files:e.dataTransfer.files}});
-  });
-}
-
-async function handleImgUpload(e){
-  const files = Array.from(e.target.files||[]);
-  if(!files.length) return;
-  toast('上傳中...');
-  for(const file of files){
-    const ext = file.name.split('.').pop();
-    const fname = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-    const {data,error} = await sb.storage.from('article-images').upload(fname,file,{contentType:file.type});
-    if(error){ toast('上傳失敗：'+error.message,'err'); continue; }
-    const {data:{publicUrl}} = sb.storage.from('article-images').getPublicUrl(fname);
-    artImages.push({url:publicUrl,name:fname});
-  }
-  renderImgPreviews();
-  toast('圖片上傳完成 ✅');
-  e.target.value='';
-}
-
-function renderImgPreviews(){
-  const grid = document.getElementById('img-preview-grid');
-  grid.innerHTML = artImages.map((img,i)=>`
-    <div class="img-preview-item">
-      <img src="${img.url}" alt="">
-      <button class="img-del" onclick="removeImg(${i})">✕</button>
-      <button class="img-insert" onclick="insertImgToEditor('${img.url}')">插入</button>
-    </div>`).join('');
-}
-
-function removeImg(i){ artImages.splice(i,1); renderImgPreviews(); }
-function insertImgToEditor(url){
-  document.getElementById('f-content-editor').focus();
-  document.execCommand('insertHTML',false,`<img src="${url}" style="max-width:100%;margin:0.5rem 0" alt="">`);
-  toast('圖片已插入文章');
-}
-
-// ── KEYWORDS ───────────────────────────────────────────────────────────────
-function addArtKw(e){
-  if(e.key!=='Enter') return;
-  e.preventDefault();
-  const v=document.getElementById('f-kw-input').value.trim();
-  if(!v||artKws.includes(v)) return;
-  artKws.push(v);
-  document.getElementById('f-kw-input').value='';
-  renderArtKws();
-}
-function removeArtKw(k){ artKws=artKws.filter(x=>x!==k); renderArtKws(); }
-function renderArtKws(){
-  document.getElementById('art-kw-tags').innerHTML=artKws.map(k=>
-    `<span class="kw-tag">${k}<button onclick="removeArtKw('${k}')">×</button></span>`
+function renderDashboard() {
+  document.getElementById('statArticles').textContent = allArticles.length;
+  document.getElementById('statPublished').textContent = allArticles.filter(a => a.published).length;
+  document.getElementById('statDraft').textContent = allArticles.filter(a => !a.published).length;
+  document.getElementById('statCats').textContent = allCats.length;
+  const recent = allArticles.slice(0, 8);
+  document.getElementById('dashRecent').innerHTML = recent.map(a =>
+    '<tr><td>' + a.title + '</td><td>' + (a.ivy_categories ? a.ivy_categories.name : '-') + '</td><td>' +
+    (a.published ? '<span class="badge badge-green">已發布</span>' : '<span class="badge badge-gray">草稿</span>') +
+    '</td><td>' + new Date(a.created_at).toLocaleDateString('zh-TW') + '</td></tr>'
   ).join('');
 }
 
-// ── EMOJI ──────────────────────────────────────────────────────────────────
-function renderEmojiGrid(){
-  document.getElementById('emoji-grid').innerHTML=EMOJIS.map(e=>
-    `<button class="emoji-btn${e===selectedEmoji?' selected':''}" onclick="setEmoji('${e}')">${e}</button>`
+function renderArticles(list) {
+  document.getElementById('articlesList').innerHTML = list.map(a =>
+    '<tr><td><strong>' + a.title + '</strong></td>' +
+    '<td>' + (a.ivy_categories ? a.ivy_categories.name : '-') + '</td>' +
+    '<td><code style="font-size:0.78rem;color:#a08085">' + a.slug + '</code></td>' +
+    '<td>' + (a.published ? '<span class="badge badge-green">已發布</span>' : '<span class="badge badge-gray">草稿</span>') + '</td>' +
+    '<td>' + new Date(a.created_at).toLocaleDateString('zh-TW') + '</td>' +
+    '<td><div class="actions">' +
+    '<button class="btn btn-sm btn-outline" onclick="editArticle(' + a.id + ')">編輯</button>' +
+    '<button class="btn btn-sm ' + (a.published ? 'btn-outline' : 'btn-success') + '" onclick="togglePublish(' + a.id + ',' + a.published + ')">' + (a.published ? '下架' : '發布') + '</button>' +
+    '<button class="btn btn-sm btn-danger" onclick="deleteArticle(' + a.id + ',\'' + a.title.replace(/'/g, '') + '\')">刪除</button>' +
+    '</div></td></tr>'
   ).join('');
 }
-function setEmoji(e){
-  if(!e) return;
-  selectedEmoji=e;
-  document.getElementById('emoji-sel-display').textContent=e;
-  document.getElementById('f-emoji-custom').value=e;
-  document.querySelectorAll('.emoji-btn').forEach(b=>{
-    b.classList.toggle('selected',b.textContent===e);
-  });
-}
 
-// ── VIDEO ──────────────────────────────────────────────────────────────────
-function previewVideo(url){
-  const box = document.getElementById('video-preview-box');
-  const embed = document.getElementById('video-embed-preview');
-  if(!url){ box.style.display='none'; return; }
-  const embedUrl = getEmbedUrl(url);
-  if(embedUrl){
-    box.style.display='block';
-    embed.innerHTML=`<iframe src="${embedUrl}" allowfullscreen></iframe>`;
-  } else { box.style.display='none'; }
-}
-function getEmbedUrl(url){
-  let m;
-  if((m=url.match(/youtube\.com\/watch\?v=([^&]+)/))) return `https://www.youtube.com/embed/${m[1]}`;
-  if((m=url.match(/youtu\.be\/([^?]+)/))) return `https://www.youtube.com/embed/${m[1]}`;
-  if((m=url.match(/vimeo\.com\/(\d+)/))) return `https://player.vimeo.com/video/${m[1]}`;
-  return null;
-}
-
-// ── SETTINGS ───────────────────────────────────────────────────────────────
-function renderCitySelect(){
-  const sel=document.getElementById('f-city');
-  sel.innerHTML='<option value="">— 選擇城市 —</option>'+cities.map(c=>`<option value="${c}">${c}</option>`).join('');
-}
-function renderCatSelect(){
-  const sel=document.getElementById('f-cat');
-  sel.innerHTML='<option value="">— 選擇分類 —</option>'+cats.map(c=>`<option value="${c}">${c}</option>`).join('');
-}
-function renderCitiesList(){
-  document.getElementById('cities-list').innerHTML=cities.map(c=>
-    `<span class="kw-tag">${c}<button onclick="removeCity('${c}')">×</button></span>`).join('');
-}
-function renderCatsList(){
-  document.getElementById('cats-list').innerHTML=cats.map(c=>
-    `<span class="kw-tag">${c}<button onclick="removeCat('${c}')">×</button></span>`).join('');
-}
-function addCity(){
-  const v=document.getElementById('new-city').value.trim();
-  if(!v||cities.includes(v)) return;
-  cities.push(v); document.getElementById('new-city').value='';
-  saveSettings(); renderCitySelect(); renderCitiesList();
-}
-function removeCity(c){ cities=cities.filter(x=>x!==c); saveSettings(); renderCitySelect(); renderCitiesList(); }
-function addCat(){
-  const v=document.getElementById('new-cat').value.trim();
-  if(!v||cats.includes(v)) return;
-  cats.push(v); document.getElementById('new-cat').value='';
-  saveSettings(); renderCatSelect(); renderCatsList();
-}
-function removeCat(c){ cats=cats.filter(x=>x!==c); saveSettings(); renderCatSelect(); renderCatsList(); }
-function saveSettings(){
-  localStorage.setItem('mantu-cities',JSON.stringify(cities));
-  localStorage.setItem('mantu-cats',JSON.stringify(cats));
-}
-
-
-// ── IMAGE COMPRESS ──────────────────────────────────────────────────────────
-function compressImg(base64, mimeType, maxSize=800){
-  return new Promise(resolve=>{
-    const img=new Image();
-    img.onload=()=>{
-      const canvas=document.createElement('canvas');
-      let w=img.width,h=img.height;
-      if(w>maxSize||h>maxSize){if(w>h){h=Math.round(h*maxSize/w);w=maxSize;}else{w=Math.round(w*maxSize/h);h=maxSize;}}
-      canvas.width=w;canvas.height=h;
-      canvas.getContext('2d').drawImage(img,0,0,w,h);
-      resolve({data:canvas.toDataURL('image/jpeg',0.75).split(',')[1],type:'image/jpeg'});
-    };
-    img.src=`data:${mimeType};base64,${base64}`;
-  });
-}
-
-
-function openKeyModal(){
-  const cur = localStorage.getItem('mantu-api-key')||'';
-  document.getElementById('key-modal-input').value = cur;
-  document.getElementById('key-modal-err').textContent = '';
-  document.getElementById('key-modal').classList.add('open');
-  setTimeout(()=>document.getElementById('key-modal-input').focus(), 100);
-}
-function closeKeyModal(){ document.getElementById('key-modal').classList.remove('open'); }
-function saveKeyModal(){
-  const v = document.getElementById('key-modal-input').value.trim();
-  if(!v){ document.getElementById('key-modal-err').textContent='請輸入 API Key'; return; }
-  localStorage.setItem('mantu-api-key', v);
-  closeKeyModal();
-  document.getElementById('key-status-dot').style.color='var(--green)';
-  toast('API Key 已更新！');
-}
-
-// ── AI UNBOXING ────────────────────────────────────────────────────────────
-let aiCoverBase64=null;
-function handleAiCover(e){
-  const file=e.target.files?.[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    aiCoverBase64={data:ev.target.result.split(',')[1],type:file.type};
-    const prev=document.getElementById('ai-cover-preview');
-    prev.src=ev.target.result;prev.style.display='block';
-    document.getElementById('ai-cover-area').innerHTML='✅ 封面已選擇';
-  };
-  reader.readAsDataURL(file);e.target.value='';
-}
-let aiImgBase64=[], aiGenTitle='', aiGenSlug='';
-
-function handleAiImgs(e){
-  const files=Array.from(e.target.files||[]);
-  aiImgBase64=[];
-  const prev=document.getElementById('ai-img-previews');
-  prev.innerHTML='';
-  files.forEach(file=>{
-    const reader=new FileReader();
-    reader.onload=ev=>{
-      aiImgBase64.push({data:ev.target.result.split(',')[1],type:file.type});
-      const img=document.createElement('img');
-      img.src=ev.target.result;
-      img.style.cssText='width:70px;height:70px;object-fit:cover;border:1px solid var(--border2)';
-      prev.appendChild(img);
-    };
-    reader.readAsDataURL(file);
-  });
-  e.target.value='';
-}
-
-
-const _SB='https://zsebcpfblecwumbaxeaz.supabase.co';
-const _SK='sb_publishable_L2DOfeM0cAJqwlVCr1LwtA_jE9MBNDn';
-const _SBH={'apikey':_SK,'Authorization':'Bearer '+_SK,'Content-Type':'application/json'};
-
-async function loadCats(){
-  const res=await fetch(_SB+'/rest/v1/categories?select=*&order=sort_order',{headers:{..._SBH}});
-  const data=await res.json();
-  window._catsCache=data;
-  renderCats(data);
-  // 同步分類下拉選單
-  ['ai-category','art-category'].forEach(id=>{
-    const sel=document.getElementById(id);
-    if(sel) sel.innerHTML=data.map(x=>'<option value="'+x.name+'">'+x.name+'</option>').join('');
-  });
-  document.querySelectorAll('select[name="category"]').forEach(sel=>{
-    sel.innerHTML=data.map(x=>'<option value="'+x.name+'">'+x.name+'</option>').join('');
-  });
-}
-
-function renderCats(cats){
-  const el=document.getElementById('cat-list');
-  if(!el)return;
-  if(!cats||!cats.length){el.innerHTML='<p style="color:var(--muted)">尚無分類</p>';return;}
-  el.innerHTML=cats.map(cat=>{
-    const prompt=cat.ai_prompt||'';
-    const preview=prompt.length>80?prompt.slice(0,80)+'...':prompt;
-    return '<div style="background:var(--surface2);border:1px solid var(--border);padding:1.2rem 1.5rem;border-radius:4px">'+
-      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem">'+
-      '<span style="font-size:1.05rem;color:var(--paper);font-weight:500">'+cat.name+'</span>'+
-      '<div style="display:flex;gap:0.5rem">'+
-      '<button onclick="editCat(''+cat.id+'',''+cat.name.replace(/'/g,"\\'")+'')" style="background:none;border:1px solid var(--border);color:var(--accent);padding:0.3rem 0.8rem;font-size:0.75rem;cursor:pointer;font-family:inherit">編輯</button>'+
-      '<button onclick="deleteCat(''+cat.id+'',''+cat.name+'')" style="background:none;border:1px solid rgba(255,80,80,0.3);color:#ff6060;padding:0.3rem 0.8rem;font-size:0.75rem;cursor:pointer;font-family:inherit">刪除</button>'+
-      '</div></div>'+
-      '<div style="font-size:0.72rem;color:var(--muted);line-height:1.6;background:var(--surface);padding:0.7rem 1rem;border-radius:3px">'+
-      (preview||'<em>未設定 AI 指令</em>')+'</div></div>';
+function renderCats() {
+  document.getElementById('catsList').innerHTML = allCats.map(c => {
+    const cnt = allArticles.filter(a => a.category_id === c.id).length;
+    return '<tr><td style="font-size:1.5rem">' + (c.icon || '') + '</td><td><strong>' + c.name + '</strong></td><td><code>' + c.slug + '</code></td><td>' + (c.description || '') + '</td><td>' + c.sort_order + '</td><td>' + cnt + '</td></tr>';
   }).join('');
 }
 
-function openAddCat(){
-  const name=prompt('分類名稱（例如：民宿、小吃、伴手禮）：');
-  if(!name||!name.trim())return;
-  const nm=name.trim();
-  const ai=prompt('AI 寫作指引（不填也可以之後再編輯）：','');
-  saveCat(null,nm,ai||'');
+function populateCatSelects() {
+  const opts = allCats.map(c => '<option value="' + c.id + '">' + (c.icon || '') + ' ' + c.name + '</option>').join('');
+  document.getElementById('editCat').innerHTML = '<option value="">-- 選擇分類 --</option>' + opts;
+  document.getElementById('filterCat').innerHTML = '<option value="">全部分類</option>' +
+    allCats.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join('');
 }
 
-async function editCat(id,name){
-  const cat=(window._catsCache||[]).find(x=>x.id===id);
-  const newName=prompt('分類名稱：',name);
-  if(!newName||!newName.trim())return;
-  const newPrompt=prompt('AI 寫作指引：',cat?cat.ai_prompt:'');
-  saveCat(id,newName.trim(),newPrompt||'');
+function filterArticles() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const cat = document.getElementById('filterCat').value;
+  let list = allArticles;
+  if (q) list = list.filter(a => a.title.toLowerCase().includes(q) || a.slug.includes(q));
+  if (cat) list = list.filter(a => String(a.category_id) === cat);
+  renderArticles(list);
 }
 
-async function saveCat(id,name,ai_prompt){
-  const url=id?_SB+'/rest/v1/categories?id=eq.'+id:_SB+'/rest/v1/categories';
-  const method=id?'PATCH':'POST';
-  const res=await fetch(url,{method,headers:{..._SBH,'Prefer':'return=minimal'},body:JSON.stringify({name,ai_prompt})});
-  if(res.ok)loadCats();else alert('儲存失敗');
+function editArticle(id) {
+  const a = allArticles.find(x => x.id === id);
+  if (!a) return;
+  document.getElementById('editId').value = a.id;
+  document.getElementById('editTitle').value = a.title;
+  document.getElementById('editSlug').value = a.slug;
+  document.getElementById('editCat').value = a.category_id || '';
+  document.getElementById('editSynopsis').value = a.synopsis || '';
+  document.getElementById('editContent').value = a.content || '';
+  document.getElementById('editMetaTitle').value = a.meta_title || '';
+  document.getElementById('editMetaDesc').value = a.meta_description || '';
+  document.getElementById('editCover').value = a.cover_image || '';
+  document.getElementById('editPublished').checked = a.published;
+  document.getElementById('editorTitle').textContent = '✏️ 編輯文章';
+  showPanel('new', document.querySelector('.sidebar-menu li:nth-child(3) a'));
 }
 
-async function deleteCat(id,name){
-  if(!confirm('確定刪除「'+name+'」分類？'))return;
-  const res=await fetch(_SB+'/rest/v1/categories?id=eq.'+id,{method:'DELETE',headers:{..._SBH}});
-  if(res.ok)loadCats();else alert('刪除失敗');
-}
-const KEY_SK = 'mantu-api-key';
-async function genAiArticle(){
-  const _catName=document.getElementById('ai-category')?.value||'';
-  const _catData=(window._catsCache||[]).find(x=>x.name===_catName);
-  const _catPrompt=_catData?.ai_prompt||'';
-  const name=document.getElementById('ai-name').value.trim();
-  if(!name){toast('請填寫店家名稱','err');return;}
-  const apiKey=localStorage.getItem('mantu-api-key');
-  if(!apiKey){document.getElementById('ai-key-warn').style.display='block';return;}
-  document.getElementById('ai-key-warn').style.display='none';
-  const btn=document.getElementById('ai-gen-btn');
-  const status=document.getElementById('ai-status');
-  btn.disabled=true;btn.textContent='生成中...';
-  status.textContent='AI 思考中...';status.style.color='var(--accent)';
-  const city=document.getElementById('ai-city').value.trim();
-  const type=document.getElementById('ai-type').value;
-  const feature=document.getElementById('ai-feature').value.trim();
-  const note=document.getElementById('ai-note').value.trim();
-  const rating=document.getElementById('ai-rating').value;
-  const price=document.getElementById('ai-price').value;
-  const prompt=`你是一位擅長寫旅遊開箱文的部落客，文風細膩有溫度。請根據以下資訊，寫一篇完整的繁體中文開箱文章。\n\n店家資料：\n- 名稱：${name}\n- 城市：${city||'未指定'}\n- 類型：${type}\n- 特色：${feature||'未提供'}\n- 評分：${rating}/5\n- 價位：${price}\n- 個人心得：${note||'未提供'}\n\n請依照以下格式回覆：\n\nTITLE: [吸引人的文章標題，有意境]\n\nBODY:\n[文章內容800-1200字，分段落，純文字段落用空行分隔]`;
-  try{
-    const userContent=[];
-    if(aiImgBase64.length>0){aiImgBase64.forEach(img=>{userContent.push({type:'image',source:{type:'base64',media_type:img.type,data:img.data}});});}
-    userContent.push({type:'text',text:prompt+(_catPrompt?'\n\n【分類寫作指引】\n'+_catPrompt:'')});
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,messages:[{role:'user',content:userContent}]})});
-    if(!res.ok){const e=await res.text();throw new Error(e.slice(0,100));}const data=await res.json();
-    const text=data.content?.[0]?.text||'';
-    const titleMatch=text.match(/TITLE:\s*(.+)/);
-    const bodyMatch=text.match(/BODY:\s*([\s\S]+)/);
-    aiGenTitle=titleMatch?titleMatch[1].trim():`${name}｜${city}${type}開箱`;
-    const body=bodyMatch?bodyMatch[1].trim():text;
-    aiGenSlug=aiGenTitle.replace(/[^\u4e00-\u9fff\w\s-]/g,'').trim().replace(/[\s_]+/g,'-').substring(0,60).toLowerCase()+'-'+Date.now();
-    document.getElementById('ai-title-preview').textContent=aiGenTitle;
-    document.getElementById('ai-body-preview').textContent=body;
-    status.textContent='✅ 生成完成！可直接編輯後發布';status.style.color='var(--green)';
-    document.getElementById('ai-publish-panel').style.display='block';
-    renderCitySelect2();renderCatSelect2();
-    if(city){const sel=document.getElementById('ai-pub-city');Array.from(sel.options).forEach(o=>{if(o.value===city)o.selected=true;});}
-    const catSel=document.getElementById('ai-pub-cat');Array.from(catSel.options).forEach(o=>{if(o.value===type)o.selected=true;});
-    document.getElementById('ai-pub-time').value=fmtDateLocal(new Date());
-  }catch(e){status.textContent='生成失敗：'+e.message.slice(0,50);status.style.color='var(--red)';}
-  btn.disabled=false;btn.textContent='✨ AI 生成開箱文';
+function cancelEdit() {
+  document.getElementById('editId').value = '';
+  document.getElementById('editTitle').value = '';
+  document.getElementById('editSlug').value = '';
+  document.getElementById('editContent').value = '';
+  document.getElementById('editSynopsis').value = '';
+  document.getElementById('editorTitle').textContent = '✏️ 新增文章';
+  showPanel('articles', document.querySelector('.sidebar-menu li:nth-child(2) a'));
 }
 
-function renderCitySelect2(){const sel=document.getElementById('ai-pub-city');sel.innerHTML='<option value="">— 選擇城市 —</option>'+cities.map(c=>`<option value="${c}">${c}</option>`).join('');}
-function renderCatSelect2(){const sel=document.getElementById('ai-pub-cat');sel.innerHTML='<option value="">— 選擇分類 —</option>'+cats.map(c=>`<option value="${c}">${c}</option>`).join('');}
-
-async function publishAiArticle(){
-  const title=aiGenTitle;
-  const body=document.getElementById('ai-body-preview').textContent.trim();
-  if(!title||!body){toast('請先生成文章','err');return;}
-  const city=document.getElementById('ai-pub-city').value;
-  const cat=document.getElementById('ai-pub-cat').value;
-  const btn=document.getElementById('ai-pub-btn');
-  const msg=document.getElementById('ai-pub-msg');
-  btn.disabled=true;btn.textContent='發布中...';
-  let coverImage=null;
-  if(aiImgBase64.length>0){
-    try{
-      const img=aiImgBase64[0];const ext=img.type.split('/')[1]||'jpg';const fname=Date.now()+'.'+ext;
-      const blob=await fetch(`data:${img.type};base64,${img.data}`).then(r=>r.blob());
-      const{data:upData}=await sb.storage.from('article-images').upload(fname,blob,{contentType:img.type});
-      if(upData){const{data:{publicUrl}}=sb.storage.from('article-images').getPublicUrl(fname);coverImage=publicUrl;}
-    }catch(e){console.log('img err',e);}
-  }
-  const htmlContent=body.split('\n\n').map(p=>p.trim()?`<p>${p.replace(/\n/g,'<br>')}</p>`:'').join('\n');
-  const status=document.getElementById('ai-pub-status').value;
-  const pubAt=document.getElementById('ai-pub-time').value;
-  const name=document.getElementById('ai-name').value.trim();
-  const type=document.getElementById('ai-type').value;
-  const articleData={title,slug:aiGenSlug,city:city||document.getElementById('ai-city').value||null,category:cat||type||null,excerpt:document.getElementById('ai-pub-excerpt').value.trim()||body.slice(0,120)+'...',content:htmlContent,keywords:[name,type,city].filter(Boolean),emoji:{咖啡廳:'☕',餐廳:'🍽️',甜點:'🍰',景點:'🏔️',住宿:'🏠',酒吧:'🍸'}[type]||'✍️',cover_image:window._coverImageUrl||coverImage,status,published_at:pubAt?new Date(pubAt).toISOString():new Date().toISOString(),
-    shop_info:{
-      name:document.getElementById('ai-name')?.value?.trim()||null,
-      address:document.getElementById('ai-shop-address')?.value?.trim()||null,
-      phone:document.getElementById('ai-shop-phone')?.value?.trim()||null,
-      hours:document.getElementById('ai-shop-hours')?.value?.trim()||null,
-      price_note:document.getElementById('ai-shop-price-note')?.value?.trim()||null,
-      parking:document.getElementById('ai-shop-parking')?.value?.trim()||null,
-      website:document.getElementById('ai-shop-website')?.value?.trim()||null,
-      maps:document.getElementById('ai-shop-maps')?.value?.trim()||null,
-      fb:document.getElementById('ai-shop-fb')?.value?.trim()||null,
-      ig:document.getElementById('ai-shop-ig')?.value?.trim()||null,
-      line:document.getElementById('ai-shop-line')?.value?.trim()||null
-    }};
-  const{error}=await sb.from('articles').insert(articleData);
-  btn.disabled=false;btn.textContent='🚀 發布到前台';
-  if(error){msg.style.color='var(--red)';msg.textContent='發布失敗：'+error.message;return;}
-  msg.style.color='var(--green)';
-  msg.innerHTML=status==='published'?`✅ 文章已發布！<a href="https://journeylift.com.tw/articles/${aiGenSlug}" target="_blank" style="color:var(--accent2);margin-left:0.5rem">查看文章 →</a>`:'📝 已存為草稿';
-  toast(status==='published'?'文章已發布 🎉':'已存為草稿');
-  await loadArticles();
+async function saveArticle() {
+  const id = document.getElementById('editId').value;
+  const title = document.getElementById('editTitle').value.trim();
+  const slug = document.getElementById('editSlug').value.trim();
+  if (!title || !slug) { toast('請填寫標題和 Slug', true); return; }
+  const data = {
+    title, slug,
+    synopsis: document.getElementById('editSynopsis').value.trim() || null,
+    content: document.getElementById('editContent').value.trim() || null,
+    category_id: document.getElementById('editCat').value || null,
+    meta_title: document.getElementById('editMetaTitle').value.trim() || null,
+    meta_description: document.getElementById('editMetaDesc').value.trim() || null,
+    cover_image: document.getElementById('editCover').value.trim() || null,
+    published: document.getElementById('editPublished').checked,
+    updated_at: new Date().toISOString()
+  };
+  try {
+    if (id) {
+      await sbFetch('ivy_articles?id=eq.' + id, { method: 'PATCH', body: JSON.stringify(data) });
+      toast('✅ 文章已更新！');
+    } else {
+      await sbFetch('ivy_articles', { method: 'POST', body: JSON.stringify(data) });
+      toast('✅ 文章已新增！');
+    }
+    await loadAll();
+    cancelEdit();
+  } catch(e) { toast('儲存失敗: ' + e.message, true); }
 }
 
-// ── PAGES ──────────────────────────────────────────────────────────────────
-function showPage(name){
-  if(name==='settings') setTimeout(loadCats,100);
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  document.getElementById('nav-'+name).classList.add('active');
-  document.querySelectorAll('.mnav-btn').forEach(b=>b.classList.remove('active'));
-  const mb=document.getElementById('mnav-'+name);
-  if(mb)mb.classList.add('active');
+async function togglePublish(id, current) {
+  try {
+    await sbFetch('ivy_articles?id=eq.' + id, { method: 'PATCH', body: JSON.stringify({ published: !current }) });
+    toast(current ? '文章已下架' : '✅ 文章已發布！');
+    await loadAll();
+  } catch(e) { toast('操作失敗: ' + e.message, true); }
 }
 
-// ── HELPERS ────────────────────────────────────────────────────────────────
-function fmtDateLocal(d){
-  const pad=n=>String(n).padStart(2,'0');
-  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+async function deleteArticle(id, title) {
+  if (!confirm('確定要刪除「' + title + '」嗎？此操作無法還原。')) return;
+  try {
+    await sbFetch('ivy_articles?id=eq.' + id, { method: 'DELETE' });
+    toast('文章已刪除');
+    await loadAll();
+  } catch(e) { toast('刪除失敗: ' + e.message, true); }
 }
 
-let toastTimer;
-function toast(msg,type='ok'){
-  const el=document.getElementById('toast');
-  el.textContent=msg; el.className=type; el.style.display='block';
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>el.style.display='none',3000);
+function showPanel(name, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  if (el) el.classList.add('active');
 }
 
-// Auto init if logged in
-if(sessionStorage.getItem('mantu_auth')==='1') init();
-// Update key button color on load
-window.addEventListener('load',()=>{
-  if(localStorage.getItem('mantu-api-key')){
-    const btn=document.getElementById('key-status-dot');
-    if(btn)btn.style.color='var(--green)';
-  }
-});
+function toast(msg, isErr) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = isErr ? '#e74c3c' : '#2d2020';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function goFront() { window.open('/', '_blank'); }
+
+document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 </script>
-
-<!-- MOBILE BOTTOM NAV -->
-<div class="mobile-nav" id="mobile-nav">
-  <div class="mobile-nav-inner">
-    <button class="mnav-btn active" id="mnav-articles" onclick="showPage('articles')">
-      <span class="mnav-icon">📝</span>文章
-    </button>
-    <button class="mnav-btn" id="mnav-ai" onclick="showPage('ai')">
-      <span class="mnav-icon">✨</span>AI
-    </button>
-    <button class="mnav-btn" onclick="openAddArt()">
-      <span class="mnav-add">＋</span>
-    </button>
-    <button class="mnav-btn" id="mnav-settings" onclick="showPage('settings')">
-      <span class="mnav-icon">⚙️</span>設定
-    </button>
-    <button class="mnav-btn" onclick="window.open('https://journeylift.com.tw','_blank')">
-      <span class="mnav-icon">🌐</span>前台
-    </button>
-  </div>
-</div>
-
-<!-- KEY MODAL -->
-<div class="modal-bg" id="key-modal">
-  <div class="modal" style="max-width:420px">
-    <div class="modal-hd">
-      <div class="modal-title">⚙ API Key 設定</div>
-      <button class="modal-close" onclick="closeKeyModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="fg">
-        <label class="fl">Anthropic API Key</label>
-        <div style="font-size:0.7rem;color:var(--text3);margin-bottom:0.5rem">Key 存在本機瀏覽器，不會上傳到任何伺服器。</div>
-        <input class="fi" type="password" id="key-modal-input" placeholder="sk-ant-api03-..." onkeydown="if(event.key==='Enter')saveKeyModal()">
-      </div>
-      <div id="key-modal-err" style="font-size:0.7rem;color:var(--red);min-height:1.2em"></div>
-    </div>
-    <div class="modal-ft">
-      <button class="btn-secondary" onclick="closeKeyModal()">取消</button>
-      <button class="btn-primary" onclick="saveKeyModal()">儲存</button>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>
