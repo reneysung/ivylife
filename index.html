@@ -1,388 +1,91 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>漫途 — 生活旅遊誌｜用文字記錄每一段旅程</title>
-<meta name="description" content="漫途旅遊誌，用文字記錄每一段值得被記住的旅程。">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Noto+Serif+TC:wght@300;400&family=Noto+Sans+TC:wght@300;400&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-:root {
-  --ink:#12100e;--ink2:#1e1b18;--ink3:#2a2520;
-  --paper:#f5f0e8;--paper2:#ede8de;
-  --gold:#c8a96e;--gold2:#e8c98e;
-  --mist:#8a8278;--mist2:#b8b0a0;
-  --ff-d:'Cormorant Garamond',serif;
-  --ff-s:'Noto Serif TC',serif;
-  --ff-n:'Noto Sans TC',sans-serif;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--ink);color:var(--paper);font-family:var(--ff-n);font-size:14px;font-weight:300;overflow-x:hidden}
-a{color:inherit;text-decoration:none}
-
-/* grain */
-body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");pointer-events:none;z-index:999;opacity:0.35}
-
-/* header */
-header{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 3rem;height:68px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(200,169,110,0.12);background:rgba(18,16,14,0.94);backdrop-filter:blur(16px)}
-.logo{font-family:var(--ff-d);font-size:1.5rem;font-weight:400;letter-spacing:0.08em;color:var(--paper)}
-.logo{color:var(--gold)}
-.logo small{font-size:0.42em;letter-spacing:0.3em;color:var(--mist2);vertical-align:super;margin-left:0.6em;font-style:normal}
-.hnav{display:flex;align-items:center;gap:2.5rem}
-.hnav a{font-size:0.68rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--mist2);transition:color 0.3s;position:relative}
-.hnav a::after{content:'';position:absolute;bottom:-3px;left:0;width:0;height:1px;background:var(--gold);transition:width 0.3s}
-.hnav a:hover{color:var(--gold)}
-.hnav a:hover::after{width:100%}
-
-/* hero */
-.hero{min-height:100vh;display:grid;grid-template-columns:55fr 45fr;padding-top:68px}
-.hero-l{padding:8rem 5rem 6rem;display:flex;flex-direction:column;justify-content:center;position:relative}
-.hero-l::after{content:'';position:absolute;right:0;top:20%;bottom:20%;width:1px;background:linear-gradient(to bottom,transparent,rgba(200,169,110,0.25),transparent)}
-.kicker{font-size:0.62rem;letter-spacing:0.42em;text-transform:uppercase;color:var(--gold);margin-bottom:2rem;display:flex;align-items:center;gap:1rem;animation:up 0.9s 0.1s both}
-.kicker::before{content:'';display:inline-block;width:36px;height:1px;background:var(--gold)}
-.h1{font-family:var(--ff-d);font-size:clamp(4rem,7.5vw,7rem);font-weight:300;line-height:1;letter-spacing:-0.01em;color:var(--paper);margin-bottom:0.15em;animation:up 0.9s 0.2s both}
-.h1 em{font-style:italic;color:var(--gold)}
-.h2{font-family:var(--ff-d);font-size:clamp(1.1rem,2vw,1.6rem);font-weight:300;font-style:italic;color:var(--mist);margin-bottom:2.5rem;line-height:1.5;animation:up 0.9s 0.3s both}
-.desc{font-size:0.8rem;color:var(--mist2);line-height:2.1;max-width:360px;margin-bottom:3rem;border-left:1px solid rgba(200,169,110,0.25);padding-left:1.2rem;animation:up 0.9s 0.4s both}
-.cta{display:flex;gap:1rem;align-items:center;animation:up 0.9s 0.5s both}
-.btn-p{background:var(--gold);color:var(--ink);padding:0.8rem 2.2rem;font-size:0.7rem;letter-spacing:0.22em;text-transform:uppercase;font-family:var(--ff-n);transition:background 0.3s,transform 0.2s;display:inline-block}
-.btn-p:hover{background:var(--gold2);transform:translateY(-2px)}
-.btn-t{font-size:0.7rem;letter-spacing:0.15em;color:var(--mist2);display:flex;align-items:center;gap:0.5rem;transition:color 0.3s}
-.btn-t:hover{color:var(--paper)}
-.btn-t span{transition:transform 0.3s}
-.btn-t:hover span{transform:translateX(5px)}
-
-.hero-r{background:var(--ink2);position:relative;overflow:hidden}
-.hero-r-inner{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:3.5rem}
-.big-num{position:absolute;top:2rem;right:2rem;font-family:var(--ff-d);font-size:14rem;font-weight:300;color:rgba(200,169,110,0.04);line-height:1;pointer-events:none;user-select:none}
-.feat-label{font-size:0.6rem;letter-spacing:0.38em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
-.feat-card{background:rgba(255,255,255,0.03);border:1px solid rgba(200,169,110,0.13);padding:2rem;transition:border-color 0.3s,background 0.3s;cursor:pointer}
-.feat-card:hover{border-color:rgba(200,169,110,0.35);background:rgba(255,255,255,0.05)}
-.feat-emoji{font-size:2.2rem;margin-bottom:0.8rem;display:block}
-.feat-meta{font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--mist);margin-bottom:0.5rem}
-.feat-title{font-family:var(--ff-s);font-size:1.5rem;font-weight:300;line-height:1.4;color:var(--paper);margin-bottom:0.5rem}
-.feat-exc{font-size:0.75rem;color:var(--mist2);line-height:1.8;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-
-/* marquee */
-.mq{overflow:hidden;border-top:1px solid rgba(200,169,110,0.08);border-bottom:1px solid rgba(200,169,110,0.08);background:var(--ink2);padding:0.65rem 0}
-.mq-t{display:flex;gap:2.5rem;animation:mq 35s linear infinite;white-space:nowrap}
-.mq-i{font-size:0.62rem;letter-spacing:0.32em;text-transform:uppercase;color:var(--mist);flex-shrink:0;display:flex;align-items:center;gap:1.2rem}
-.mq-i b{color:var(--gold);font-size:0.45rem;font-weight:400}
-@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-
-/* section */
-.sec{max-width:1320px;margin:0 auto;padding:6rem 3rem}
-.sec-hd{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:3rem;padding-bottom:1.5rem;border-bottom:1px solid rgba(200,169,110,0.12)}
-.sec-lbl{font-size:0.6rem;letter-spacing:0.42em;text-transform:uppercase;color:var(--gold);margin-bottom:0.5rem}
-.sec-ttl{font-family:var(--ff-s);font-size:2.2rem;font-weight:300;color:var(--paper);line-height:1.2}
-.sec-all{font-size:0.66rem;letter-spacing:0.2em;color:var(--mist2);transition:color 0.3s;display:flex;align-items:center;gap:0.5rem;padding-bottom:0.2rem}
-.sec-all:hover{color:var(--gold)}
-.sec-all span{transition:transform 0.3s}
-.sec-all:hover span{transform:translateX(4px)}
-
-/* article grid */
-.grid-main{display:grid;grid-template-columns:3fr 2fr;gap:1px;background:rgba(200,169,110,0.08)}
-.grid-small{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(200,169,110,0.08);margin-top:1px}
-.ac{background:var(--ink);display:block;padding:2.5rem;transition:background 0.3s;position:relative;overflow:hidden}
-.ac:hover{background:var(--ink2)}
-.ac-big{grid-row:1/3;padding:3.5rem}
-.ac::after{content:'';position:absolute;bottom:0;left:2.5rem;right:2.5rem;height:1px;background:linear-gradient(to right,transparent,rgba(200,169,110,0.25),transparent);transform:scaleX(0);transition:transform 0.4s}
-.ac:hover::after{transform:scaleX(1)}
-.ac-n{font-family:var(--ff-d);font-size:0.7rem;color:rgba(200,169,110,0.35);letter-spacing:0.2em;margin-bottom:1.2rem}
-.ac-emoji{font-size:1.8rem;margin-bottom:1rem;display:block}
-.ac-big .ac-emoji{font-size:3rem}
-.ac-meta{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.6rem}
-.ac-ttl{font-family:var(--ff-s);font-size:1.2rem;font-weight:300;line-height:1.45;color:var(--paper);margin-bottom:0.7rem}
-.ac-big .ac-ttl{font-family:var(--ff-s);font-size:1.7rem;margin-bottom:1rem}
-.ac-exc{font-size:0.76rem;color:var(--mist2);line-height:1.85;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.ac-big .ac-exc{-webkit-line-clamp:3}
-.ac-ft{display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;padding-top:1.2rem;border-top:1px solid rgba(255,255,255,0.05)}
-.ac-dt{font-size:0.63rem;color:var(--mist);letter-spacing:0.08em}
-.ac-arr{font-size:0.68rem;color:var(--gold);opacity:0;transform:translateX(-8px);transition:opacity 0.3s,transform 0.3s}
-.ac:hover .ac-arr{opacity:1;transform:translateX(0)}
-.empty{text-align:center;padding:6rem 2rem;color:var(--mist)}
-.empty-num{font-family:var(--ff-d);font-size:5rem;font-weight:300;font-style:italic;color:rgba(200,169,110,0.12);display:block;margin-bottom:1rem}
-.loading{text-align:center;padding:6rem;font-size:0.72rem;letter-spacing:0.25em;color:var(--mist)}
-
-/* divider */
-.ornament{display:flex;align-items:center;justify-content:center;gap:1.5rem;padding:1.5rem 3rem;color:rgba(200,169,110,0.25);font-family:var(--ff-d);font-size:1.3rem}
-.ornament::before,.ornament::after{content:'';flex:1;height:1px;background:linear-gradient(to right,transparent,rgba(200,169,110,0.15))}
-.ornament::after{background:linear-gradient(to left,transparent,rgba(200,169,110,0.15))}
-
-/* footer */
-footer{border-top:1px solid rgba(200,169,110,0.08);padding:4rem 3rem;background:var(--ink2)}
-.ft-in{max-width:1320px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:3rem}
-.ft-brand .logo{display:block;margin-bottom:1rem}
-.ft-brand p{font-size:0.75rem;color:var(--mist);line-height:1.85;max-width:260px}
-.ft-ttl{font-size:0.6rem;letter-spacing:0.32em;text-transform:uppercase;color:var(--gold);margin-bottom:1.2rem}
-.ft-links{display:flex;flex-direction:column;gap:0.6rem}
-.ft-links a{font-size:0.77rem;color:var(--mist2);transition:color 0.3s}
-.ft-links a:hover{color:var(--paper)}
-.ft-copy{grid-column:1/-1;border-top:1px solid rgba(200,169,110,0.08);padding-top:2rem;margin-top:1rem;font-size:0.62rem;letter-spacing:0.18em;color:var(--mist);text-align:center}
-
-/* city filter */
-.city-bar{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:2.5rem}
-.city-btn{padding:0.3rem 0.85rem;border:1px solid rgba(200,169,110,0.18);background:none;color:var(--mist);cursor:pointer;font-family:var(--ff-n);font-size:0.65rem;letter-spacing:0.1em;transition:all 0.2s}
-.city-btn:hover,.city-btn.on{border-color:var(--gold);color:var(--gold)}
-/* cover image */
-.ac-cover{width:100%;aspect-ratio:3/2;object-fit:cover;display:block;margin-bottom:1.2rem}
-.ac-big .ac-cover{aspect-ratio:16/9;margin-bottom:1.5rem}
-@media(max-width:900px){.city-bar{gap:0.3rem}.city-btn{font-size:0.62rem}}
-@keyframes up{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
-
-@media(max-width:900px){
-  .h1{font-size:clamp(2rem,10vw,3.5rem)!important;overflow:hidden}
-  .h2{font-size:0.95rem!important;margin-bottom:1rem!important}
-  .desc{font-size:0.75rem;margin-bottom:1.2rem!important}
-  .kicker{margin-bottom:1rem!important}
-  .btn-p{padding:0.65rem 1.8rem}
-  header{padding:0 1.5rem}
-  .hero{grid-template-columns:1fr;min-height:0!important;height:auto!important}
-  .hero-l{padding:5.5rem 1.2rem 1.2rem}
-  .hero-l::after{display:none}
-  .hero-r{display:none}
-  .grid-main{grid-template-columns:1fr}
-  .ac-big{grid-row:auto}
-  .grid-small{grid-template-columns:1fr 1fr}
-  .sec{padding:2.5rem 1.5rem}
-  .ft-in{grid-template-columns:1fr}
-}
-
-/* region & keyword SEO section */
-.region-sec{padding:4rem 0 3rem;border-top:1px solid rgba(200,169,110,0.1)}
-.region-sec .sec-ttl{font-size:0.7rem;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;margin-bottom:2rem;text-align:center}
-.region-grid{display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;margin-bottom:3rem}
-.region-chip{display:inline-flex;flex-direction:column;align-items:center;border:1px solid rgba(200,169,110,0.2);padding:0.8rem 1.5rem;text-decoration:none;transition:all 0.2s;gap:0.2rem}
-.region-chip:hover{border-color:var(--gold);background:rgba(200,169,110,0.05)}
-.region-chip-name{font-size:0.9rem;color:var(--paper);font-family:var(--ff-s)}
-.region-chip-count{font-size:0.65rem;color:var(--mist);letter-spacing:0.05em}
-.kw-grid{display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center}
-.kw-chip{padding:0.3rem 0.9rem;border:1px solid rgba(200,169,110,0.15);color:var(--mist);text-decoration:none;font-size:0.7rem;letter-spacing:0.08em;transition:all 0.2s}
-.kw-chip:hover{border-color:var(--gold);color:var(--gold)}
-@media(max-width:768px){.region-chip{padding:0.6rem 1rem}.region-chip-name{font-size:0.8rem}}
-</style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>IvyLife 艾薇生活 - 美食旅遊生活風格分享</title>
+<meta name="description" content="艾薇的生活分享平台，記錄美食餐廳、飯店民宿、醫學美容、居家設計等生活體驗，帶你發現生活中的每一個美好。">
+<meta property="og:title" content="IvyLife 艾薇生活">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ivylife.com.tw">
+<link rel="canonical" href="https://ivylife.com.tw/">
+<link rel="stylesheet" href="/css/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Blog","name":"IvyLife 艾薇生活","url":"https://ivylife.com.tw","author":{"@type":"Person","name":"艾薇 Ivy"}}</script>
 </head>
 <body>
-
-<header>
-  <a href="/" class="logo">漫途 <small>旅遊誌</small></a>
-  <nav class="hnav">
-    <a href="/">首頁</a>
-    <a href="/articles">文章</a>
-  </nav>
-</header>
-
+<nav class="nav"><div class="nav-inner"><a class="nav-logo" href="/">Ivy<span>Life</span></a>
+<ul class="nav-links" id="navLinks">
+<li><a href="/category.html?cat=tastyfood">美食餐廳</a></li>
+<li><a href="/category.html?cat=hotel">飯店民宿</a></li>
+<li><a href="/category.html?cat=beauty">醫學美容</a></li>
+<li><a href="/category.html?cat=renovation">宅修清潔</a></li>
+<li><a href="/category.html?cat=furniture">設計推薦</a></li>
+<li><a href="/about.html">關於艾薇</a></li>
+</ul>
+<div class="nav-hamburger" id="hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')"><span></span><span></span><span></span></div>
+</div></nav>
 <section class="hero">
-  <div class="hero-l">
-    <div class="kicker">Travel · Life · Story</div>
-    <h1 class="h1">慢旅行<br><span style="font-style:italic;color:var(--gold)">快記憶</span></h1>
-    <p class="h2">每一段旅程，都值得被文字留住</p>
-    <p class="desc">漫途是一本關於旅行的誌，記錄那些值得被記住的風景、滋味與感受。用緩慢的步伐，深刻的眼光，書寫每一段屬於自己的故事。</p>
-    <div class="cta">
-      <a href="/articles" class="btn-p">探索文章</a>
-    </div>
-  </div>
-  <div class="hero-r">
-    <div class="big-num">01</div>
-    <div class="hero-r-inner">
-      <div class="feat-label">最新刊登</div>
-      <div class="feat-card" id="hero-feat">
-        <span class="feat-emoji">✍️</span>
-        <div class="feat-meta">載入中...</div>
-        <div class="feat-title"> </div>
-      </div>
-    </div>
-  </div>
+<div class="hero-inner">
+<p class="hero-eyebrow">✦ 艾薇の生活日記 ✦</p>
+<h1>用心感受<em>每一刻</em><br>美好的生活體驗</h1>
+<p class="hero-desc">從美食餐廳到居家美學，艾薇帶你探索生活中最值得珍藏的每個瞬間。</p>
+<div class="hero-cta">
+<a href="#latest" class="btn-primary">探索最新文章</a>
+<a href="/about.html" class="btn-outline">認識艾薇</a>
+</div></div>
 </section>
-
-<div class="mq">
-  <div class="mq-t">
-    <div class="mq-i">旅行日記 <span style="color:var(--gold);font-size:0.45rem">✦</span></div>
-    <div class="mq-i">咖啡廳探訪 <span style="color:var(--gold);font-size:0.45rem">✦</span></div>
-    <div class="mq-i">城市漫遊 <span style="color:var(--gold);font-size:0.45rem">✦</span></div>
-    <div class="mq-i">美食紀錄 <span style="color:var(--gold);font-size:0.45rem">✦</span></div>
-    <div class="mq-i">日常旅途 <span style="color:var(--gold);font-size:0.45rem">✦</span></div>
-    <div class="mq-i">文字風景 <span style="color:var(--gold);font-size:0.45rem">✦</span></div>
-    <div class="mq-i">旅行日記 <span style="color:var(--gold);font-size:0.45rem">✦</span></div>
-    <div class="mq-i">咖啡廳探訪 <span style="color:var(--gold);font-size:0.45rem">✦</span></div>
-    <div class="mq-i">城市漫遊 <span style="color:var(--gold);font-size:0.45rem">✦</span></div>
-    <div class="mq-i">美食紀錄 <span style="color:var(--gold);font-size:0.45rem">✦</span></div>
-    <div class="mq-i">日常旅途 <span style="color:var(--gold);font-size:0.45rem">✦</span></div>
-    <div class="mq-i">文字風景 <span style="color:var(--gold);font-size:0.45rem">✦</span></div>
-  </div>
+<div style="background:var(--cream);padding:40px 0">
+<div class="section" style="padding-top:0;padding-bottom:0">
+<div id="categoriesGrid" class="categories-grid">
+<div class="loading-state" style="grid-column:1/-1;padding:2rem"><div class="loading-spinner"></div></div>
+</div></div></div>
+<div class="section" id="latest">
+<div class="section-header">
+<span class="section-eyebrow">Latest Stories</span>
+<h2 class="section-title">最新文章</h2>
+<p class="section-subtitle">艾薇最新的生活體驗與真實分享</p>
 </div>
-
-<section class="sec">
-  <div class="sec-hd">
-    <div>
-      <div class="sec-lbl">Latest Stories</div>
-      <h2 class="sec-ttl">最新文章</h2>
-    </div>
-    <a href="/articles" class="sec-all">所有文章 <span>→</span></a>
-  </div>
-  <div class="city-bar" id="city-bar"></div>
-  <div id="ac-container"><div class="loading">Loading...</div></div>
-</section>
-
-<div class="ornament">❧</div>
-
-
-<section class="region-sec container">
-  <div class="sec-ttl">探索地區</div>
-  <div class="region-grid" id="hp-region-grid">
-    <div style="color:var(--mist);font-size:0.8rem">載入中...</div>
-  </div>
-  <div class="sec-ttl" style="margin-top:1rem">熱門關鍵字</div>
-  <div class="kw-grid" id="hp-kw-grid">
-    <div style="color:var(--mist);font-size:0.8rem">載入中...</div>
-  </div>
-</section>
-<footer>
-  <div class="ft-in">
-    <div class="ft-brand">
-      <a href="/" class="logo">漫途 <small>旅遊誌</small></a>
-      <p>用文字記錄每一段值得被記住的旅程。慢旅行，深刻的眼光。</p>
-    </div>
-    <div>
-      <div class="ft-ttl">導覽</div>
-      <div class="ft-links">
-        <a href="/">首頁</a>
-        <a href="/articles">所有文章</a>
-
-    <div>
-      <div class="ft-ttl">聯絡我們</div>
-      <div class="ft-links">
-        <a href="https://lin.ee/ZBhZQL3" target="_blank" rel="noopener">💬 LINE 官方帳號</a>
-      </div>
-    </div>
-    <div class="ft-copy">© 2026 漫途旅遊誌 · 用文字記錄每一段旅程</div>
-  </div>
-</footer>
-
+<div id="featuredContainer"><div class="loading-state"><div class="loading-spinner"></div><p>載入中⋯</p></div></div>
+</div>
+<div style="background:var(--cream)">
+<div class="section">
+<div class="section-header">
+<span class="section-eyebrow">More to Explore</span>
+<h2 class="section-title">繼續探索</h2>
+</div>
+<div id="moreArticles" class="articles-grid"></div>
+</div></div>
+<footer class="footer"><div class="footer-inner">
+<div class="footer-brand"><a class="nav-logo" href="/">Ivy<span>Life</span></a><p>艾薇的生活分享平台，記錄每一個值得珍藏的美好時刻。從台灣各地美食到生活美學，帶你發現生活中的小確幸。</p></div>
+<div><h5>分類</h5><ul>
+<li><a href="/category.html?cat=tastyfood">美食餐廳</a></li>
+<li><a href="/category.html?cat=hotel">飯店民宿</a></li>
+<li><a href="/category.html?cat=beauty">醫學美容</a></li>
+<li><a href="/category.html?cat=massage">全身按摩</a></li>
+<li><a href="/category.html?cat=carcare">汽車美容</a></li>
+</ul></div>
+<div><h5>關於</h5><ul>
+<li><a href="/about.html">關於艾薇</a></li>
+<li><a href="/sitemap.xml">網站地圖</a></li>
+<li><a href="/privacy.html">隱私政策</a></li>
+</ul></div>
+</div><div class="footer-bottom"><p>© 2024 IvyLife 艾薇生活 · 台灣生活風格部落格</p></div></footer>
+<script src="/js/supabase.js"></script>
 <script>
-const sb = supabase.createClient(
-  'https://zsebcpfblecwumbaxeaz.supabase.co',
-  'sb_publishable_L2DOfeM0cAJqwlVCr1LwtA_jE9MBNDn'
-);
-let _all=[], _city='';
-
-async function load(){
-  const {data} = await sb.from('articles').select('*').eq('status','published').order('published_at',{ascending:false}).limit(20);
-  _all = data||[];
-  if(_all.length>0){
-    const a=_all[0];
-    const fc=document.getElementById('hero-feat');
-    fc.onclick=()=>location.href=`/articles/${a.slug}`;
-    fc.querySelector('.feat-emoji').textContent=a.emoji||'✍️';
-    fc.querySelector('.feat-meta').textContent=[a.city,a.category].filter(Boolean).join(' · ')||'漫途';
-    fc.querySelector('.feat-title').textContent=a.title;
-    if(a.cover_image){
-      const img=document.createElement('img');
-      img.src=a.cover_image;img.style.cssText='width:100%;aspect-ratio:16/9;object-fit:cover;margin-bottom:1rem';
-      fc.insertBefore(img,fc.querySelector('.feat-emoji'));
-      fc.querySelector('.feat-emoji').style.display='none';
-    }
-    if(a.excerpt){const el=document.createElement('div');el.className='feat-exc';el.textContent=a.excerpt;fc.appendChild(el);}
-  }
-  const KNOWN=new Set(['台北','台南','台中','高雄','花蓮','宜蘭','南投','嘉義','屏東','台東','澎湖','金門','基隆','新竹','苗栗','彰化','雲林','新北','桃園']);const cities=[...new Set(_all.map(a=>a.city).filter(c=>c&&KNOWN.has(c)))];
-  const bar=document.getElementById('city-bar');
-  if(cities.length>1){
-    bar.innerHTML='<a class="city-btn on" href="/articles">全部</a>'+cities.map(c=>`<a class="city-btn" href="/articles?city=${encodeURIComponent(c)}">${c}</a>`).join('');
-  }
-  rg(_all);
+async function loadCategories(){
+  try{
+    const cats=await getCategories();
+    document.getElementById('categoriesGrid').innerHTML=cats.map(c=>'<a class="category-pill fade-in" href="/category.html?cat='+c.slug+'"><span class="category-icon">'+(c.icon||categoryIcon(c.name))+'</span><span class="category-name">'+c.name+'</span></a>').join('');
+  }catch{}
 }
-
-function fc(city){
-  _city=city;
-  document.querySelectorAll('.city-btn').forEach(b=>b.classList.toggle('on',b.textContent===city||(city===''&&b.textContent==='全部')));
-  rg(city?_all.filter(a=>a.city===city):_all);
+async function loadArticles(){
+  try{
+    const articles=await getArticles({limit:9});
+    if(!articles.length){document.getElementById('featuredContainer').innerHTML='<p style="text-align:center;color:var(--text-light)">尚未有文章</p>';return;}
+    const f=articles[0];
+    document.getElementById('featuredContainer').innerHTML='<a class="featured-card" href="/'+f.slug+'.html" style="text-decoration:none"><div class="featured-img">'+categoryIcon(f.ivy_categories?.name||'')+'</div><div class="featured-body"><span class="card-category">'+(f.ivy_categories?.name||'生活')+'</span><h2 class="card-title" style="font-size:1.5rem">'+f.title+'</h2><p class="card-synopsis" style="-webkit-line-clamp:4">'+(f.synopsis||'')+'</p><span class="card-meta">'+formatDate(f.created_at)+'</span></div></a>';
+    document.getElementById('moreArticles').innerHTML=articles.slice(1).map(a=>'<a class="article-card fade-in" href="/'+a.slug+'.html" style="text-decoration:none;color:inherit"><div class="card-img">'+categoryIcon(a.ivy_categories?.name||'')+'</div><div class="card-body"><span class="card-category">'+(a.ivy_categories?.name||'')+'</span><h3 class="card-title">'+a.title+'</h3><p class="card-synopsis">'+(a.synopsis||'')+'</p><span class="card-meta">'+formatDate(a.created_at)+'</span></div></a>').join('');
+  }catch(e){document.getElementById('featuredContainer').innerHTML='<div class="error-state"><h2>載入失敗</h2><p>'+e.message+'</p></div>';}
 }
-// city-btn <a> click: prevent navigation, do JS filter instead
-document.addEventListener('click',function(e){
-  const btn=e.target.closest('.city-btn');
-  if(!btn||!btn.href)return;
-  e.preventDefault();
-  const url=new URL(btn.href);
-  const city=decodeURIComponent(url.searchParams.get('city')||'');
-  fc(city);
-});
-
-function fmt(d){return d?new Date(d).toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric'}):''}
-function fmtS(d){return d?new Date(d).toLocaleDateString('zh-TW'):''}
-
-function card(a,n,big){
-  const cover=a.cover_image
-    ?`<img class="ac-cover" src="${a.cover_image}" alt="${a.title}" loading="lazy">`
-    :`<span class="ac-emoji">${a.emoji||'✍️'}</span>`;
-  return `<a href="/articles/${a.slug}" class="ac${big?' ac-big':''}">
-    <div class="ac-n">No.${String(n).padStart(2,'0')}</div>
-    ${cover}
-    <div class="ac-meta">${[a.city,a.category].filter(Boolean).join(' · ')||'漫途'}</div>
-    <div class="ac-ttl">${a.title}</div>
-    <div class="ac-exc">${a.excerpt||''}</div>
-    <div class="ac-ft">
-      <span class="ac-dt">${big?fmt(a.published_at):fmtS(a.published_at)}</span>
-      <span class="ac-arr">${big?'閱讀全文 →':'→'}</span>
-    </div>
-  </a>`;
-}
-
-function rg(list){
-  const el=document.getElementById('ac-container');
-  if(!list.length){el.innerHTML='<div class="empty"><span class="empty-num">漫途</span>此地尚無文章</div>';return;}
-  const[first,...rest]=list;
-  const side=rest.slice(0,1),small=rest.slice(1,6);
-  el.innerHTML=`<div class="grid-main">${card(first,1,true)}${side.map((a,i)=>card(a,i+2,false)).join('')}</div>${small.length?`<div class="grid-small">${small.map((a,i)=>card(a,i+3,false)).join('')}</div>`:''}`;
-}
-
-load();
+loadCategories();loadArticles();
 </script>
-
-<script>
-(function(){
-  var SB='https://zsebcpfblecwumbaxeaz.supabase.co';
-  var SK='sb_publishable_L2DOfeM0cAJqwlVCr1LwtA_jE9MBNDn';
-  function mk(tag,style,text){var el=document.createElement(tag);if(style)el.style.cssText=style;if(text!=null)el.textContent=text;return el;}
-
-  // 載入地區
-  fetch(SB+'/rest/v1/regions?select=*&order=sort_order',{headers:{apikey:SK,Authorization:'Bearer '+SK}})
-  .then(function(r){return r.json();})
-  .then(function(regs){
-    var el=document.getElementById('hp-region-grid');
-    if(!el||!regs||!regs.length)return;
-    while(el.firstChild)el.removeChild(el.firstChild);
-    regs.forEach(function(reg){
-      var a=document.createElement('a');
-      a.className='region-chip';
-      a.href='/'+reg.slug;
-      var name=mk('span','','');
-      name.className='region-chip-name';
-      name.textContent=reg.name;
-      a.appendChild(name);
-      el.appendChild(a);
-    });
-  }).catch(function(){});
-
-  // 載入關鍵字
-  fetch(SB+'/rest/v1/keywords?select=*,regions(name)&order=sort_order',{headers:{apikey:SK,Authorization:'Bearer '+SK}})
-  .then(function(r){return r.json();})
-  .then(function(kws){
-    var el=document.getElementById('hp-kw-grid');
-    if(!el||!kws||!kws.length)return;
-    while(el.firstChild)el.removeChild(el.firstChild);
-    kws.forEach(function(kw){
-      var a=document.createElement('a');
-      a.className='kw-chip';
-      var region=kw.regions?kw.regions.name:'';
-      // 連結到地區文章列表（之後有關鍵字頁面再換）
-      a.href='/articles?city='+encodeURIComponent(region)+'&kw='+encodeURIComponent(kw.slug);
-      a.textContent=kw.name;
-      el.appendChild(a);
-    });
-  }).catch(function(){});
-})();
-</script>
-
-</body>
-</html>
+</body></html>
