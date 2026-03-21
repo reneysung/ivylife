@@ -402,6 +402,32 @@ async function uploadIvyCover(e){
   }
   e.target.value='';
 }
+
+async function uploadIvyCover(e){
+  const file=e.target.files?.[0];if(!file)return;
+  const status=document.getElementById('coverUploadStatus');
+  const preview=document.getElementById('coverPreview');
+  const wrap=document.getElementById('coverPreviewWrap');
+  if(preview)preview.src=URL.createObjectURL(file);
+  if(wrap)wrap.style.display='block';
+  if(status){status.textContent='⏫ 上傳中...';status.style.color='#888';}
+  const STOR='https://zsebcpfblecwumbaxeaz.supabase.co';
+  const PKEY='sb_publishable_L2DOfeM0cAJqwlVCr1LwtA_jE9MBNDn';
+  const ext=file.name.split('.').pop()||'jpg';
+  const fname='cover-'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;
+  try{
+    const r=await fetch(STOR+'/storage/v1/object/ivy-images/'+fname,{method:'POST',headers:{'apikey':PKEY,'Authorization':'Bearer '+PKEY,'Content-Type':file.type},body:file});
+    if(!r.ok){const t=await r.text();throw new Error(t);}
+    const url=STOR+'/storage/v1/object/public/ivy-images/'+fname;
+    document.getElementById('edCover').value=url;
+    if(status){status.textContent='✅ 上傳成功';status.style.color='#4caf50';}
+    console.log('IVY_COVER_UPLOADED:',url);
+  }catch(err){
+    if(status){status.textContent='❌ 失敗：'+err.message.substring(0,40);status.style.color='#f44336';}
+    console.error('ivy cover err:',err);
+  }
+  e.target.value='';
+}
 </script>
 </body>
 </html>
