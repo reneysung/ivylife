@@ -1,4 +1,6 @@
-<html lang="zh-TW"><script src="chrome-extension://eppiocemhmnlbhjplcgkofciiegomcon/content/location/location.js" id="eppiocemhmnlbhjplcgkofciiegomcon"></script><script src="chrome-extension://eppiocemhmnlbhjplcgkofciiegomcon/libs/extend-native-history-api.js"></script><script src="chrome-extension://eppiocemhmnlbhjplcgkofciiegomcon/libs/requests.js"></script><head></head><body __processed_04004920-fe1f-49ce-8d78-18d9612c5446__="true">function doLogin() {
+
+
+function doLogin() {
   if (document.getElementById('pwInput').value === PASS) {
     document.getElementById('loginPage').style.display = 'none';
     document.getElementById('adminPage').style.display = 'block';
@@ -7,59 +9,59 @@
     document.getElementById('loginErr').style.display = 'block';
   }
 }
-document.getElementById('pwInput').addEventListener('keydown', e =&gt; { if (e.key === 'Enter') doLogin(); });
+document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
 async function loadAll() {
   try {
     [cats, arts] = await Promise.all([
       sb('ivy_categories?order=sort_order.asc'),
-      sb('ivy_articles?select=*,ivy_categories(name,slug)&amp;order=created_at.desc')
+      sb('ivy_articles?select=*,ivy_categories(name,slug)&order=created_at.desc')
     ]);
     renderDash(); renderArts(arts); renderCats(); fillCatOpts();
-    document.getElementById('lastUpdate').textContent = '更新於 ' + new Date().toLocaleTimeString('zh-TW');
-  } catch(e) { toast('載入失敗: ' + e.message, 1); }
+    document.getElementById('lastUpdate').textContent = 'æ´æ°æ¼ ' + new Date().toLocaleTimeString('zh-TW');
+  } catch(e) { toast('è¼å¥å¤±æ: ' + e.message, 1); }
 }
 
 function renderDash() {
   document.getElementById('s1').textContent = arts.length;
-  document.getElementById('s2').textContent = arts.filter(a =&gt; a.published).length;
-  document.getElementById('s3').textContent = arts.filter(a =&gt; !a.published).length;
+  document.getElementById('s2').textContent = arts.filter(a => a.published).length;
+  document.getElementById('s3').textContent = arts.filter(a => !a.published).length;
   document.getElementById('s4').textContent = cats.length;
-  document.getElementById('dashRecent').innerHTML = arts.slice(0,10).map(a =&gt;
-    '<strong>' + esc(a.title) + '</strong>' + (a.ivy_categories ? a.ivy_categories.name : '-') + '' +
-    badge(a.published) + '' + fmtDate(a.created_at) + ''
-  ).join('') || '暫無文章';
+  document.getElementById('dashRecent').innerHTML = arts.slice(0,10).map(a =>
+    '<tr><td><strong>' + esc(a.title) + '</strong></td><td>' + (a.ivy_categories ? a.ivy_categories.name : '-') + '</td><td>' +
+    badge(a.published) + '</td><td>' + fmtDate(a.created_at) + '</td></tr>'
+  ).join('') || '<tr><td colspan="4" class="empty-state">æ«ç¡æç« </td></tr>';
 }
 
 function renderArts(list) {
-  document.getElementById('artList').innerHTML = list.map(a =&gt;
-    '<strong>' + esc(a.title) + '</strong>' +
-    '' + (a.ivy_categories ? a.ivy_categories.name : '-') + '' +
-    '<code style="font-size:0.75rem;color:#a08085">' + a.slug + '</code>' +
-    '' + badge(a.published) + '' +
-    '' + fmtDate(a.created_at) + '' +
-    '<div class="actions">' +
-      '<button class="btn btn-sm btn-outline" onclick="editArt(' + a.id + ')">編輯</button>' +
-      '<button class="btn btn-sm ' + (a.published ? 'btn-outline' : 'btn-success') + '" onclick="togglePub(' + a.id + ',' + a.published + ')">' + (a.published ? '下架' : '發布') + '</button>' +
-      '<button class="btn btn-sm btn-danger" onclick="delArt(' + a.id + ',\'' + a.title.replace(/'/g,'').substring(0,20) + '\')">刪除</button>' +
-    '</div>'
-  ).join('') || '暫無文章';
+  document.getElementById('artList').innerHTML = list.map(a =>
+    '<tr><td><strong>' + esc(a.title) + '</strong></td>' +
+    '<td>' + (a.ivy_categories ? a.ivy_categories.name : '-') + '</td>' +
+    '<td><code style="font-size:0.75rem;color:#a08085">' + a.slug + '</code></td>' +
+    '<td>' + badge(a.published) + '</td>' +
+    '<td>' + fmtDate(a.created_at) + '</td>' +
+    '<td><div class="actions">' +
+      '<button class="btn btn-sm btn-outline" onclick="editArt(' + a.id + ')">ç·¨è¼¯</button>' +
+      '<button class="btn btn-sm ' + (a.published ? 'btn-outline' : 'btn-success') + '" onclick="togglePub(' + a.id + ',' + a.published + ')">' + (a.published ? 'ä¸æ¶' : 'ç¼å¸') + '</button>' +
+      '<button class="btn btn-sm btn-danger" onclick="delArt(' + a.id + ',\'' + a.title.replace(/'/g,'').substring(0,20) + '\')">åªé¤</button>' +
+    '</div></td></tr>'
+  ).join('') || '<tr><td colspan="6" class="empty-state">æ«ç¡æç« </td></tr>';
 }
 
 function renderCats() {
-  document.getElementById('catList').innerHTML = cats.map(c =&gt; {
-    const cnt = arts.filter(a =&gt; a.category_id === c.id).length;
-    return '' + (c.icon||'') + '<strong>' + c.name + '</strong>' +
-      '<code>' + c.slug + '</code>' + (c.description||'') + '' +
-      '' + c.sort_order + '<strong>' + cnt + '</strong>';
+  document.getElementById('catList').innerHTML = cats.map(c => {
+    const cnt = arts.filter(a => a.category_id === c.id).length;
+    return '<tr><td style="font-size:1.4rem">' + (c.icon||'') + '</td><td><strong>' + c.name + '</strong></td>' +
+      '<td><code>' + c.slug + '</code></td><td style="color:#a08085">' + (c.description||'') + '</td>' +
+      '<td style="text-align:center">' + c.sort_order + '</td><td style="text-align:center"><strong>' + cnt + '</strong></td></tr>';
   }).join('');
 }
 
 function fillCatOpts() {
-  const opts = cats.map(c =&gt; '<option value="' + c.id + '">' + (c.icon||'') + ' ' + c.name + '</option>').join('');
-  document.getElementById('edCat').innerHTML = '<option value="">-- 選擇分類 --</option>' + opts;
-  document.getElementById('filterCat').innerHTML = '<option value="">全部分類</option>' +
-    cats.map(c =&gt; '<option value="' + c.id + '">' + c.name + '</option>').join('');
+  const opts = cats.map(c => '<option value="' + c.id + '">' + (c.icon||'') + ' ' + c.name + '</option>').join('');
+  document.getElementById('edCat').innerHTML = '<option value="">-- é¸æåé¡ --</option>' + opts;
+  document.getElementById('filterCat').innerHTML = '<option value="">å¨é¨åé¡</option>' +
+    cats.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join('');
 }
 
 function filterList() {
@@ -67,14 +69,14 @@ function filterList() {
   const cat = document.getElementById('filterCat').value;
   const pub = document.getElementById('filterPub').value;
   let list = arts;
-  if (q) list = list.filter(a =&gt; a.title.toLowerCase().includes(q) || a.slug.includes(q));
-  if (cat) list = list.filter(a =&gt; String(a.category_id) === cat);
-  if (pub !== '') list = list.filter(a =&gt; String(a.published) === pub);
+  if (q) list = list.filter(a => a.title.toLowerCase().includes(q) || a.slug.includes(q));
+  if (cat) list = list.filter(a => String(a.category_id) === cat);
+  if (pub !== '') list = list.filter(a => String(a.published) === pub);
   renderArts(list);
 }
 
 function editArt(id) {
-  const a = arts.find(x =&gt; x.id === id);
+  const a = arts.find(x => x.id === id);
   if (!a) return;
   document.getElementById('edId').value = a.id;
   document.getElementById('edTitleInput').value = a.title || '';
@@ -86,26 +88,26 @@ function editArt(id) {
   document.getElementById('edMetaT').value = a.meta_title || '';
   document.getElementById('edMetaD').value = a.meta_description || '';
   document.getElementById('edPub').checked = !!a.published;
-  document.getElementById('edTitle').textContent = '✏️ 編輯文章';
+  document.getElementById('edTitle').textContent = 'âï¸ ç·¨è¼¯æç« ';
   showPanel('new', document.querySelector('.sidebar-menu li:nth-child(3) a'));
   window.scrollTo(0,0);
 }
 
 function resetForm() {
   document.getElementById('edId').value = '';
-  ['edTitleInput','edSlug','edSynopsis','edContent','edCover','edMetaT','edMetaD'].forEach(id =&gt; document.getElementById(id).value = '');
+  ['edTitleInput','edSlug','edSynopsis','edContent','edCover','edMetaT','edMetaD'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('edCat').value = '';
   document.getElementById('edPub').checked = true;
-  document.getElementById('edTitle').textContent = '✏️ 新增文章';
+  document.getElementById('edTitle').textContent = 'âï¸ æ°å¢æç« ';
   showPanel('articles', document.querySelector('.sidebar-menu li:nth-child(2) a'));
 }
 
 async function saveArt() {
   const id = document.getElementById('edId').value;
   const title = document.getElementById('edTitleInput').value.trim();
-  const slug = document.getElementById('edSlug').value.trim().replace(/[^a-zA-Z0-9一-鿿-_]/g, '');
-  if (!title) { toast('請填寫文章標題', 1); return; }
-  if (!slug) { toast('請填寫 Slug（網址）', 1); return; }
+  const slug = document.getElementById('edSlug').value.trim().replace(/[^a-zA-Z0-9ä¸-é¿¿-_]/g, '');
+  if (!title) { toast('è«å¡«å¯«æç« æ¨é¡', 1); return; }
+  if (!slug) { toast('è«å¡«å¯« Slugï¼ç¶²åï¼', 1); return; }
   const data = {
     title, slug,
     synopsis: document.getElementById('edSynopsis').value.trim() || null,
@@ -120,36 +122,36 @@ async function saveArt() {
   try {
     if (id) {
       await sb('ivy_articles?id=eq.' + id, { method: 'PATCH', body: JSON.stringify(data) });
-      toast('✅ 文章已更新！');
+      toast('â æç« å·²æ´æ°ï¼');
     } else {
       await sb('ivy_articles', { method: 'POST', body: JSON.stringify(data) });
-      toast('✅ 文章已新增！');
+      toast('â æç« å·²æ°å¢ï¼');
     }
     await loadAll();
     resetForm();
-  } catch(e) { toast('儲存失敗: ' + e.message, 1); }
+  } catch(e) { toast('å²å­å¤±æ: ' + e.message, 1); }
 }
 
 async function togglePub(id, cur) {
   try {
     await sb('ivy_articles?id=eq.' + id, { method: 'PATCH', body: JSON.stringify({ published: !cur }) });
-    toast(cur ? '文章已下架' : '✅ 文章已發布！');
+    toast(cur ? 'æç« å·²ä¸æ¶' : 'â æç« å·²ç¼å¸ï¼');
     await loadAll();
-  } catch(e) { toast('操作失敗: ' + e.message, 1); }
+  } catch(e) { toast('æä½å¤±æ: ' + e.message, 1); }
 }
 
 async function delArt(id, title) {
-  if (!confirm('確定刪除「' + title + '⋯」？此動作無法還原。')) return;
+  if (!confirm('ç¢ºå®åªé¤ã' + title + 'â¯ãï¼æ­¤åä½ç¡æ³éåã')) return;
   try {
     await sb('ivy_articles?id=eq.' + id, { method: 'DELETE' });
-    toast('文章已刪除');
+    toast('æç« å·²åªé¤');
     await loadAll();
-  } catch(e) { toast('刪除失敗: ' + e.message, 1); }
+  } catch(e) { toast('åªé¤å¤±æ: ' + e.message, 1); }
 }
 
 function showPanel(name, el) {
-  document.querySelectorAll('.panel').forEach(p =&gt; p.classList.remove('active'));
-  document.querySelectorAll('.sidebar-menu a').forEach(a =&gt; a.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
   document.getElementById('panel-' + name).classList.add('active');
   if (el) el.classList.add('active');
 }
@@ -160,19 +162,19 @@ function toast(msg, isErr) {
   t.style.background = isErr ? '#e74c3c' : '#2d2020';
   t.classList.add('show');
   clearTimeout(window._toastTimer);
-  window._toastTimer = setTimeout(() =&gt; t.classList.remove('show'), 3000);
+  window._toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-function badge(pub) { return pub ? '<span class="badge badge-green">已發布</span>' : '<span class="badge badge-gray">草稿</span>'; }
+function badge(pub) { return pub ? '<span class="badge badge-green">å·²ç¼å¸</span>' : '<span class="badge badge-gray">èç¨¿</span>'; }
 function fmtDate(s) { return s ? new Date(s).toLocaleDateString('zh-TW') : '-'; }
-function esc(s) { return s ? s.replace(/&amp;/g,'&amp;').replace(//g,'&gt;') : ''; }
+function esc(s) { return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
 
-
-
-
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>IvyLife 後台管理</title>
+<title>IvyLife å¾å°ç®¡ç</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Noto Sans TC',system-ui,sans-serif;background:#f8f4f5;color:#2d2020;min-height:100vh}
@@ -239,89 +241,87 @@ tr:hover td{background:#fdf8f4}
 .check-row label{font-size:0.9rem;color:#2d2020;cursor:pointer}
 @media(max-width:768px){.stats-grid{grid-template-columns:repeat(2,1fr)}.form-row{grid-template-columns:1fr}.sidebar{width:180px}.main{margin-left:180px}}
 </style>
-
-
+</head>
+<body>
 
 <div id="loginPage">
 <div class="login-box">
   <div class="login-logo">Ivy<span>Life</span></div>
-  <div class="login-sub">後台管理系統</div>
-  <input type="password" id="pwInput" placeholder="請輸入管理密碼">
-  <button class="btn-primary" onclick="doLogin()">登入</button>
-  <div class="login-err" id="loginErr">密碼錯誤，請再試一次</div>
+  <div class="login-sub">å¾å°ç®¡çç³»çµ±</div>
+  <input type="password" id="pwInput" placeholder="è«è¼¸å¥ç®¡çå¯ç¢¼">
+  <button class="btn-primary" onclick="doLogin()">ç»å¥</button>
+  <div class="login-err" id="loginErr">å¯ç¢¼é¯èª¤ï¼è«åè©¦ä¸æ¬¡</div>
 </div>
 </div>
 
 <div id="adminPage">
 <nav class="sidebar">
-  <div class="sidebar-logo">Ivy<span>Life</span> 後台</div>
+  <div class="sidebar-logo">Ivy<span>Life</span> å¾å°</div>
   <ul class="sidebar-menu">
-    <li><a class="active" onclick="showPanel('dashboard',this)">📊 總覽</a></li>
-    <li><a onclick="showPanel('articles',this)">📝 文章管理</a></li>
-    <li><a onclick="showPanel('new',this)">✏️ 新增文章</a></li>
-    <li><a onclick="showPanel('categories',this)">🏷️ 分類管理</a></li>
+    <li><a class="active" onclick="showPanel('dashboard',this)">ð ç¸½è¦½</a></li>
+    <li><a onclick="showPanel('articles',this)">ð æç« ç®¡ç</a></li>
+    <li><a onclick="showPanel('new',this)">âï¸ æ°å¢æç« </a></li>
+    <li><a onclick="showPanel('categories',this)">ð·ï¸ åé¡ç®¡ç</a></li>
   </ul>
   <div class="sidebar-footer">
-    <button onclick="window.open('/','_blank')">↗ 前往前台</button>
+    <button onclick="window.open('/','_blank')">â åå¾åå°</button>
   </div>
 </nav>
 
 <main class="main">
 
 <div id="panel-dashboard" class="panel active">
-  <div class="page-header"><h1>📊 網站總覽</h1><span style="font-size:0.8rem;color:#a08085" id="lastUpdate"></span></div>
+  <div class="page-header"><h1>ð ç¶²ç«ç¸½è¦½</h1><span style="font-size:0.8rem;color:#a08085" id="lastUpdate"></span></div>
   <div class="stats-grid">
-    <div class="stat-card"><div class="stat-num" id="s1">-</div><div class="stat-label">篇文章</div></div>
-    <div class="stat-card"><div class="stat-num" id="s2">-</div><div class="stat-label">已發布</div></div>
-    <div class="stat-card"><div class="stat-num" id="s3">-</div><div class="stat-label">草稿</div></div>
-    <div class="stat-card"><div class="stat-num" id="s4">-</div><div class="stat-label">個分類</div></div>
+    <div class="stat-card"><div class="stat-num" id="s1">-</div><div class="stat-label">ç¯æç« </div></div>
+    <div class="stat-card"><div class="stat-num" id="s2">-</div><div class="stat-label">å·²ç¼å¸</div></div>
+    <div class="stat-card"><div class="stat-num" id="s3">-</div><div class="stat-label">èç¨¿</div></div>
+    <div class="stat-card"><div class="stat-num" id="s4">-</div><div class="stat-label">ååé¡</div></div>
   </div>
   <div class="card">
-    <div class="card-header">最新 10 篇文章<button class="btn btn-sm btn-rose" onclick="showPanel('new',document.querySelector('.sidebar-menu li:nth-child(3) a'))">+ 新增</button></div>
-    <table><thead><tr><th>標題</th><th>分類</th><th>狀態</th><th>日期</th></tr></thead><tbody id="dashRecent"></tbody></table>
+    <div class="card-header">ææ° 10 ç¯æç« <button class="btn btn-sm btn-rose" onclick="showPanel('new',document.querySelector('.sidebar-menu li:nth-child(3) a'))">+ æ°å¢</button></div>
+    <table><thead><tr><th>æ¨é¡</th><th>åé¡</th><th>çæ</th><th>æ¥æ</th></tr></thead><tbody id="dashRecent"></tbody></table>
   </div>
 </div>
 
 <div id="panel-articles" class="panel">
   <div class="page-header">
-    <h1>📝 文章管理</h1>
-    <button class="btn btn-rose" onclick="showPanel('new',document.querySelector('.sidebar-menu li:nth-child(3) a'))">+ 新增文章</button>
+    <h1>ð æç« ç®¡ç</h1>
+    <button class="btn btn-rose" onclick="showPanel('new',document.querySelector('.sidebar-menu li:nth-child(3) a'))">+ æ°å¢æç« </button>
   </div>
   <div class="toolbar">
-    <input type="text" id="searchQ" placeholder="搜尋標題或 slug⋯" oninput="filterList()">
-    <select id="filterCat" onchange="filterList()"><option value="">全部分類</option></select>
-    <select id="filterPub" onchange="filterList()"><option value="">全部狀態</option><option value="true">已發布</option><option value="false">草稿</option></select>
+    <input type="text" id="searchQ" placeholder="æå°æ¨é¡æ slugâ¯" oninput="filterList()">
+    <select id="filterCat" onchange="filterList()"><option value="">å¨é¨åé¡</option></select>
+    <select id="filterPub" onchange="filterList()"><option value="">å¨é¨çæ</option><option value="true">å·²ç¼å¸</option><option value="false">èç¨¿</option></select>
   </div>
   <div class="card">
-    <table><thead><tr><th>標題</th><th>分類</th><th>Slug</th><th>狀態</th><th>日期</th><th>操作</th></tr></thead>
+    <table><thead><tr><th>æ¨é¡</th><th>åé¡</th><th>Slug</th><th>çæ</th><th>æ¥æ</th><th>æä½</th></tr></thead>
     <tbody id="artList"></tbody></table>
   </div>
 </div>
 
 <div id="panel-new" class="panel">
   <div class="page-header">
-    <h1 id="edTitle">✏️ 新增文章</h1>
-    <button class="btn btn-outline" onclick="resetForm()">× 取消</button>
+    <h1 id="edTitle">âï¸ æ°å¢æç« </h1>
+    <button class="btn btn-outline" onclick="resetForm()">Ã åæ¶</button>
   </div>
   <div class="card">
     <div class="editor-form">
       <input type="hidden" id="edId">
-      <div class="form-group"><label>文章標題 *</label><input type="text" id="edTitleInput" placeholder="例：台南必吃美食推薦｜10家私藏餐廳"></div>
+      <div class="form-group"><label>æç« æ¨é¡ *</label><input type="text" id="edTitleInput" placeholder="ä¾ï¼å°åå¿åç¾é£æ¨è¦ï½10å®¶ç§èé¤å»³"></div>
       <div class="form-row">
-        <div class="form-group"><label>Slug（網址）* <span style="color:#d4697a;font-size:0.75rem">— 對應舊網址如 tastyfood01</span></label><input type="text" id="edSlug" placeholder="tastyfood01"></div>
-        <div class="form-group"><label>分類</label><select id="edCat"><option value="">-- 選擇分類 --</option></select></div>
+        <div class="form-group"><label>Slugï¼ç¶²åï¼* <span style="color:#d4697a;font-size:0.75rem">â å°æèç¶²åå¦ tastyfood01</span></label><input type="text" id="edSlug" placeholder="tastyfood01"></div>
+        <div class="form-group"><label>åé¡</label><select id="edCat"><option value="">-- é¸æåé¡ --</option></select></div>
       </div>
-      <div class="form-group"><label>摘要（顯示在列表頁）</label><textarea id="edSynopsis" rows="3" placeholder="一段簡短描述，吸引讀者點閱⋯"></textarea></div>
-      <div class="form-group"><label>文章內文（HTML 格式）</label><textarea id="edContent" rows="14" placeholder="&lt;p&gt;大家好，我是艾薇！&lt;/p&gt;
-&lt;h2&gt;小標題&lt;/h2&gt;
-&lt;p&gt;內文...&lt;/p&gt;"></textarea></div>
+      <div class="form-group"><label>æè¦ï¼é¡¯ç¤ºå¨åè¡¨é ï¼</label><textarea id="edSynopsis" rows="3" placeholder="ä¸æ®µç°¡ç­æè¿°ï¼å¸å¼è®èé»é±â¯"></textarea></div>
+      <div class="form-group"><label>æç« å§æï¼HTML æ ¼å¼ï¼</label><textarea id="edContent" rows="14" placeholder="&lt;p&gt;å¤§å®¶å¥½ï¼ææ¯è¾èï¼&lt;/p&gt;&#10;&lt;h2&gt;å°æ¨é¡&lt;/h2&gt;&#10;&lt;p&gt;å§æ...&lt;/p&gt;"></textarea></div>
       <div class="form-row">
         <div class="form-group">
-  <label>封面圖片</label>
+  <label>å°é¢åç</label>
   <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
-    <input type="text" id="edCover" placeholder="https://... 或點擊上傳" style="flex:1;min-width:200px">
+    <input type="text" id="edCover" placeholder="https://... æé»æä¸å³" style="flex:1;min-width:200px">
     <label id="coverUploadBtn" style="cursor:pointer;background:#c9697a;color:#fff;padding:0.4rem 0.8rem;border-radius:6px;font-size:0.82rem;white-space:nowrap;user-select:none">
-      📸 上傳圖片
+      ð¸ ä¸å³åç
       <input type="file" id="coverFileInput" accept="image/*" style="display:none" onchange="uploadIvyCover(event)">
     </label>
   </div>
@@ -330,22 +330,22 @@ tr:hover td{background:#fdf8f4}
     <span id="coverUploadStatus" style="font-size:0.78rem;margin-left:0.5rem;color:#888"></span>
   </div>
 </div>
-        <div class="form-group"><label>SEO 標題（選填，留空自動帶入標題）</label><input type="text" id="edMetaT" placeholder="SEO 用標題"></div>
+        <div class="form-group"><label>SEO æ¨é¡ï¼é¸å¡«ï¼çç©ºèªåå¸¶å¥æ¨é¡ï¼</label><input type="text" id="edMetaT" placeholder="SEO ç¨æ¨é¡"></div>
       </div>
-      <div class="form-group"><label>SEO 描述（選填，留空自動帶入摘要）</label><input type="text" id="edMetaD" placeholder="搜尋引擎顯示的描述文字"></div>
-      <div class="check-row"><input type="checkbox" id="edPub" checked=""><label for="edPub">立即發布（取消勾選則存為草稿）</label></div>
+      <div class="form-group"><label>SEO æè¿°ï¼é¸å¡«ï¼çç©ºèªåå¸¶å¥æè¦ï¼</label><input type="text" id="edMetaD" placeholder="æå°å¼æé¡¯ç¤ºçæè¿°æå­"></div>
+      <div class="check-row"><input type="checkbox" id="edPub" checked><label for="edPub">ç«å³ç¼å¸ï¼åæ¶å¾é¸åå­çºèç¨¿ï¼</label></div>
       <div class="form-actions">
-        <button class="btn btn-rose" onclick="saveArt()">💾 儲存文章</button>
-        <button class="btn btn-outline" onclick="resetForm()">取消</button>
+        <button class="btn btn-rose" onclick="saveArt()">ð¾ å²å­æç« </button>
+        <button class="btn btn-outline" onclick="resetForm()">åæ¶</button>
       </div>
     </div>
   </div>
 </div>
 
 <div id="panel-categories" class="panel">
-  <div class="page-header"><h1>🏷️ 分類管理</h1><span style="font-size:0.82rem;color:#a08085">分類目前需透過 Supabase 管理</span></div>
+  <div class="page-header"><h1>ð·ï¸ åé¡ç®¡ç</h1><span style="font-size:0.82rem;color:#a08085">åé¡ç®åééé Supabase ç®¡ç</span></div>
   <div class="card">
-    <table><thead><tr><th>圖示</th><th>名稱</th><th>Slug</th><th>說明</th><th>排序</th><th>文章數</th></tr></thead>
+    <table><thead><tr><th>åç¤º</th><th>åç¨±</th><th>Slug</th><th>èªªæ</th><th>æåº</th><th>æç« æ¸</th></tr></thead>
     <tbody id="catList"></tbody></table>
   </div>
 </div>
@@ -384,7 +384,7 @@ async function uploadIvyCover(e){
   const wrap=document.getElementById('coverPreviewWrap');
   preview.src=URL.createObjectURL(file);
   wrap.style.display='block';
-  status.textContent='⏫ 上傳中...';status.style.color='#888';
+  status.textContent='â« ä¸å³ä¸­...';status.style.color='#888';
   const ext=file.name.split('.').pop()||'jpg';
   const fname='cover-'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;
   try{
@@ -394,14 +394,14 @@ async function uploadIvyCover(e){
     if(!r.ok){const t=await r.text();throw new Error(t);}
     const url=SB+'/storage/v1/object/public/ivy-images/'+fname;
     document.getElementById('edCover').value=url;
-    status.textContent='✅ 上傳成功';status.style.color='#4caf50';
+    status.textContent='â ä¸å³æå';status.style.color='#4caf50';
     console.log('IVY_COVER_UPLOADED:',url);
   }catch(err){
-    status.textContent='❌ '+err.message.substring(0,40);status.style.color='#f44336';
+    status.textContent='â '+err.message.substring(0,40);status.style.color='#f44336';
     console.error('ivy cover err:',err);
   }
   e.target.value='';
 }
 </script>
-
-</body></html>
+</body>
+</html>
