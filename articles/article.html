@@ -28,9 +28,9 @@
 .loading-state,.error-state{text-align:center;padding:4rem 2rem;color:var(--text-light,#888)}
 .art-footer-line{border-top:1px solid var(--border,#eee);margin-top:3rem;padding-top:2rem;text-align:center;font-size:0.85rem;color:var(--text-light,#888)}
 </style>
+<script src="/js/supabase.js"></script>
 </head>
 <body>
-<script src="/js/supabase.js"></script>
 <nav class="nav"><div class="nav-inner"><a class="nav-logo" href="/">Ivy<span>Life</span></a>
 <ul class="nav-links" id="navLinks">
 <li><a href="/category.html?cat=tastyfood">美食餐廳</a></li>
@@ -98,7 +98,7 @@ async function load(){
     wrap.innerHTML='<div class="error-state"><h2>載入失敗</h2><p>'+e.message+'</p><p><a href="/">回首頁</a></p></div>';
   }
 }
-load();
+document.addEventListener('DOMContentLoaded', load);
 </script>
 </body>
 </html>
