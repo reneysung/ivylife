@@ -1,4 +1,10 @@
 [[redirects]]
+  from = "/article/:slug"
+  to = "/articles/article.html"
+  status = 200
+  force = false
+
+[[redirects]]
   from = "/:slug.html"
   to = "/article.html?slug=:slug"
   status = 200
