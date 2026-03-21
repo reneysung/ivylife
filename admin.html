@@ -7,771 +7,467 @@
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Noto Sans TC',system-ui,sans-serif;background:#f8f4f5;color:#2d2020;min-height:100vh}
-
-/* ── LOGIN ── */
+:root{--rose:#c8566a;--rose-light:#f2a5b0;--rose-pale:#fff0f2;--gold:#c99960;--dark:#2d2020;--gray:#a08085;--bg:#f8f4f5;--green:#27ae60;--red:#e74c3c;--border:rgba(200,86,106,0.15)}
+body{font-family:'Noto Sans TC',system-ui,sans-serif;background:var(--bg);color:var(--dark);min-height:100vh}
 #loginPage{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#fff0f2,#fde8d8)}
-.login-box{background:white;border-radius:20px;padding:2.5rem;width:380px;box-shadow:0 12px 40px rgba(212,105,122,.18);text-align:center}
-.ivy-logo-wrap{margin-bottom:1.2rem}
-.ivy-logo-svg{width:120px;height:auto}
-.login-sub{color:#a08085;font-size:.85rem;margin-bottom:2rem}
-.login-box input{width:100%;padding:11px 14px;border:1.5px solid rgba(212,105,122,.25);border-radius:10px;font-size:.95rem;margin-bottom:1rem;outline:none;font-family:inherit;transition:border-color .2s}
-.login-box input:focus{border-color:#d4697a;box-shadow:0 0 0 3px rgba(212,105,122,.1)}
-.btn-primary{width:100%;padding:12px;background:linear-gradient(135deg,#d4697a,#e8899a);color:white;border:none;border-radius:50px;font-size:.95rem;cursor:pointer;font-family:inherit;font-weight:500;transition:all .2s}
-.btn-primary:hover{background:linear-gradient(135deg,#c05a6a,#d4697a);transform:translateY(-1px);box-shadow:0 4px 12px rgba(212,105,122,.3)}
-.login-err{color:#d4697a;font-size:.82rem;margin-top:.5rem;display:none}
-
-/* ── ADMIN LAYOUT ── */
+.login-box{background:white;border-radius:20px;padding:2.5rem;width:360px;box-shadow:0 12px 48px rgba(200,86,106,0.12);text-align:center}
+.ivy-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:0.3rem}
+.ivy-logo svg{width:44px;height:44px}
+.logo-txt{font-size:1.6rem;font-weight:700;letter-spacing:-0.5px}
+.logo-txt .ivy{color:var(--rose)}
+.logo-txt .life{color:var(--gold);font-style:italic}
+.login-sub{color:var(--gray);font-size:0.82rem;margin-bottom:1.8rem}
+.login-box input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:0.92rem;margin-bottom:1rem;outline:none;font-family:inherit;transition:border-color 0.2s}
+.login-box input:focus{border-color:var(--rose)}
+.btn-primary{width:100%;padding:12px;background:linear-gradient(135deg,var(--rose),#e07a8a);color:white;border:none;border-radius:50px;font-size:0.95rem;cursor:pointer;font-weight:500;transition:opacity 0.2s}
+.btn-primary:hover{opacity:0.88}
+.login-err{color:var(--rose);font-size:0.82rem;margin-top:0.5rem;display:none}
 #adminPage{display:none;min-height:100vh}
-.sidebar{position:fixed;left:0;top:0;width:230px;height:100vh;background:#2d2020;color:white;padding:1.5rem 0;z-index:10;display:flex;flex-direction:column}
-.sidebar-logo{padding:0 1.5rem 1.5rem;border-bottom:1px solid rgba(255,255,255,.1)}
-.sidebar-logo svg{width:110px;height:auto}
-.sidebar-menu{list-style:none;padding:1rem 0;flex:1}
-.sidebar-menu li a{display:flex;align-items:center;gap:.7rem;padding:.75rem 1.5rem;color:rgba(255,255,255,.7);text-decoration:none;font-size:.88rem;transition:all .2s;cursor:pointer}
-.sidebar-menu li a:hover,.sidebar-menu li a.active{background:rgba(242,165,176,.15);color:white;border-right:3px solid #f2a5b0}
-.sidebar-footer{padding:1rem 1.5rem;border-top:1px solid rgba(255,255,255,.1)}
-.sidebar-footer button{width:100%;padding:8px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);border:none;border-radius:8px;cursor:pointer;font-size:.82rem;font-family:inherit}
-.sidebar-footer button:hover{background:rgba(255,255,255,.2);color:white}
+.sidebar{position:fixed;left:0;top:0;width:230px;height:100vh;background:var(--dark);color:white;padding:1.5rem 0;z-index:10;display:flex;flex-direction:column}
+.sb-logo{padding:0 1.5rem 1.2rem;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:10px}
+.sb-logo svg{width:32px;height:32px}
+.sb-logo-txt{font-size:1.1rem;font-weight:700}
+.sb-logo-txt .ivy{color:var(--rose-light)}
+.sb-logo-txt .life{color:var(--gold);font-style:italic}
+.sb-menu{list-style:none;padding:0.8rem 0;flex:1}
+.sb-menu li a{display:flex;align-items:center;gap:0.7rem;padding:0.65rem 1.5rem;color:rgba(255,255,255,0.65);text-decoration:none;font-size:0.87rem;transition:all 0.2s;cursor:pointer}
+.sb-menu li a:hover,.sb-menu li a.active{background:rgba(242,165,176,0.15);color:white}
+.sb-foot{padding:1rem 1.5rem;border-top:1px solid rgba(255,255,255,0.08)}
+.sb-foot button{width:100%;padding:8px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.6);border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;transition:all 0.2s}
+.sb-foot button:hover{background:rgba(255,255,255,0.15);color:white}
 .main{margin-left:230px;padding:2rem;min-height:100vh}
-.page-header{margin-bottom:2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
-.page-header h1{font-size:1.4rem;font-weight:500}
-
-/* ── BUTTONS ── */
-.btn{padding:8px 20px;border-radius:50px;font-size:.85rem;cursor:pointer;border:none;transition:all .2s;font-family:inherit}
-.btn-rose{background:#d4697a;color:white}.btn-rose:hover{background:#c05a6a}
-.btn-outline{background:transparent;color:#d4697a;border:1.5px solid #d4697a}.btn-outline:hover{background:#fff0f2}
-.btn-sm{padding:5px 14px;font-size:.78rem}
-.btn-danger{background:#e74c3c;color:white}.btn-danger:hover{background:#c0392b}
-.btn-success{background:#27ae60;color:white}.btn-success:hover{background:#219a52}
-.btn-ai{background:linear-gradient(135deg,#667eea,#764ba2);color:white;display:flex;align-items:center;gap:.4rem}
-.btn-ai:hover{background:linear-gradient(135deg,#5a6fd6,#6a4292);transform:translateY(-1px)}
-
-/* ── CARDS / TABLES ── */
+.page-hdr{margin-bottom:1.8rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.page-hdr h1{font-size:1.35rem;font-weight:500}
+.btn{padding:8px 20px;border-radius:50px;font-size:0.85rem;cursor:pointer;border:none;transition:all 0.2s;font-family:inherit}
+.btn-rose{background:linear-gradient(135deg,var(--rose),#e07a8a);color:white}
+.btn-rose:hover{opacity:0.88}
+.btn-outline{background:transparent;color:var(--rose);border:1.5px solid var(--rose)}
+.btn-outline:hover{background:var(--rose-pale)}
+.btn-sm{padding:5px 14px;font-size:0.78rem}
+.btn-danger{background:var(--red);color:white}
+.btn-success{background:var(--green);color:white}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#e0b070);color:white}
+.btn-gold:hover{opacity:0.88}
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
-.stat-card{background:white;border-radius:14px;padding:1.2rem 1.5rem;border:1px solid rgba(212,105,122,.1)}
-.stat-num{font-size:2rem;font-weight:500;color:#d4697a}
-.stat-label{font-size:.8rem;color:#a08085;margin-top:.2rem}
-.card{background:white;border-radius:14px;border:1px solid rgba(212,105,122,.1);overflow:hidden;margin-bottom:1.5rem}
-.card-header{padding:1rem 1.5rem;border-bottom:1px solid rgba(212,105,122,.08);display:flex;align-items:center;justify-content:space-between;font-size:.9rem;font-weight:500}
-table{width:100%;border-collapse:collapse;font-size:.85rem}
-th{padding:.7rem 1.2rem;text-align:left;background:#fdf8f4;color:#a08085;font-weight:400;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
-td{padding:.75rem 1.2rem;border-top:1px solid rgba(212,105,122,.08);vertical-align:middle}
+.stat-card{background:white;border-radius:14px;padding:1.2rem 1.5rem;border:1px solid var(--border)}
+.stat-num{font-size:2rem;font-weight:500;color:var(--rose)}
+.stat-lbl{font-size:0.8rem;color:var(--gray);margin-top:0.2rem}
+.card{background:white;border-radius:14px;border:1px solid var(--border);overflow:hidden;margin-bottom:1.5rem}
+.card-hdr{padding:1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:0.9rem;font-weight:500}
+table{width:100%;border-collapse:collapse;font-size:0.84rem}
+th{padding:0.7rem 1.2rem;text-align:left;background:#fdf8f4;color:var(--gray);font-weight:400;font-size:0.77rem;text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap}
+td{padding:0.75rem 1.2rem;border-top:1px solid var(--border);vertical-align:middle}
 tr:hover td{background:#fdf8f4}
-.badge{display:inline-block;padding:2px 10px;border-radius:50px;font-size:.72rem}
+.badge{display:inline-block;padding:2px 10px;border-radius:50px;font-size:0.72rem}
 .badge-green{background:#e8f5e9;color:#2e7d32}
 .badge-gray{background:#f5f5f5;color:#757575}
-.actions{display:flex;gap:.4rem;flex-wrap:wrap}
-.panel{display:none}.panel.active{display:block}
-.toolbar{display:flex;gap:.8rem;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
-.toolbar input,.toolbar select{padding:8px 14px;border:1.5px solid rgba(212,105,122,.2);border-radius:50px;font-size:.85rem;outline:none;font-family:inherit;background:white}
-.toolbar input{min-width:200px}.toolbar input:focus,.toolbar select:focus{border-color:#d4697a}
-.empty-state{text-align:center;padding:3rem;color:#a08085;font-size:.9rem}
-
-/* ── EDITOR FORM ── */
-.editor-form{padding:1.5rem;display:flex;flex-direction:column;gap:1.2rem}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
-.form-group{display:flex;flex-direction:column;gap:.4rem}
-.form-group label{font-size:.8rem;color:#a08085;font-weight:400}
-.form-group input,.form-group select,.form-group textarea{padding:9px 12px;border:1.5px solid rgba(212,105,122,.2);border-radius:8px;font-size:.9rem;font-family:inherit;outline:none;transition:border-color .2s;background:white;color:#2d2020}
-.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#d4697a;box-shadow:0 0 0 3px rgba(212,105,122,.1)}
-.form-group textarea{min-height:100px;resize:vertical;line-height:1.7}
-.form-actions{display:flex;gap:.8rem;padding-top:.5rem;flex-wrap:wrap}
-.section-title{font-size:.9rem;font-weight:600;color:#d4697a;padding:.5rem 0;border-bottom:2px solid rgba(212,105,122,.15);margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem}
-
-/* ── QUILL ── */
-.ql-container{border:1.5px solid rgba(212,105,122,.2)!important;border-top:none!important;border-radius:0 0 8px 8px!important;min-height:300px;font-family:'Noto Sans TC',sans-serif!important;font-size:.9rem}
-.ql-toolbar{border:1.5px solid rgba(212,105,122,.2)!important;border-radius:8px 8px 0 0!important;background:#fdf8f4}
-.ql-editor{min-height:280px;line-height:1.8}
-
-/* ── COVER UPLOAD ── */
-.cover-row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
-.cover-row input[type=text]{flex:1;min-width:200px}
-.upload-btn{cursor:pointer;background:#c9697a;color:#fff;padding:.4rem .8rem;border-radius:6px;font-size:.82rem;white-space:nowrap;user-select:none}
-.upload-btn input{display:none}
-.ai-gen-btn{cursor:pointer;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:.4rem .9rem;border-radius:6px;font-size:.82rem;border:none;font-family:inherit;display:flex;align-items:center;gap:.3rem}
-.ai-gen-btn:hover{opacity:.9}
-#coverPreviewWrap{margin-top:.5rem;display:none}
-#coverPreview{max-width:220px;max-height:130px;object-fit:cover;border-radius:6px;border:1.5px solid #e0d4d5}
-#coverUploadStatus{font-size:.78rem;margin-left:.5rem;color:#888}
-
-/* ── STORE INFO ── */
-.store-card{background:linear-gradient(135deg,#fff8f0,#fff0f2);border:1.5px solid rgba(212,105,122,.15);border-radius:12px;padding:1.2rem}
-
-/* ── TOAST ── */
-.toast{position:fixed;bottom:2rem;right:2rem;padding:12px 20px;background:#2d2020;color:white;border-radius:8px;font-size:.85rem;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;max-width:320px}
+.actions{display:flex;gap:0.4rem;flex-wrap:wrap}
+.toolbar{display:flex;gap:0.8rem;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
+.toolbar input,.toolbar select{padding:8px 14px;border:1.5px solid var(--border);border-radius:50px;font-size:0.85rem;outline:none;font-family:inherit;background:white}
+.toolbar input:focus,.toolbar select:focus{border-color:var(--rose)}
+.toolbar input{min-width:200px}
+.eform{padding:1.5rem;display:flex;flex-direction:column;gap:1.2rem}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.fgrp{display:flex;flex-direction:column;gap:0.4rem}
+.fgrp label{font-size:0.82rem;color:var(--gray)}
+.fgrp label span{color:var(--rose)}
+.fgrp input,.fgrp select,.fgrp textarea{padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;font-family:inherit;outline:none;transition:border-color 0.2s;background:white;color:var(--dark)}
+.fgrp input:focus,.fgrp select:focus,.fgrp textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(200,86,106,0.08)}
+.fgrp textarea{min-height:100px;resize:vertical;line-height:1.7}
+.factions{display:flex;gap:0.8rem;padding-top:0.5rem;flex-wrap:wrap}
+.sec-title{font-size:0.82rem;font-weight:600;color:var(--rose);text-transform:uppercase;letter-spacing:0.08em;padding:0.8rem 0 0.4rem;border-top:1px solid var(--border);margin-top:0.5rem}
+.cover-area{display:flex;gap:0.6rem;align-items:flex-start;flex-wrap:wrap}
+.cover-area input[type=text]{flex:1;min-width:200px}
+.cover-btns{display:flex;gap:0.5rem;flex-shrink:0}
+#coverPreviewWrap{margin-top:0.5rem;display:none;align-items:center;gap:0.8rem}
+#coverPreview{max-width:240px;max-height:135px;object-fit:cover;border-radius:8px;border:1px solid var(--border)}
+#coverUploadStatus{font-size:0.78rem;color:var(--gray)}
+.ai-gen{display:none;align-items:center;gap:0.5rem;font-size:0.82rem;color:var(--rose);margin-top:0.4rem}
+.spinner{width:16px;height:16px;border:2px solid var(--rose-pale);border-top-color:var(--rose);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ql-container{font-size:0.9rem;font-family:inherit;border-radius:0 0 10px 10px;border-color:var(--border)!important}
+.ql-toolbar{border-radius:10px 10px 0 0;border-color:var(--border)!important;background:#fdf8f4}
+.ql-editor{min-height:260px;line-height:1.8}
+.store-sec{background:var(--rose-pale);border-radius:12px;padding:1.2rem;border:1px solid var(--border)}
+.store-sec h3{font-size:0.9rem;font-weight:600;color:var(--rose);margin-bottom:0.8rem}
+.toast{position:fixed;bottom:2rem;right:2rem;padding:12px 20px;background:var(--dark);color:white;border-radius:10px;font-size:0.85rem;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;max-width:320px}
 .toast.show{opacity:1}
-
-/* ── AI PANEL ── */
-.ai-overlay{display:none;position:fixed;inset:0;background:rgba(45,32,32,.5);z-index:100;align-items:center;justify-content:center}
-.ai-overlay.show{display:flex}
-.ai-box{background:white;border-radius:20px;padding:2rem;width:440px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.2)}
-.ai-box h3{font-size:1.1rem;margin-bottom:1rem;color:#2d2020;display:flex;align-items:center;gap:.5rem}
-.ai-progress{width:100%;height:6px;background:#f0e8e8;border-radius:3px;margin:1rem 0;overflow:hidden}
-.ai-progress-bar{height:100%;background:linear-gradient(90deg,#667eea,#d4697a);border-radius:3px;width:0%;transition:width .5s}
-.ai-status{font-size:.85rem;color:#a08085;text-align:center;min-height:40px}
-.ai-preview{width:100%;max-height:180px;object-fit:cover;border-radius:8px;margin-top:1rem;display:none}
-
-@media(max-width:768px){.stats-grid{grid-template-columns:repeat(2,1fr)}.form-row,.form-row-3{grid-template-columns:1fr}.sidebar{width:180px}.main{margin-left:180px}}
+.panel{display:none}.panel.active{display:block}
+.empty-state{text-align:center;padding:3rem;color:var(--gray);font-size:0.9rem}
+.check-row{display:flex;align-items:center;gap:0.5rem}
+.check-row input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--rose)}
+.check-row label{font-size:0.9rem;cursor:pointer}
+.tag-wrap{display:flex;flex-wrap:wrap;gap:0.4rem;padding:8px 10px;border:1.5px solid var(--border);border-radius:10px;background:white;cursor:text;min-height:42px;align-items:center}
+.tag-wrap:focus-within{border-color:var(--rose);box-shadow:0 0 0 3px rgba(200,86,106,0.08)}
+.tag-item{display:inline-flex;align-items:center;gap:4px;background:var(--rose-pale);color:var(--rose);padding:2px 10px;border-radius:50px;font-size:0.78rem;white-space:nowrap}
+.tag-item button{background:none;border:none;cursor:pointer;color:var(--rose);font-size:0.9rem;line-height:1;padding:0}
+.tag-input{border:none;outline:none;font-family:inherit;font-size:0.85rem;color:var(--dark);min-width:120px;background:transparent}
+@media(max-width:768px){.stats-grid{grid-template-columns:repeat(2,1fr)}.frow{grid-template-columns:1fr}.sidebar{width:180px}.main{margin-left:180px}}
 </style>
 </head>
 <body>
-
-<!-- IVY LOGO SVG (inline reusable) -->
-<svg style="display:none">
-  <symbol id="ivy-logo-full" viewBox="0 0 200 52">
-    <g transform="translate(0,2)">
-      <!-- leaf cluster -->
-      <ellipse cx="18" cy="24" rx="14" ry="9" fill="#d4697a" transform="rotate(-25,18,24)" opacity=".9"/>
-      <ellipse cx="26" cy="14" rx="11" ry="7" fill="#c05a6a" transform="rotate(15,26,14)" opacity=".85"/>
-      <ellipse cx="30" cy="28" rx="12" ry="7" fill="#e8899a" transform="rotate(40,30,28)" opacity=".8"/>
-      <ellipse cx="12" cy="32" rx="9" ry="6" fill="#b04868" transform="rotate(-45,12,32)" opacity=".75"/>
-      <!-- stem -->
-      <path d="M22 42 Q20 30 18 24" stroke="#c05a6a" stroke-width="1.5" fill="none"/>
-    </g>
-    <!-- text -->
-    <text x="46" y="32" font-family="Georgia,serif" font-size="22" font-weight="700" fill="#d4697a" letter-spacing="-0.5">Ivy</text>
-    <text x="78" y="32" font-family="Georgia,serif" font-size="22" font-style="italic" fill="#c9996a" letter-spacing="-0.5">Life</text>
-    <text x="46" y="44" font-family="'Noto Sans TC',sans-serif" font-size="8" fill="#a08085" letter-spacing="2">後台管理系統</text>
-  </symbol>
-  <symbol id="ivy-logo-sm" viewBox="0 0 160 44">
-    <g transform="translate(0,2)">
-      <ellipse cx="16" cy="20" rx="12" ry="8" fill="#d4697a" transform="rotate(-25,16,20)" opacity=".9"/>
-      <ellipse cx="23" cy="12" rx="9" ry="6" fill="#c05a6a" transform="rotate(15,23,12)" opacity=".85"/>
-      <ellipse cx="27" cy="24" rx="10" ry="6" fill="#e8899a" transform="rotate(40,27,24)" opacity=".8"/>
-      <path d="M20 36 Q18 26 16 20" stroke="#c05a6a" stroke-width="1.5" fill="none"/>
-    </g>
-    <text x="40" y="28" font-family="Georgia,serif" font-size="19" font-weight="700" fill="#f2a5b0" letter-spacing="-0.5">Ivy</text>
-    <text x="68" y="28" font-family="Georgia,serif" font-size="19" font-style="italic" fill="#c9996a" letter-spacing="-0.5">Life</text>
-  </symbol>
-</svg>
-
-<!-- LOGIN -->
 <div id="loginPage">
 <div class="login-box">
-  <div class="ivy-logo-wrap">
-    <svg class="ivy-logo-svg" viewBox="0 0 200 52"><use href="#ivy-logo-full"/></svg>
+  <div class="ivy-logo">
+    <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="22" cy="22" r="21" fill="#fff0f2" stroke="#c8566a" stroke-width="1.5"/>
+      <path d="M22 36C22 36 10 28 10 19C10 13.477 15.477 9 22 9C28.523 9 34 13.477 34 19C34 28 22 36 22 36Z" fill="#f2a5b0" opacity="0.5"/>
+      <path d="M22 8C22 8 14 14 14 22C14 26 17.5 30 22 32C26.5 30 30 26 30 22C30 14 22 8 22 8Z" fill="#c8566a" opacity="0.85"/>
+      <ellipse cx="19" cy="20" rx="4.5" ry="6" transform="rotate(-20 19 20)" fill="white" opacity="0.6"/>
+      <ellipse cx="25" cy="18" rx="3.5" ry="5" transform="rotate(15 25 18)" fill="white" opacity="0.4"/>
+      <path d="M22 32V38" stroke="#c99960" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <div class="logo-txt"><span class="ivy">Ivy</span><span class="life">Life</span></div>
   </div>
-  <div class="login-sub">生活旅遊後台管理系統</div>
+  <div class="login-sub">後台管理系統</div>
   <input type="password" id="pwInput" placeholder="請輸入管理員密碼">
-  <button class="btn-primary" onclick="doLogin()">登入後台</button>
-  <div class="login-err" id="loginErr">密碼錯誤，請重新輸入</div>
+  <button class="btn-primary" onclick="doLogin()">登入</button>
+  <div class="login-err" id="loginErr">密碼錯誤，請再試一次</div>
 </div>
 </div>
-
-<!-- ADMIN -->
 <div id="adminPage">
 <nav class="sidebar">
-  <div class="sidebar-logo">
-    <svg viewBox="0 0 160 44"><use href="#ivy-logo-sm"/></svg>
+  <div class="sb-logo">
+    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M16 28C16 28 6 22 6 14C6 9 10.477 5 16 5C21.523 5 26 9 26 14C26 22 16 28 16 28Z" fill="#f2a5b0" opacity="0.4"/>
+      <path d="M16 4C16 4 10 9 10 16C10 19.5 12.5 23 16 24.5C19.5 23 22 19.5 22 16C22 9 16 4 16 4Z" fill="#f2a5b0"/>
+      <ellipse cx="14" cy="15" rx="3" ry="4.5" transform="rotate(-20 14 15)" fill="white" opacity="0.5"/>
+    </svg>
+    <div class="sb-logo-txt"><span class="ivy">Ivy</span><span class="life">Life</span> 後台</div>
   </div>
-  <ul class="sidebar-menu">
-    <li><a class="active" onclick="showPanel('dashboard',this)">📊 網站總覽</a></li>
+  <ul class="sb-menu">
+    <li><a class="active" onclick="showPanel('dashboard',this)">📊 總覽</a></li>
     <li><a onclick="showPanel('articles',this)">📝 文章管理</a></li>
-    <li><a onclick="showPanel('new',this)">✏️ 新增文章</a></li>
+    <li><a onclick="showPanel('new',this);resetForm()">✏️ 新增文章</a></li>
     <li><a onclick="showPanel('categories',this)">🏷️ 分類管理</a></li>
   </ul>
-  <div class="sidebar-footer">
-    <button onclick="window.open('/','_blank')">↗ 前往前台</button>
-  </div>
+  <div class="sb-foot"><button onclick="window.open('/','_blank')">↗ 前往前台</button></div>
 </nav>
-
 <main class="main">
-
-<!-- DASHBOARD -->
 <div id="panel-dashboard" class="panel active">
-  <div class="page-header"><h1>📊 網站總覽</h1><span style="font-size:.8rem;color:#a08085" id="lastUpdate"></span></div>
+  <div class="page-hdr"><h1>📊 網站總覽</h1><span style="font-size:0.8rem;color:var(--gray)" id="lastUpdate"></span></div>
   <div class="stats-grid">
-    <div class="stat-card"><div class="stat-num" id="s1">-</div><div class="stat-label">總文章數</div></div>
-    <div class="stat-card"><div class="stat-num" id="s2">-</div><div class="stat-label">已發布</div></div>
-    <div class="stat-card"><div class="stat-num" id="s3">-</div><div class="stat-label">草稿</div></div>
-    <div class="stat-card"><div class="stat-num" id="s4">-</div><div class="stat-label">分類數</div></div>
+    <div class="stat-card"><div class="stat-num" id="s1">-</div><div class="stat-lbl">全部文章</div></div>
+    <div class="stat-card"><div class="stat-num" id="s2">-</div><div class="stat-lbl">已發布</div></div>
+    <div class="stat-card"><div class="stat-num" id="s3">-</div><div class="stat-lbl">草稿</div></div>
+    <div class="stat-card"><div class="stat-num" id="s4">-</div><div class="stat-lbl">分類數</div></div>
   </div>
   <div class="card">
-    <div class="card-header">最新 10 篇文章 <button class="btn btn-sm btn-rose" onclick="showPanel('new',document.querySelector('.sidebar-menu li:nth-child(3) a'))">+ 新增</button></div>
+    <div class="card-hdr">最新 10 篇文章<button class="btn btn-sm btn-rose" onclick="showPanel('new',document.querySelector('.sb-menu li:nth-child(3) a'));resetForm()">+ 新增</button></div>
     <table><thead><tr><th>標題</th><th>分類</th><th>縣市</th><th>狀態</th><th>日期</th></tr></thead><tbody id="dashRecent"></tbody></table>
   </div>
 </div>
-
-<!-- ARTICLES -->
 <div id="panel-articles" class="panel">
-  <div class="page-header">
-    <h1>📝 文章管理</h1>
-    <button class="btn btn-rose" onclick="showPanel('new',document.querySelector('.sidebar-menu li:nth-child(3) a'))">+ 新增文章</button>
-  </div>
+  <div class="page-hdr"><h1>📝 文章管理</h1><button class="btn btn-rose" onclick="showPanel('new',document.querySelector('.sb-menu li:nth-child(3) a'));resetForm()">+ 新增文章</button></div>
   <div class="toolbar">
     <input type="text" id="searchQ" placeholder="搜尋標題或 slug…" oninput="filterList()">
     <select id="filterCat" onchange="filterList()"><option value="">全部分類</option></select>
     <select id="filterCity" onchange="filterList()">
       <option value="">全部縣市</option>
-      <option value="台北市">台北市</option><option value="新北市">新北市</option><option value="桃園市">桃園市</option><option value="台中市">台中市</option><option value="台南市">台南市</option><option value="高雄市">高雄市</option><option value="基隆市">基隆市</option><option value="新竹市">新竹市</option><option value="嘉義市">嘉義市</option><option value="新竹縣">新竹縣</option><option value="苗栗縣">苗栗縣</option><option value="彰化縣">彰化縣</option><option value="南投縣">南投縣</option><option value="雲林縣">雲林縣</option><option value="嘉義縣">嘉義縣</option><option value="屏東縣">屏東縣</option><option value="宜蘭縣">宜蘭縣</option><option value="花蓮縣">花蓮縣</option><option value="台東縣">台東縣</option><option value="澎湖縣">澎湖縣</option><option value="金門縣">金門縣</option><option value="連江縣">連江縣</option>
+      <option>台北市</option><option>新北市</option><option>桃園市</option><option>台中市</option><option>台南市</option><option>高雄市</option>
+      <option>新竹市</option><option>新竹縣</option><option>苗栗縣</option><option>彰化縣</option><option>南投縣</option><option>雲林縣</option>
+      <option>嘉義市</option><option>嘉義縣</option><option>屏東縣</option><option>宜蘭縣</option><option>花蓮縣</option><option>台東縣</option>
+      <option>澎湖縣</option><option>金門縣</option><option>連江縣</option>
     </select>
     <select id="filterPub" onchange="filterList()"><option value="">全部狀態</option><option value="true">已發布</option><option value="false">草稿</option></select>
   </div>
-  <div class="card">
-    <table><thead><tr><th>標題</th><th>分類</th><th>縣市</th><th>Slug</th><th>狀態</th><th>日期</th><th>操作</th></tr></thead>
-    <tbody id="artList"></tbody></table>
-  </div>
+  <div class="card"><table><thead><tr><th>標題</th><th>分類</th><th>縣市</th><th>Slug</th><th>狀態</th><th>日期</th><th>操作</th></tr></thead><tbody id="artList"></tbody></table></div>
 </div>
-
-<!-- NEW / EDIT -->
 <div id="panel-new" class="panel">
-  <div class="page-header">
-    <h1 id="edTitle">✏️ 新增文章</h1>
-    <button class="btn btn-outline" onclick="resetForm()">✕ 取消</button>
-  </div>
-  <div class="card">
-    <div class="editor-form">
-      <input type="hidden" id="edId">
-
-      <!-- 基本資料 -->
-      <div class="section-title">📄 基本資料</div>
-      <div class="form-group"><label>文章標題 *</label><input type="text" id="edTitleInput" placeholder="例：台南必吃！這家拉麵讓我念念不忘"></div>
-      <div class="form-row">
-        <div class="form-group"><label>Slug（網址）* <span style="color:#d4697a;font-size:.75rem">— 英文小寫+數字+連字號</span></label><input type="text" id="edSlug" placeholder="tainan-ramen-01"></div>
-        <div class="form-group"><label>分類</label><select id="edCat"><option value="">-- 選擇分類 --</option></select></div>
+  <div class="page-hdr"><h1 id="edTitle">✏️ 新增文章</h1><button class="btn btn-outline" onclick="resetForm()">× 取消</button></div>
+  <div class="card"><div class="eform">
+    <input type="hidden" id="edId">
+    <div class="fgrp"><label>文章標題 <span>*</span></label><input type="text" id="edTitleInput" placeholder="例：台南必吃美食推薦｜艾薇精選10家私藏餐廳"></div>
+    <div class="frow">
+      <div class="fgrp"><label>Slug（網址）<span>*</span> <span style="color:var(--gold);font-size:0.75rem">— 英文小寫+數字，如 tastyfood01</span></label><input type="text" id="edSlug" placeholder="tastyfood01"></div>
+      <div class="fgrp"><label>分類</label><select id="edCat"><option value="">-- 選擇分類 --</option></select></div>
+    </div>
+    <div class="frow">
+      <div class="fgrp">
+        <label>縣市</label>
+        <select id="edCity">
+          <option value="">-- 選擇縣市 --</option>
+          <option>台北市</option><option>新北市</option><option>桃園市</option><option>台中市</option><option>台南市</option><option>高雄市</option>
+          <option>新竹市</option><option>新竹縣</option><option>苗栗縣</option><option>彰化縣</option><option>南投縣</option><option>雲林縣</option>
+          <option>嘉義市</option><option>嘉義縣</option><option>屏東縣</option><option>宜蘭縣</option><option>花蓮縣</option><option>台東縣</option>
+          <option>澎湖縣</option><option>金門縣</option><option>連江縣</option>
+        </select>
       </div>
-      <div class="form-row">
-        <div class="form-group"><label>縣市</label>
-          <select id="edCity">
-            <option value="">-- 選擇縣市 --</option>
-            <option value="台北市">台北市</option><option value="新北市">新北市</option><option value="桃園市">桃園市</option><option value="台中市">台中市</option><option value="台南市">台南市</option><option value="高雄市">高雄市</option><option value="基隆市">基隆市</option><option value="新竹市">新竹市</option><option value="嘉義市">嘉義市</option><option value="新竹縣">新竹縣</option><option value="苗栗縣">苗栗縣</option><option value="彰化縣">彰化縣</option><option value="南投縣">南投縣</option><option value="雲林縣">雲林縣</option><option value="嘉義縣">嘉義縣</option><option value="屏東縣">屏東縣</option><option value="宜蘭縣">宜蘭縣</option><option value="花蓮縣">花蓮縣</option><option value="台東縣">台東縣</option><option value="澎湖縣">澎湖縣</option><option value="金門縣">金門縣</option><option value="連江縣">連江縣</option>
-          </select>
+      <div class="fgrp">
+        <label>關鍵字 <span style="color:var(--gray);font-size:0.75rem">（Enter 新增）</span></label>
+        <div class="tag-wrap" id="tagWrap" onclick="document.getElementById('tagInput').focus()">
+          <input type="text" id="tagInput" class="tag-input" placeholder="輸入關鍵字後按 Enter">
         </div>
-        <div class="form-group"><label>關鍵字 <span style="font-size:.75rem;color:#a08085">（用逗號分隔，例：拉麵,台南美食,必吃）</span></label><input type="text" id="edKeywords" placeholder="拉麵,台南美食,必吃"></div>
-      </div>
-      <div class="form-group"><label>摘要（顯示在列表頁）</label><textarea id="edSynopsis" rows="3" placeholder="一段簡短描述，吸引讀者點開…"></textarea></div>
-
-      <!-- 封面圖 -->
-      <div class="section-title">🖼️ 封面圖片</div>
-      <div class="form-group">
-        <label>封面圖 URL</label>
-        <div class="cover-row">
-          <input type="text" id="edCover" placeholder="https://... 或使用下方上傳/AI生成">
-          <label class="upload-btn">📸 上傳圖片<input type="file" id="coverFileInput" accept="image/*" onchange="uploadIvyCover(event)"></label>
-          <button class="ai-gen-btn" onclick="generateAICover()">✨ AI 生成封面</button>
-        </div>
-        <div id="coverPreviewWrap" style="margin-top:.5rem;display:none">
-          <img id="coverPreview" style="max-width:220px;max-height:130px;object-fit:cover;border-radius:6px;border:1.5px solid #e0d4d5">
-          <span id="coverUploadStatus" style="font-size:.78rem;margin-left:.5rem;color:#888"></span>
-        </div>
-      </div>
-
-      <!-- 文章內文 -->
-      <div class="section-title">📝 文章內文</div>
-      <div class="form-group">
-        <label>內文編輯器（支援富文本格式）</label>
-        <div id="quillEditor"></div>
-        <textarea id="edContent" style="display:none"></textarea>
-      </div>
-
-      <!-- 店家資料 -->
-      <div class="section-title">🏪 店家資料（選填）</div>
-      <div class="store-card">
-        <div class="form-row">
-          <div class="form-group"><label>店家名稱</label><input type="text" id="edStoreName" placeholder="例：一蘭拉麵 台南店"></div>
-          <div class="form-group"><label>電話</label><input type="text" id="edStorePhone" placeholder="06-123-4567"></div>
-        </div>
-        <div class="form-group" style="margin-top:.8rem"><label>地址</label><input type="text" id="edStoreAddress" placeholder="台南市中西區..."></div>
-        <div class="form-group" style="margin-top:.8rem"><label>營業時間</label><input type="text" id="edStoreHours" placeholder="週一至週五 11:00-21:00，週末 10:00-22:00"></div>
-      </div>
-
-      <!-- SEO -->
-      <div class="section-title">🔍 SEO 設定</div>
-      <div class="form-row">
-        <div class="form-group"><label>SEO 標題（選填，不填用文章標題）</label><input type="text" id="edMetaT" placeholder="SEO 用標題"></div>
-        <div class="form-group"><label>SEO 描述（選填）</label><input type="text" id="edMetaD" placeholder="搜尋引擎顯示的描述文字"></div>
-      </div>
-      <div class="form-group"><label>AI 封面提示詞記錄</label><input type="text" id="edAiPrompt" placeholder="（自動記錄 AI 封面的生成提示詞）" readonly style="color:#999"></div>
-
-      <div style="display:flex;align-items:center;gap:.5rem">
-        <input type="checkbox" id="edPub" checked style="width:16px;height:16px;cursor:pointer;accent-color:#d4697a">
-        <label for="edPub" style="font-size:.9rem;cursor:pointer">立即發布（取消勾選則儲存為草稿）</label>
-      </div>
-
-      <div class="form-actions">
-        <button class="btn btn-rose" onclick="saveArt()">💾 儲存文章</button>
-        <button class="btn btn-outline" onclick="resetForm()">取消</button>
+        <input type="hidden" id="edKeywords">
       </div>
     </div>
-  </div>
+    <div class="sec-title">🖼️ 封面圖片</div>
+    <div class="fgrp">
+      <label>封面圖</label>
+      <div class="cover-area">
+        <input type="text" id="edCover" placeholder="https://... 或使用下方按鈕上傳／AI生成">
+        <div class="cover-btns">
+          <label style="cursor:pointer;background:var(--rose);color:#fff;padding:0.45rem 0.9rem;border-radius:8px;font-size:0.82rem;white-space:nowrap;user-select:none">📸 上傳圖片<input type="file" id="coverFileInput" accept="image/*" style="display:none" onchange="uploadIvyCover(event)"></label>
+          <button class="btn btn-gold btn-sm" onclick="generateAICover()" id="aiCoverBtn">✨ AI 生成封面</button>
+        </div>
+      </div>
+      <div id="aiGen" class="ai-gen"><div class="spinner"></div>AI 正在生成封面圖...</div>
+      <div id="coverPreviewWrap" style="display:none;margin-top:0.5rem;align-items:center;gap:0.8rem">
+        <img id="coverPreview" style="max-width:240px;max-height:135px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
+        <span id="coverUploadStatus" style="font-size:0.78rem;color:var(--gray)"></span>
+      </div>
+    </div>
+    <div class="fgrp"><label>摘要（顯示在列表頁）</label><textarea id="edSynopsis" rows="3" placeholder="一段簡短描述，吸引讀者點開…"></textarea></div>
+    <div class="sec-title">📄 文章內文</div>
+    <div class="fgrp"><label>內文（富文本編輯器）</label><div id="quillEditor"></div><input type="hidden" id="edContent"></div>
+    <div class="sec-title">🏪 店家資訊</div>
+    <div class="store-sec">
+      <h3>📍 店家基本資料（選填）</h3>
+      <div class="frow">
+        <div class="fgrp"><label>店家名稱</label><input type="text" id="edStoreName" placeholder="例：好食餐廳"></div>
+        <div class="fgrp"><label>電話</label><input type="text" id="edStorePhone" placeholder="例：06-123-4567"></div>
+      </div>
+      <div class="fgrp"><label>地址</label><input type="text" id="edStoreAddress" placeholder="例：台南市中西區民生路一段123號"></div>
+      <div class="frow">
+        <div class="fgrp"><label>營業時間</label><input type="text" id="edStoreHours" placeholder="例：週一至週日 11:00–21:00"></div>
+        <div class="fgrp"><label>AI 封面提示（選填）</label><input type="text" id="edAiPrompt" placeholder="例：台南美食 南瓜濃湯 溫馨餐廳氛圍"></div>
+      </div>
+    </div>
+    <div class="sec-title">🔍 SEO 設定</div>
+    <div class="frow">
+      <div class="fgrp"><label>SEO 標題（選填）</label><input type="text" id="edMetaT" placeholder="SEO 用標題"></div>
+      <div class="fgrp"><label>SEO 描述（選填）</label><input type="text" id="edMetaD" placeholder="搜尋結果顯示的描述文字"></div>
+    </div>
+    <div class="check-row"><input type="checkbox" id="edPub" checked><label for="edPub">立刻發布（取消勾選則存為草稿）</label></div>
+    <div class="factions">
+      <button class="btn btn-rose" onclick="saveArt()">💾 儲存文章</button>
+      <button class="btn btn-outline" onclick="resetForm()">取消</button>
+    </div>
+  </div></div>
 </div>
-
-<!-- CATEGORIES -->
 <div id="panel-categories" class="panel">
-  <div class="page-header"><h1>🏷️ 分類管理</h1><span style="font-size:.82rem;color:#a08085">分類目前需透過 Supabase 管理</span></div>
-  <div class="card">
-    <table><thead><tr><th>圖示</th><th>名稱</th><th>Slug</th><th>說明</th><th>排序</th><th>文章數</th></tr></thead>
-    <tbody id="catList"></tbody></table>
-  </div>
+  <div class="page-hdr"><h1>🏷️ 分類管理</h1><span style="font-size:0.82rem;color:var(--gray)">分類目前需透過 Supabase 管理</span></div>
+  <div class="card"><table><thead><tr><th>圖示</th><th>名稱</th><th>Slug</th><th>說明</th><th>排序</th><th>文章數</th></tr></thead><tbody id="catList"></tbody></table></div>
 </div>
-
-</main>
-</div>
-
-<!-- AI 生成封面 Overlay -->
-<div class="ai-overlay" id="aiOverlay">
-  <div class="ai-box">
-    <h3>✨ AI 生成封面圖</h3>
-    <div id="aiStatus" class="ai-status">請稍候，正在根據文章內容生成封面…</div>
-    <div class="ai-progress"><div class="ai-progress-bar" id="aiBar"></div></div>
-    <img id="aiPreviewImg" class="ai-preview">
-    <div style="display:flex;gap:.8rem;margin-top:1rem;justify-content:flex-end">
-      <button class="btn btn-outline btn-sm" onclick="closeAIOverlay()">取消</button>
-      <button class="btn btn-rose btn-sm" id="aiUseBtn" style="display:none" onclick="useAICover()">✅ 使用此封面</button>
-    </div>
-  </div>
-</div>
-
+</main></div>
 <div class="toast" id="toast"></div>
-
 <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 <script>
-const SB = 'https://zsebcpfblecwumbaxeaz.supabase.co';
-const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZWJjcGZibGVjd3VtYmF4ZWF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3OTUzMjcsImV4cCI6MjA4OTM3MTMyN30.g0rsqNO6cItp8Qw3ybveVwX2afjTSwsT7WFHL_320jQ';
-const PASS = 'ivy2024admin';
-let arts = [], cats = [];
-let quill = null;
+const SB='https://zsebcpfblecwumbaxeaz.supabase.co';
+const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZWJjcGZibGVjd3VtYmF4ZWF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3OTUzMjcsImV4cCI6MjA4OTM3MTMyN30.g0rsqNO6cItp8Qw3ybveVwX2afjTSwtS7WFHL_320jQ';
+const PASS='ivy2024admin';
+let arts=[],cats=[],quill;
 
-function doLogin() {
-  if (document.getElementById('pwInput').value === PASS) {
-    document.getElementById('loginPage').style.display = 'none';
-    document.getElementById('adminPage').style.display = 'block';
-    loadAll();
-    initQuill();
-  } else {
-    document.getElementById('loginErr').style.display = 'block';
-  }
+function initQuill(){if(quill)return;quill=new Quill('#quillEditor',{theme:'snow',placeholder:'在此輸入文章內文，支援標題、粗體、清單、連結等…',modules:{toolbar:[[{header:[2,3,false]}],['bold','italic','underline','strike'],[{color:[]},{background:[]}],[{list:'ordered'},{list:'bullet'}],['blockquote','code-block'],['link','image'],['clean']]}});}
+
+function doLogin(){
+  if(document.getElementById('pwInput').value===PASS){
+    document.getElementById('loginPage').style.display='none';
+    document.getElementById('adminPage').style.display='block';
+    initQuill();loadAll();
+  }else{document.getElementById('loginErr').style.display='block';}
 }
-document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('pwInput').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 
-function initQuill() {
-  if (quill) return;
-  quill = new Quill('#quillEditor', {
-    theme: 'snow',
-    placeholder: '開始撰寫文章內容…',
-    modules: {
-      toolbar: [
-        [{ header: [1,2,3,false] }],
-        ['bold','italic','underline','strike'],
-        [{ color: [] },{ background: [] }],
-        [{ list: 'ordered' },{ list: 'bullet' }],
-        ['blockquote','code-block'],
-        ['link','image'],
-        ['clean']
-      ]
-    }
-  });
+async function sb(path,opt){
+  opt=opt||{};
+  const r=await fetch(SB+'/rest/v1/'+path,Object.assign({},opt,{headers:Object.assign({'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=representation'},opt.headers||{})}));
+  if(!r.ok){const e=await r.text();throw new Error(e);}
+  try{return await r.json();}catch{return[];}
 }
 
-async function sb(path, opt) {
-  opt = opt || {};
-  const r = await fetch(SB + '/rest/v1/' + path, Object.assign({}, opt, {
-    headers: Object.assign({ 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' }, opt.headers || {})
-  }));
-  if (!r.ok) { const e = await r.text(); throw new Error(e); }
-  try { return await r.json(); } catch { return []; }
+async function loadAll(){
+  try{
+    [cats,arts]=await Promise.all([sb('ivy_categories?order=sort_order.asc'),sb('ivy_articles?select=*,ivy_categories(name,slug)&order=created_at.desc')]);
+    renderDash();renderArts(arts);renderCats();fillCatOpts();
+    document.getElementById('lastUpdate').textContent='更新於 '+new Date().toLocaleTimeString('zh-TW');
+  }catch(e){toast('載入失敗：'+e.message,1);}
 }
 
-async function loadAll() {
-  try {
-    [cats, arts] = await Promise.all([
-      sb('ivy_categories?order=sort_order.asc'),
-      sb('ivy_articles?select=*,ivy_categories(name,slug)&order=created_at.desc')
-    ]);
-    renderDash(); renderArts(arts); renderCats(); fillCatOpts();
-    document.getElementById('lastUpdate').textContent = '更新於 ' + new Date().toLocaleTimeString('zh-TW');
-  } catch(e) { toast('載入失敗: ' + e.message, 1); }
+function renderDash(){
+  document.getElementById('s1').textContent=arts.length;
+  document.getElementById('s2').textContent=arts.filter(a=>a.published).length;
+  document.getElementById('s3').textContent=arts.filter(a=>!a.published).length;
+  document.getElementById('s4').textContent=cats.length;
+  document.getElementById('dashRecent').innerHTML=arts.slice(0,10).map(a=>'<tr><td><strong>'+esc(a.title)+'</strong></td><td>'+(a.ivy_categories?a.ivy_categories.name:'-')+'</td><td>'+(a.city||'-')+'</td><td>'+badge(a.published)+'</td><td>'+fmtDate(a.created_at)+'</td></tr>').join('')||'<tr><td colspan="5" class="empty-state">暫無文章</td></tr>';
 }
 
-function renderDash() {
-  document.getElementById('s1').textContent = arts.length;
-  document.getElementById('s2').textContent = arts.filter(a => a.published).length;
-  document.getElementById('s3').textContent = arts.filter(a => !a.published).length;
-  document.getElementById('s4').textContent = cats.length;
-  document.getElementById('dashRecent').innerHTML = arts.slice(0,10).map(a =>
-    '<tr><td><strong>' + esc(a.title) + '</strong></td><td>' + (a.ivy_categories ? a.ivy_categories.name : '-') + '</td><td>' + (a.city||'-') + '</td><td>' + badge(a.published) + '</td><td>' + fmtDate(a.created_at) + '</td></tr>'
-  ).join('') || '<tr><td colspan="5" class="empty-state">暫無文章</td></tr>';
+function renderArts(list){
+  document.getElementById('artList').innerHTML=list.map(a=>'<tr><td><strong>'+esc(a.title)+'</strong></td><td>'+(a.ivy_categories?a.ivy_categories.name:'-')+'</td><td>'+(a.city||'-')+'</td><td><code style="font-size:0.75rem;color:var(--gray)">'+a.slug+'</code></td><td>'+badge(a.published)+'</td><td>'+fmtDate(a.created_at)+'</td><td><div class="actions"><button class="btn btn-sm btn-outline" onclick="editArt('+a.id+')">編輯</button><button class="btn btn-sm '+(a.published?'btn-outline':'btn-success')+'" onclick="togglePub('+a.id+','+a.published+')">'+(a.published?'下架':'發布')+'</button><button class="btn btn-sm btn-danger" onclick="delArt('+a.id+',''+a.title.replace(/'/g,'').substring(0,20)+'')">刪除</button></div></td></tr>').join('')||'<tr><td colspan="7" class="empty-state">暫無文章</td></tr>';
 }
 
-function renderArts(list) {
-  document.getElementById('artList').innerHTML = list.map(a =>
-    '<tr><td><strong>' + esc(a.title) + '</strong></td>' +
-    '<td>' + (a.ivy_categories ? a.ivy_categories.name : '-') + '</td>' +
-    '<td>' + (a.city||'-') + '</td>' +
-    '<td><code style="font-size:.75rem;color:#a08085">' + a.slug + '</code></td>' +
-    '<td>' + badge(a.published) + '</td>' +
-    '<td>' + fmtDate(a.created_at) + '</td>' +
-    '<td><div class="actions">' +
-      '<button class="btn btn-sm btn-outline" onclick="editArt(' + a.id + ')">編輯</button>' +
-      '<button class="btn btn-sm ' + (a.published ? 'btn-outline' : 'btn-success') + '" onclick="togglePub(' + a.id + ',' + a.published + ')">' + (a.published ? '下架' : '發布') + '</button>' +
-      '<button class="btn btn-sm btn-danger" onclick="delArt(' + a.id + ',\'' + a.title.replace(/'/g,'').substring(0,20) + '\')">刪除</button>' +
-    '</div></td></tr>'
-  ).join('') || '<tr><td colspan="7" class="empty-state">暫無文章</td></tr>';
+function renderCats(){
+  document.getElementById('catList').innerHTML=cats.map(c=>{const cnt=arts.filter(a=>a.category_id===c.id).length;return '<tr><td style="font-size:1.4rem">'+(c.icon||'')+'</td><td><strong>'+c.name+'</strong></td><td><code>'+c.slug+'</code></td><td style="color:var(--gray)">'+(c.description||'')+'</td><td style="text-align:center">'+c.sort_order+'</td><td style="text-align:center"><strong>'+cnt+'</strong></td></tr>';}).join('');
 }
 
-function renderCats() {
-  document.getElementById('catList').innerHTML = cats.map(c => {
-    const cnt = arts.filter(a => a.category_id === c.id).length;
-    return '<tr><td style="font-size:1.4rem">' + (c.icon||'') + '</td><td><strong>' + c.name + '</strong></td>' +
-      '<td><code>' + c.slug + '</code></td><td style="color:#a08085">' + (c.description||'') + '</td>' +
-      '<td style="text-align:center">' + c.sort_order + '</td><td style="text-align:center"><strong>' + cnt + '</strong></td></tr>';
-  }).join('');
+function fillCatOpts(){
+  const opts=cats.map(c=>'<option value="'+c.id+'">'+(c.icon||'')+' '+c.name+'</option>').join('');
+  document.getElementById('edCat').innerHTML='<option value="">-- 選擇分類 --</option>'+opts;
+  document.getElementById('filterCat').innerHTML='<option value="">全部分類</option>'+cats.map(c=>'<option value="'+c.id+'">'+c.name+'</option>').join('');
 }
 
-function fillCatOpts() {
-  const opts = cats.map(c => '<option value="' + c.id + '">' + (c.icon||'') + ' ' + c.name + '</option>').join('');
-  document.getElementById('edCat').innerHTML = '<option value="">-- 選擇分類 --</option>' + opts;
-  document.getElementById('filterCat').innerHTML = '<option value="">全部分類</option>' + cats.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join('');
-}
-
-function filterList() {
-  const q = document.getElementById('searchQ').value.toLowerCase();
-  const cat = document.getElementById('filterCat').value;
-  const city = document.getElementById('filterCity').value;
-  const pub = document.getElementById('filterPub').value;
-  let list = arts;
-  if (q) list = list.filter(a => a.title.toLowerCase().includes(q) || a.slug.includes(q));
-  if (cat) list = list.filter(a => String(a.category_id) === cat);
-  if (city) list = list.filter(a => a.city === city);
-  if (pub !== '') list = list.filter(a => String(a.published) === pub);
+function filterList(){
+  const q=document.getElementById('searchQ').value.toLowerCase();
+  const cat=document.getElementById('filterCat').value;
+  const city=document.getElementById('filterCity').value;
+  const pub=document.getElementById('filterPub').value;
+  let list=arts;
+  if(q)list=list.filter(a=>a.title.toLowerCase().includes(q)||a.slug.includes(q));
+  if(cat)list=list.filter(a=>String(a.category_id)===cat);
+  if(city)list=list.filter(a=>a.city===city);
+  if(pub!=='')list=list.filter(a=>String(a.published)===pub);
   renderArts(list);
 }
 
-function editArt(id) {
-  const a = arts.find(x => x.id === id);
-  if (!a) return;
-  document.getElementById('edId').value = a.id;
-  document.getElementById('edTitleInput').value = a.title || '';
-  document.getElementById('edSlug').value = a.slug || '';
-  document.getElementById('edCat').value = a.category_id || '';
-  document.getElementById('edCity').value = a.city || '';
-  document.getElementById('edKeywords').value = a.keywords || '';
-  document.getElementById('edSynopsis').value = a.synopsis || '';
-  document.getElementById('edContent').value = a.content || '';
-  if (quill) quill.root.innerHTML = a.content || '';
-  document.getElementById('edCover').value = a.cover_image || '';
-  if (a.cover_image) {
-    document.getElementById('coverPreview').src = a.cover_image;
-    document.getElementById('coverPreviewWrap').style.display = 'block';
-  }
-  document.getElementById('edStoreName').value = a.store_name || '';
-  document.getElementById('edStorePhone').value = a.store_phone || '';
-  document.getElementById('edStoreAddress').value = a.store_address || '';
-  document.getElementById('edStoreHours').value = a.store_hours || '';
-  document.getElementById('edMetaT').value = a.meta_title || '';
-  document.getElementById('edMetaD').value = a.meta_description || '';
-  document.getElementById('edAiPrompt').value = a.ai_cover_prompt || '';
-  document.getElementById('edPub').checked = !!a.published;
-  document.getElementById('edTitle').textContent = '✏️ 編輯文章';
-  showPanel('new', document.querySelector('.sidebar-menu li:nth-child(3) a'));
-  window.scrollTo(0,0);
+function getTags(){return Array.from(document.querySelectorAll('.tag-item')).map(t=>t.dataset.val);}
+function addTag(val){
+  val=val.trim();if(!val||getTags().includes(val))return;
+  const wrap=document.getElementById('tagWrap'),inp=document.getElementById('tagInput');
+  const span=document.createElement('span');span.className='tag-item';span.dataset.val=val;
+  span.innerHTML=val+'<button onclick="this.parentElement.remove();updateKw()">×</button>';
+  wrap.insertBefore(span,inp);inp.value='';updateKw();
+}
+function updateKw(){document.getElementById('edKeywords').value=getTags().join(',');}
+function setTags(str){
+  const wrap=document.getElementById('tagWrap'),inp=document.getElementById('tagInput');
+  wrap.querySelectorAll('.tag-item').forEach(t=>t.remove());
+  if(str)str.split(',').filter(Boolean).forEach(addTag);
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('tagInput').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===','){e.preventDefault();addTag(e.target.value);}});
+});
+
+function editArt(id){
+  const a=arts.find(x=>x.id===id);if(!a)return;
+  ['edId','edTitleInput','edSlug','edSynopsis','edCover','edMetaT','edMetaD','edStoreName','edStorePhone','edStoreAddress','edStoreHours','edAiPrompt'].forEach(k=>document.getElementById(k).value=a[k.replace('ed','').replace(/([A-Z])/g,c=>'_'+c.toLowerCase()).replace('_id','id').replace('_title_input','title').replace('_slug','slug').replace('_synopsis','synopsis').replace('_cover','cover_image').replace('_meta_t','meta_title').replace('_meta_d','meta_description').replace('_store_name','store_name').replace('_store_phone','store_phone').replace('_store_address','store_address').replace('_store_hours','store_hours').replace('_ai_prompt','ai_cover_prompt')]||'');
+  document.getElementById('edId').value=a.id;
+  document.getElementById('edTitleInput').value=a.title||'';
+  document.getElementById('edSlug').value=a.slug||'';
+  document.getElementById('edCat').value=a.category_id||'';
+  document.getElementById('edCity').value=a.city||'';
+  document.getElementById('edSynopsis').value=a.synopsis||'';
+  document.getElementById('edCover').value=a.cover_image||'';
+  document.getElementById('edMetaT').value=a.meta_title||'';
+  document.getElementById('edMetaD').value=a.meta_description||'';
+  document.getElementById('edStoreName').value=a.store_name||'';
+  document.getElementById('edStorePhone').value=a.store_phone||'';
+  document.getElementById('edStoreAddress').value=a.store_address||'';
+  document.getElementById('edStoreHours').value=a.store_hours||'';
+  document.getElementById('edAiPrompt').value=a.ai_cover_prompt||'';
+  document.getElementById('edPub').checked=!!a.published;
+  setTags(a.keywords||'');
+  if(quill)quill.root.innerHTML=a.content||'';
+  if(a.cover_image){document.getElementById('coverPreview').src=a.cover_image;document.getElementById('coverPreviewWrap').style.display='flex';}
+  document.getElementById('edTitle').textContent='✏️ 編輯文章';
+  showPanel('new',document.querySelector('.sb-menu li:nth-child(3) a'));window.scrollTo(0,0);
 }
 
-function resetForm() {
-  document.getElementById('edId').value = '';
-  ['edTitleInput','edSlug','edSynopsis','edContent','edCover','edMetaT','edMetaD','edKeywords','edStoreName','edStorePhone','edStoreAddress','edStoreHours','edAiPrompt'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('edCat').value = '';
-  document.getElementById('edCity').value = '';
-  document.getElementById('edPub').checked = true;
-  document.getElementById('edTitle').textContent = '✏️ 新增文章';
-  document.getElementById('coverPreviewWrap').style.display = 'none';
-  if (quill) quill.root.innerHTML = '';
-  showPanel('articles', document.querySelector('.sidebar-menu li:nth-child(2) a'));
+function resetForm(){
+  document.getElementById('edId').value='';
+  ['edTitleInput','edSlug','edSynopsis','edCover','edMetaT','edMetaD','edStoreName','edStorePhone','edStoreAddress','edStoreHours','edAiPrompt'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('edCat').value='';document.getElementById('edCity').value='';
+  document.getElementById('edPub').checked=true;setTags('');
+  if(quill)quill.setText('');
+  document.getElementById('coverPreviewWrap').style.display='none';
+  document.getElementById('edTitle').textContent='✏️ 新增文章';
+  showPanel('articles',document.querySelector('.sb-menu li:nth-child(2) a'));
 }
 
-async function saveArt() {
-  // 同步 Quill 內容到 hidden textarea
-  if (quill) document.getElementById('edContent').value = quill.root.innerHTML;
-  const id = document.getElementById('edId').value;
-  const title = document.getElementById('edTitleInput').value.trim();
-  const slug = document.getElementById('edSlug').value.trim().replace(/[^a-zA-Z0-9\u4e00-\u9fff\-_]/g, '');
-  if (!title) { toast('請填寫文章標題', 1); return; }
-  if (!slug) { toast('請填寫 Slug（網址）', 1); return; }
-  const data = {
-    title, slug,
-    synopsis: document.getElementById('edSynopsis').value.trim() || null,
-    content: document.getElementById('edContent').value.trim() || null,
-    category_id: document.getElementById('edCat').value || null,
-    city: document.getElementById('edCity').value || null,
-    keywords: document.getElementById('edKeywords').value.trim() || null,
-    cover_image: document.getElementById('edCover').value.trim() || null,
-    store_name: document.getElementById('edStoreName').value.trim() || null,
-    store_phone: document.getElementById('edStorePhone').value.trim() || null,
-    store_address: document.getElementById('edStoreAddress').value.trim() || null,
-    store_hours: document.getElementById('edStoreHours').value.trim() || null,
-    meta_title: document.getElementById('edMetaT').value.trim() || null,
-    meta_description: document.getElementById('edMetaD').value.trim() || null,
-    ai_cover_prompt: document.getElementById('edAiPrompt').value.trim() || null,
-    published: document.getElementById('edPub').checked,
-    updated_at: new Date().toISOString()
-  };
-  try {
-    if (id) {
-      await sb('ivy_articles?id=eq.' + id, { method: 'PATCH', body: JSON.stringify(data) });
-      toast('✅ 文章已更新！');
-    } else {
-      await sb('ivy_articles', { method: 'POST', body: JSON.stringify(data) });
-      toast('✅ 文章已新增！');
-    }
-    await loadAll();
-    resetForm();
-  } catch(e) { toast('儲存失敗: ' + e.message, 1); }
+async function saveArt(){
+  const id=document.getElementById('edId').value;
+  const title=document.getElementById('edTitleInput').value.trim();
+  const slug=document.getElementById('edSlug').value.trim().replace(/[^a-zA-Z0-9一-鿿-_]/g,'');
+  if(!title){toast('請填寫文章標題',1);return;}
+  if(!slug){toast('請填寫 Slug（網址）',1);return;}
+  if(quill)document.getElementById('edContent').value=quill.root.innerHTML;
+  const data={title,slug,synopsis:document.getElementById('edSynopsis').value.trim()||null,content:document.getElementById('edContent').value.trim()||null,category_id:document.getElementById('edCat').value||null,cover_image:document.getElementById('edCover').value.trim()||null,meta_title:document.getElementById('edMetaT').value.trim()||null,meta_description:document.getElementById('edMetaD').value.trim()||null,published:document.getElementById('edPub').checked,city:document.getElementById('edCity').value||null,keywords:document.getElementById('edKeywords').value||null,store_name:document.getElementById('edStoreName').value.trim()||null,store_phone:document.getElementById('edStorePhone').value.trim()||null,store_address:document.getElementById('edStoreAddress').value.trim()||null,store_hours:document.getElementById('edStoreHours').value.trim()||null,ai_cover_prompt:document.getElementById('edAiPrompt').value.trim()||null,updated_at:new Date().toISOString()};
+  try{
+    if(id){await sb('ivy_articles?id=eq.'+id,{method:'PATCH',body:JSON.stringify(data)});toast('✅ 文章已更新！');}
+    else{await sb('ivy_articles',{method:'POST',body:JSON.stringify(data)});toast('✅ 文章已新增！');}
+    await loadAll();resetForm();
+  }catch(e){toast('儲存失敗：'+e.message,1);}
 }
 
-async function togglePub(id, cur) {
-  try {
-    await sb('ivy_articles?id=eq.' + id, { method: 'PATCH', body: JSON.stringify({ published: !cur }) });
-    toast(cur ? '文章已下架' : '✅ 文章已發布！');
-    await loadAll();
-  } catch(e) { toast('操作失敗: ' + e.message, 1); }
+async function uploadIvyCover(e){
+  const file=e.target.files?.[0];if(!file)return;
+  const status=document.getElementById('coverUploadStatus'),preview=document.getElementById('coverPreview'),wrap=document.getElementById('coverPreviewWrap');
+  preview.src=URL.createObjectURL(file);wrap.style.display='flex';
+  status.textContent='⏳ 上傳中...';status.style.color='#888';
+  const ext=file.name.split('.').pop()||'jpg';
+  const fname='cover-'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;
+  try{
+    const r=await fetch(SB+'/storage/v1/object/ivy-images/'+fname,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':file.type},body:file});
+    if(!r.ok){const t=await r.text();throw new Error(t);}
+    const url=SB+'/storage/v1/object/public/ivy-images/'+fname;
+    document.getElementById('edCover').value=url;
+    status.textContent='✅ 上傳成功';status.style.color='#4caf50';
+  }catch(err){status.textContent='❌ '+err.message.substring(0,40);status.style.color='#f44336';}
+  e.target.value='';
 }
 
-async function delArt(id, title) {
-  if (!confirm('確定刪除「' + title + '…」？此動作無法還原。')) return;
-  try {
-    await sb('ivy_articles?id=eq.' + id, { method: 'DELETE' });
-    toast('文章已刪除');
-    await loadAll();
-  } catch(e) { toast('刪除失敗: ' + e.message, 1); }
+async function generateAICover(){
+  const title=document.getElementById('edTitleInput').value.trim();
+  const synopsis=document.getElementById('edSynopsis').value.trim();
+  const customPrompt=document.getElementById('edAiPrompt').value.trim();
+  const city=document.getElementById('edCity').value;
+  const catId=document.getElementById('edCat').value;
+  const catName=catId?(cats.find(c=>String(c.id)===catId)?.name||''):'';
+  if(!title&&!customPrompt){toast('請先填寫文章標題再生成封面',1);return;}
+  const btn=document.getElementById('aiCoverBtn'),gen=document.getElementById('aiGen');
+  btn.disabled=true;gen.style.display='flex';toast('✨ AI 正在生成封面圖，請稍候…');
+  const prompt=customPrompt||title+(city?' '+city:'')+(catName?' '+catName:'')+(synopsis?' '+synopsis.substring(0,60):'');
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,messages:[{role:'user',content:'請為以下文章生成精美封面圖 SVG（1200x630px）。
+標題：'+title+'
+分類：'+(catName||'生活風格')+'
+縣市：'+(city||'台灣')+'
+提示：'+prompt+'
+要求：1.輸出純SVG代碼以<svg開頭</svg結尾 2.viewBox="0 0 1200 630" 3.玫瑰粉/珊瑚/金色系漸層背景 4.中央顯示文章標題中文字體48-56px白色 5.右下角分類名稱 6.左下角IvyLife品牌名稱 7.加入適合主題的裝飾性幾何或花卉圖案 8.只輸出SVG代碼不要說明'}]})});
+    if(!resp.ok)throw new Error('API 請求失敗：'+resp.status);
+    const data=await resp.json();
+    const text=data.content?.[0]?.text||'';
+    const svgMatch=text.match(/<svg[sS]*?</svg>/i);
+    if(!svgMatch)throw new Error('未能取得 SVG 內容');
+    const svgCode=svgMatch[0];
+    const blob=new Blob([svgCode],{type:'image/svg+xml'});
+    const fname='ai-cover-'+Date.now()+'.svg';
+    const uploadResp=await fetch(SB+'/storage/v1/object/ivy-images/'+fname,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'image/svg+xml'},body:blob});
+    if(!uploadResp.ok){const t=await uploadResp.text();throw new Error(t);}
+    const url=SB+'/storage/v1/object/public/ivy-images/'+fname;
+    document.getElementById('edCover').value=url;
+    const preview=document.getElementById('coverPreview'),wrap=document.getElementById('coverPreviewWrap'),status=document.getElementById('coverUploadStatus');
+    preview.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svgCode);
+    wrap.style.display='flex';status.textContent='✅ AI 封面已生成';status.style.color='#4caf50';
+    toast('✅ AI 封面生成完成！');
+  }catch(err){toast('AI 生成失敗：'+err.message.substring(0,60),1);console.error(err);}
+  finally{btn.disabled=false;gen.style.display='none';}
 }
 
-// ── 封面上傳 ──
-async function uploadIvyCover(e) {
-  const file = e.target.files?.[0]; if (!file) return;
-  const status = document.getElementById('coverUploadStatus');
-  const preview = document.getElementById('coverPreview');
-  const wrap = document.getElementById('coverPreviewWrap');
-  preview.src = URL.createObjectURL(file);
-  wrap.style.display = 'block';
-  status.textContent = '⏳ 上傳中...'; status.style.color = '#888';
-  const ext = file.name.split('.').pop() || 'jpg';
-  const fname = 'cover-' + Date.now() + '-' + Math.random().toString(36).slice(2) + '.' + ext;
-  try {
-    const r = await fetch(SB + '/storage/v1/object/ivy-images/' + fname, {
-      method: 'POST', headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': file.type }, body: file
-    });
-    if (!r.ok) { const t = await r.text(); throw new Error(t); }
-    const url = SB + '/storage/v1/object/public/ivy-images/' + fname;
-    document.getElementById('edCover').value = url;
-    status.textContent = '✅ 上傳成功'; status.style.color = '#4caf50';
-    console.log('IVY_COVER_UPLOADED:', url);
-  } catch(err) {
-    status.textContent = '❌ ' + err.message.substring(0,40); status.style.color = '#f44336';
-    console.error('ivy cover err:', err);
-  }
-  e.target.value = '';
+async function togglePub(id,cur){
+  try{await sb('ivy_articles?id=eq.'+id,{method:'PATCH',body:JSON.stringify({published:!cur})});toast(cur?'文章已下架':'✅ 文章已發布！');await loadAll();}
+  catch(e){toast('操作失敗：'+e.message,1);}
 }
 
-// ── AI 生成封面 ──
-let aiGeneratedUrl = '';
-async function generateAICover() {
-  const title = document.getElementById('edTitleInput').value.trim();
-  const synopsis = document.getElementById('edSynopsis').value.trim();
-  const city = document.getElementById('edCity').value;
-  const keywords = document.getElementById('edKeywords').value.trim();
-  const catEl = document.getElementById('edCat');
-  const catName = catEl.options[catEl.selectedIndex]?.text?.replace(/^[^a-zA-Z\u4e00-\u9fff]*/,'') || '';
-  if (!title) { toast('請先填寫文章標題再生成封面', 1); return; }
-
-  const prompt = `請根據以下文章資訊，用繁體中文生成一段封面圖的詳細視覺描述（英文），用於 AI 圖片生成：
-文章標題：${title}
-分類：${catName}
-城市：${city || '台灣'}
-關鍵字：${keywords}
-摘要：${synopsis}
-要求：溫暖、有質感、適合生活旅遊部落格，色調以粉橙暖色為主，構圖簡潔。請直接輸出英文圖片描述，不要其他說明。`;
-
-  document.getElementById('aiOverlay').classList.add('show');
-  document.getElementById('aiStatus').textContent = '🤖 正在呼叫 Claude AI 分析文章內容…';
-  document.getElementById('aiBar').style.width = '20%';
-  document.getElementById('aiPreviewImg').style.display = 'none';
-  document.getElementById('aiUseBtn').style.display = 'none';
-
-  try {
-    // Step 1: 用 Claude API 生成圖片描述
-    const aiResp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 300,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-    const aiData = await aiResp.json();
-    const imgDesc = aiData.content?.[0]?.text || title;
-    document.getElementById('aiStatus').textContent = '🎨 AI 描述生成完成，正在以 Canvas 合成封面…';
-    document.getElementById('aiBar').style.width = '60%';
-    document.getElementById('edAiPrompt').value = imgDesc.substring(0, 200);
-
-    // Step 2: 用 canvas 根據描述合成精美封面
-    const canvas = document.createElement('canvas');
-    canvas.width = 1200; canvas.height = 630;
-    const ctx = canvas.getContext('2d');
-
-    // 根據分類決定色彩
-    const catColors = {
-      '美食餐廳': ['#ff9a9e','#ffecd2','#ff6b6b'],
-      '飯店民宿': ['#a18cd1','#fbc2eb','#7b68ee'],
-      '醫學美容': ['#fccb90','#d57eeb','#e040fb'],
-      '汽車美容': ['#4facfe','#00f2fe','#1976d2'],
-      '全身按摩': ['#84fab0','#8fd3f4','#26a69a'],
-      '宅修清潔': ['#f093fb','#f5576c','#e91e63'],
-      '設計推薦': ['#4facfe','#43e97b','#2196f3'],
-    };
-    const colors = catColors[catName] || ['#f8a5c2','#fde8d8','#d4697a'];
-
-    // 漸層背景
-    const grad = ctx.createLinearGradient(0, 0, 1200, 630);
-    grad.addColorStop(0, colors[0]);
-    grad.addColorStop(0.5, colors[1]);
-    grad.addColorStop(1, colors[2]);
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 1200, 630);
-
-    // 裝飾圓
-    ctx.globalAlpha = 0.15;
-    ctx.fillStyle = 'white';
-    ctx.beginPath(); ctx.arc(1050, 100, 200, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(150, 520, 150, 0, Math.PI*2); ctx.fill();
-    ctx.globalAlpha = 1;
-
-    // 半透明遮罩
-    const overlay = ctx.createLinearGradient(0, 200, 0, 630);
-    overlay.addColorStop(0, 'rgba(0,0,0,0)');
-    overlay.addColorStop(1, 'rgba(0,0,0,0.45)');
-    ctx.fillStyle = overlay;
-    ctx.fillRect(0, 0, 1200, 630);
-
-    // IvyLife 品牌標記
-    ctx.fillStyle = 'rgba(255,255,255,0.95)';
-    ctx.font = 'bold 28px Georgia, serif';
-    ctx.fillText('IvyLife', 60, 68);
-    ctx.font = 'italic 20px Georgia, serif';
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    ctx.fillText('艾薇生活', 60, 95);
-
-    // 分類標籤
-    if (catName) {
-      ctx.fillStyle = 'rgba(255,255,255,0.25)';
-      ctx.beginPath(); ctx.roundRect(60, 130, catName.length*22+40, 38, 19); ctx.fill();
-      ctx.fillStyle = 'white';
-      ctx.font = '18px "Noto Sans TC", sans-serif';
-      ctx.fillText(catName, 80, 155);
-    }
-
-    // 城市標籤
-    if (city) {
-      const cityX = 60 + (catName ? catName.length*22+60 : 0);
-      ctx.fillStyle = 'rgba(255,255,255,0.2)';
-      ctx.beginPath(); ctx.roundRect(cityX, 130, city.length*18+30, 38, 19); ctx.fill();
-      ctx.fillStyle = 'white';
-      ctx.font = '17px "Noto Sans TC", sans-serif';
-      ctx.fillText('📍 ' + city, cityX+15, 155);
-    }
-
-    // 主標題
-    ctx.fillStyle = 'white';
-    ctx.shadowColor = 'rgba(0,0,0,0.4)';
-    ctx.shadowBlur = 12;
-    const maxW = 1080;
-    const words = title.split('');
-    let line = '', lines = [];
-    for (const ch of words) {
-      const test = line + ch;
-      ctx.font = 'bold 62px "Noto Sans TC", sans-serif';
-      if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = ch; }
-      else line = test;
-    }
-    lines.push(line);
-    lines = lines.slice(0, 3);
-    const lineH = 80;
-    const startY = lines.length === 1 ? 380 : lines.length === 2 ? 340 : 300;
-    lines.forEach((l, i) => {
-      ctx.font = 'bold 62px "Noto Sans TC", sans-serif';
-      ctx.fillText(l, 60, startY + i * lineH);
-    });
-
-    // 摘要
-    if (synopsis) {
-      ctx.shadowBlur = 0;
-      ctx.fillStyle = 'rgba(255,255,255,0.85)';
-      ctx.font = '24px "Noto Sans TC", sans-serif';
-      const sumShort = synopsis.substring(0, 40) + (synopsis.length > 40 ? '…' : '');
-      ctx.fillText(sumShort, 60, startY + lines.length * lineH + 20);
-    }
-
-    // 關鍵字標籤
-    if (keywords) {
-      const tags = keywords.split(',').slice(0, 4);
-      let tagX = 60;
-      tags.forEach(tag => {
-        tag = tag.trim();
-        if (!tag) return;
-        const tw = ctx.measureText(tag).width + 30;
-        ctx.fillStyle = 'rgba(255,255,255,0.2)';
-        ctx.beginPath(); ctx.roundRect(tagX, 570, tw, 34, 17); ctx.fill();
-        ctx.fillStyle = 'rgba(255,255,255,0.9)';
-        ctx.font = '15px "Noto Sans TC", sans-serif';
-        ctx.fillText('# ' + tag, tagX + 12, 592);
-        tagX += tw + 12;
-      });
-    }
-
-    // 上傳到 Supabase
-    document.getElementById('aiStatus').textContent = '☁️ 正在上傳封面至 Supabase Storage…';
-    document.getElementById('aiBar').style.width = '80%';
-
-    const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.92));
-    const fname = 'ai-cover-' + Date.now() + '.jpg';
-    const uploadR = await fetch(SB + '/storage/v1/object/ivy-images/' + fname, {
-      method: 'POST', headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'image/jpeg' }, body: blob
-    });
-    if (!uploadR.ok) throw new Error(await uploadR.text());
-
-    aiGeneratedUrl = SB + '/storage/v1/object/public/ivy-images/' + fname;
-    document.getElementById('aiBar').style.width = '100%';
-    document.getElementById('aiStatus').textContent = '✅ 封面生成完成！';
-    document.getElementById('aiPreviewImg').src = aiGeneratedUrl;
-    document.getElementById('aiPreviewImg').style.display = 'block';
-    document.getElementById('aiUseBtn').style.display = 'inline-block';
-
-  } catch(err) {
-    document.getElementById('aiStatus').textContent = '❌ 生成失敗: ' + err.message.substring(0,60);
-    console.error('AI cover err:', err);
-  }
+async function delArt(id,title){
+  if(!confirm('確定刪除「'+title+'…」？此動作無法還原。'))return;
+  try{await sb('ivy_articles?id=eq.'+id,{method:'DELETE'});toast('文章已刪除');await loadAll();}
+  catch(e){toast('刪除失敗：'+e.message,1);}
 }
 
-function useAICover() {
-  if (!aiGeneratedUrl) return;
-  document.getElementById('edCover').value = aiGeneratedUrl;
-  document.getElementById('coverPreview').src = aiGeneratedUrl;
-  document.getElementById('coverPreviewWrap').style.display = 'block';
-  document.getElementById('coverUploadStatus').textContent = '✅ AI 生成封面已套用';
-  closeAIOverlay();
-  toast('✅ AI 封面已套用！');
-}
-function closeAIOverlay() {
-  document.getElementById('aiOverlay').classList.remove('show');
-  document.getElementById('aiBar').style.width = '0%';
+function showPanel(name,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-menu a').forEach(a=>a.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  if(el)el.classList.add('active');
 }
 
-function showPanel(name, el) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
-  document.getElementById('panel-' + name).classList.add('active');
-  if (el) el.classList.add('active');
+function toast(msg,isErr){
+  const t=document.getElementById('toast');t.textContent=msg;t.style.background=isErr?'#e74c3c':'#2d2020';
+  t.classList.add('show');clearTimeout(window._tt);window._tt=setTimeout(()=>t.classList.remove('show'),3000);
 }
-function toast(msg, isErr) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.style.background = isErr ? '#e74c3c' : '#2d2020';
-  t.classList.add('show'); clearTimeout(window._toastTimer);
-  window._toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
-}
-function badge(pub) { return pub ? '<span class="badge badge-green">已發布</span>' : '<span class="badge badge-gray">草稿</span>'; }
-function fmtDate(s) { return s ? new Date(s).toLocaleDateString('zh-TW') : '-'; }
-function esc(s) { return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
+function badge(pub){return pub?'<span class="badge badge-green">已發布</span>':'<span class="badge badge-gray">草稿</span>';}
+function fmtDate(s){return s?new Date(s).toLocaleDateString('zh-TW'):'-';}
+function esc(s){return s?s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
 </script>
 </body>
 </html>
