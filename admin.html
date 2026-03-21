@@ -1,6 +1,4 @@
-
-
-function doLogin() {
+<html lang="zh-TW"><script src="chrome-extension://eppiocemhmnlbhjplcgkofciiegomcon/content/location/location.js" id="eppiocemhmnlbhjplcgkofciiegomcon"></script><script src="chrome-extension://eppiocemhmnlbhjplcgkofciiegomcon/libs/extend-native-history-api.js"></script><script src="chrome-extension://eppiocemhmnlbhjplcgkofciiegomcon/libs/requests.js"></script><head></head><body __processed_04004920-fe1f-49ce-8d78-18d9612c5446__="true">function doLogin() {
   if (document.getElementById('pwInput').value === PASS) {
     document.getElementById('loginPage').style.display = 'none';
     document.getElementById('adminPage').style.display = 'block';
@@ -9,13 +7,13 @@ function doLogin() {
     document.getElementById('loginErr').style.display = 'block';
   }
 }
-document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('pwInput').addEventListener('keydown', e =&gt; { if (e.key === 'Enter') doLogin(); });
 
 async function loadAll() {
   try {
     [cats, arts] = await Promise.all([
       sb('ivy_categories?order=sort_order.asc'),
-      sb('ivy_articles?select=*,ivy_categories(name,slug)&order=created_at.desc')
+      sb('ivy_articles?select=*,ivy_categories(name,slug)&amp;order=created_at.desc')
     ]);
     renderDash(); renderArts(arts); renderCats(); fillCatOpts();
     document.getElementById('lastUpdate').textContent = '更新於 ' + new Date().toLocaleTimeString('zh-TW');
@@ -24,44 +22,44 @@ async function loadAll() {
 
 function renderDash() {
   document.getElementById('s1').textContent = arts.length;
-  document.getElementById('s2').textContent = arts.filter(a => a.published).length;
-  document.getElementById('s3').textContent = arts.filter(a => !a.published).length;
+  document.getElementById('s2').textContent = arts.filter(a =&gt; a.published).length;
+  document.getElementById('s3').textContent = arts.filter(a =&gt; !a.published).length;
   document.getElementById('s4').textContent = cats.length;
-  document.getElementById('dashRecent').innerHTML = arts.slice(0,10).map(a =>
-    '<tr><td><strong>' + esc(a.title) + '</strong></td><td>' + (a.ivy_categories ? a.ivy_categories.name : '-') + '</td><td>' +
-    badge(a.published) + '</td><td>' + fmtDate(a.created_at) + '</td></tr>'
-  ).join('') || '<tr><td colspan="4" class="empty-state">暫無文章</td></tr>';
+  document.getElementById('dashRecent').innerHTML = arts.slice(0,10).map(a =&gt;
+    '<strong>' + esc(a.title) + '</strong>' + (a.ivy_categories ? a.ivy_categories.name : '-') + '' +
+    badge(a.published) + '' + fmtDate(a.created_at) + ''
+  ).join('') || '暫無文章';
 }
 
 function renderArts(list) {
-  document.getElementById('artList').innerHTML = list.map(a =>
-    '<tr><td><strong>' + esc(a.title) + '</strong></td>' +
-    '<td>' + (a.ivy_categories ? a.ivy_categories.name : '-') + '</td>' +
-    '<td><code style="font-size:0.75rem;color:#a08085">' + a.slug + '</code></td>' +
-    '<td>' + badge(a.published) + '</td>' +
-    '<td>' + fmtDate(a.created_at) + '</td>' +
-    '<td><div class="actions">' +
+  document.getElementById('artList').innerHTML = list.map(a =&gt;
+    '<strong>' + esc(a.title) + '</strong>' +
+    '' + (a.ivy_categories ? a.ivy_categories.name : '-') + '' +
+    '<code style="font-size:0.75rem;color:#a08085">' + a.slug + '</code>' +
+    '' + badge(a.published) + '' +
+    '' + fmtDate(a.created_at) + '' +
+    '<div class="actions">' +
       '<button class="btn btn-sm btn-outline" onclick="editArt(' + a.id + ')">編輯</button>' +
       '<button class="btn btn-sm ' + (a.published ? 'btn-outline' : 'btn-success') + '" onclick="togglePub(' + a.id + ',' + a.published + ')">' + (a.published ? '下架' : '發布') + '</button>' +
       '<button class="btn btn-sm btn-danger" onclick="delArt(' + a.id + ',\'' + a.title.replace(/'/g,'').substring(0,20) + '\')">刪除</button>' +
-    '</div></td></tr>'
-  ).join('') || '<tr><td colspan="6" class="empty-state">暫無文章</td></tr>';
+    '</div>'
+  ).join('') || '暫無文章';
 }
 
 function renderCats() {
-  document.getElementById('catList').innerHTML = cats.map(c => {
-    const cnt = arts.filter(a => a.category_id === c.id).length;
-    return '<tr><td style="font-size:1.4rem">' + (c.icon||'') + '</td><td><strong>' + c.name + '</strong></td>' +
-      '<td><code>' + c.slug + '</code></td><td style="color:#a08085">' + (c.description||'') + '</td>' +
-      '<td style="text-align:center">' + c.sort_order + '</td><td style="text-align:center"><strong>' + cnt + '</strong></td></tr>';
+  document.getElementById('catList').innerHTML = cats.map(c =&gt; {
+    const cnt = arts.filter(a =&gt; a.category_id === c.id).length;
+    return '' + (c.icon||'') + '<strong>' + c.name + '</strong>' +
+      '<code>' + c.slug + '</code>' + (c.description||'') + '' +
+      '' + c.sort_order + '<strong>' + cnt + '</strong>';
   }).join('');
 }
 
 function fillCatOpts() {
-  const opts = cats.map(c => '<option value="' + c.id + '">' + (c.icon||'') + ' ' + c.name + '</option>').join('');
+  const opts = cats.map(c =&gt; '<option value="' + c.id + '">' + (c.icon||'') + ' ' + c.name + '</option>').join('');
   document.getElementById('edCat').innerHTML = '<option value="">-- 選擇分類 --</option>' + opts;
   document.getElementById('filterCat').innerHTML = '<option value="">全部分類</option>' +
-    cats.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join('');
+    cats.map(c =&gt; '<option value="' + c.id + '">' + c.name + '</option>').join('');
 }
 
 function filterList() {
@@ -69,14 +67,14 @@ function filterList() {
   const cat = document.getElementById('filterCat').value;
   const pub = document.getElementById('filterPub').value;
   let list = arts;
-  if (q) list = list.filter(a => a.title.toLowerCase().includes(q) || a.slug.includes(q));
-  if (cat) list = list.filter(a => String(a.category_id) === cat);
-  if (pub !== '') list = list.filter(a => String(a.published) === pub);
+  if (q) list = list.filter(a =&gt; a.title.toLowerCase().includes(q) || a.slug.includes(q));
+  if (cat) list = list.filter(a =&gt; String(a.category_id) === cat);
+  if (pub !== '') list = list.filter(a =&gt; String(a.published) === pub);
   renderArts(list);
 }
 
 function editArt(id) {
-  const a = arts.find(x => x.id === id);
+  const a = arts.find(x =&gt; x.id === id);
   if (!a) return;
   document.getElementById('edId').value = a.id;
   document.getElementById('edTitleInput').value = a.title || '';
@@ -95,7 +93,7 @@ function editArt(id) {
 
 function resetForm() {
   document.getElementById('edId').value = '';
-  ['edTitleInput','edSlug','edSynopsis','edContent','edCover','edMetaT','edMetaD'].forEach(id => document.getElementById(id).value = '');
+  ['edTitleInput','edSlug','edSynopsis','edContent','edCover','edMetaT','edMetaD'].forEach(id =&gt; document.getElementById(id).value = '');
   document.getElementById('edCat').value = '';
   document.getElementById('edPub').checked = true;
   document.getElementById('edTitle').textContent = '✏️ 新增文章';
@@ -150,8 +148,8 @@ async function delArt(id, title) {
 }
 
 function showPanel(name, el) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p =&gt; p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-menu a').forEach(a =&gt; a.classList.remove('active'));
   document.getElementById('panel-' + name).classList.add('active');
   if (el) el.classList.add('active');
 }
@@ -162,16 +160,16 @@ function toast(msg, isErr) {
   t.style.background = isErr ? '#e74c3c' : '#2d2020';
   t.classList.add('show');
   clearTimeout(window._toastTimer);
-  window._toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  window._toastTimer = setTimeout(() =&gt; t.classList.remove('show'), 3000);
 }
 
 function badge(pub) { return pub ? '<span class="badge badge-green">已發布</span>' : '<span class="badge badge-gray">草稿</span>'; }
 function fmtDate(s) { return s ? new Date(s).toLocaleDateString('zh-TW') : '-'; }
-function esc(s) { return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
+function esc(s) { return s ? s.replace(/&amp;/g,'&amp;').replace(//g,'&gt;') : ''; }
 
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
+
+
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>IvyLife 後台管理</title>
@@ -241,8 +239,8 @@ tr:hover td{background:#fdf8f4}
 .check-row label{font-size:0.9rem;color:#2d2020;cursor:pointer}
 @media(max-width:768px){.stats-grid{grid-template-columns:repeat(2,1fr)}.form-row{grid-template-columns:1fr}.sidebar{width:180px}.main{margin-left:180px}}
 </style>
-</head>
-<body>
+
+
 
 <div id="loginPage">
 <div class="login-box">
@@ -314,7 +312,9 @@ tr:hover td{background:#fdf8f4}
         <div class="form-group"><label>分類</label><select id="edCat"><option value="">-- 選擇分類 --</option></select></div>
       </div>
       <div class="form-group"><label>摘要（顯示在列表頁）</label><textarea id="edSynopsis" rows="3" placeholder="一段簡短描述，吸引讀者點閱⋯"></textarea></div>
-      <div class="form-group"><label>文章內文（HTML 格式）</label><textarea id="edContent" rows="14" placeholder="&lt;p&gt;大家好，我是艾薇！&lt;/p&gt;&#10;&lt;h2&gt;小標題&lt;/h2&gt;&#10;&lt;p&gt;內文...&lt;/p&gt;"></textarea></div>
+      <div class="form-group"><label>文章內文（HTML 格式）</label><textarea id="edContent" rows="14" placeholder="&lt;p&gt;大家好，我是艾薇！&lt;/p&gt;
+&lt;h2&gt;小標題&lt;/h2&gt;
+&lt;p&gt;內文...&lt;/p&gt;"></textarea></div>
       <div class="form-row">
         <div class="form-group">
   <label>封面圖片</label>
@@ -333,7 +333,7 @@ tr:hover td{background:#fdf8f4}
         <div class="form-group"><label>SEO 標題（選填，留空自動帶入標題）</label><input type="text" id="edMetaT" placeholder="SEO 用標題"></div>
       </div>
       <div class="form-group"><label>SEO 描述（選填，留空自動帶入摘要）</label><input type="text" id="edMetaD" placeholder="搜尋引擎顯示的描述文字"></div>
-      <div class="check-row"><input type="checkbox" id="edPub" checked><label for="edPub">立即發布（取消勾選則存為草稿）</label></div>
+      <div class="check-row"><input type="checkbox" id="edPub" checked=""><label for="edPub">立即發布（取消勾選則存為草稿）</label></div>
       <div class="form-actions">
         <button class="btn btn-rose" onclick="saveArt()">💾 儲存文章</button>
         <button class="btn btn-outline" onclick="resetForm()">取消</button>
@@ -385,8 +385,6 @@ async function uploadIvyCover(e){
   preview.src=URL.createObjectURL(file);
   wrap.style.display='block';
   status.textContent='⏫ 上傳中...';status.style.color='#888';
-  const SB='https://zsebcpfblecwumbaxeaz.supabase.co';
-  const KEY='sb_publishable_L2DOfeM0cAJqwlVCr1LwtA_jE9MBNDn';
   const ext=file.name.split('.').pop()||'jpg';
   const fname='cover-'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;
   try{
@@ -405,5 +403,5 @@ async function uploadIvyCover(e){
   e.target.value='';
 }
 </script>
-</body>
-</html>
+
+</body></html>
