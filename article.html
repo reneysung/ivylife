@@ -1,115 +1,162 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title id="metaTitle">載入中 - IvyLife 艾薇生活</title>
-<meta name="description" id="metaDesc" content="">
-<meta property="og:title" id="ogTitle" content="">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title id="pgTitle">IvyLife 艾薇生活</title>
+<meta name="description" id="pgDesc" content="IvyLife 艾薇生活">
+<meta name="keywords" id="pgKw" content="IvyLife,艾薇生活">
+<meta name="robots" content="index, follow">
+<link rel="canonical" id="pgCanon" href="">
 <meta property="og:type" content="article">
-<meta property="og:url" id="ogUrl" content="">
-<link rel="canonical" id="canonical" href="">
-<link rel="stylesheet" href="/css/style.css">
+<meta property="og:title" id="ogT" content="">
+<meta property="og:description" id="ogD" content="">
+<meta property="og:image" id="ogI" content="">
+<meta property="og:url" id="ogU" content="">
+<meta property="og:site_name" content="IvyLife 艾薇生活">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--rose:#c8566a;--rose-light:#f2a5b0;--rose-pale:#fff0f2;--gold:#c99960;--dark:#2d2020;--gray:#a08085;--bg:#f8f4f5;--border:rgba(200,86,106,0.12)}
+body{font-family:'Noto Sans TC',system-ui,sans-serif;background:var(--bg);color:var(--dark)}
+.nav{background:white;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(200,86,106,0.06)}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 2rem;height:64px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo svg{width:36px;height:36px}
+.logo-text{font-size:1.35rem;font-weight:700}
+.logo-text .ivy{color:var(--rose)}
+.logo-text .life{color:var(--gold);font-style:italic}
+.nav-links{display:flex;gap:0.2rem;list-style:none}
+.nav-links a{padding:0.5rem 0.9rem;color:var(--gray);text-decoration:none;font-size:0.88rem;border-radius:8px;transition:all 0.2s}
+.nav-links a:hover{color:var(--rose);background:var(--rose-pale)}
+.cover-wrap{width:100%;max-height:480px;overflow:hidden;background:linear-gradient(135deg,var(--rose-pale),#fde8d8)}
+.cover-img{width:100%;max-height:480px;object-fit:cover;display:block}
+.cover-ph{height:280px;display:flex;align-items:center;justify-content:center;font-size:4rem;opacity:0.3}
+.art-wrap{max-width:780px;margin:0 auto;padding:2rem 1.5rem 4rem}
+.back-link{display:inline-flex;align-items:center;gap:0.4rem;color:var(--rose);text-decoration:none;font-size:0.85rem;margin-bottom:1.5rem;transition:gap 0.2s}
+.back-link:hover{gap:0.7rem}
+.art-meta{display:flex;flex-wrap:wrap;gap:0.6rem;align-items:center;margin-bottom:1rem}
+.cat-badge{background:var(--rose);color:white;padding:3px 12px;border-radius:50px;font-size:0.78rem;font-weight:500;text-decoration:none}
+.city-badge{background:var(--rose-pale);color:var(--rose);padding:3px 12px;border-radius:50px;font-size:0.78rem}
+.art-date{font-size:0.8rem;color:var(--gray)}
+h1.art-title{font-size:clamp(1.5rem,4vw,2rem);font-weight:700;line-height:1.35;margin-bottom:1.2rem}
+.art-synopsis{font-size:1rem;color:var(--gray);line-height:1.8;padding:1rem 1.2rem;border-left:4px solid var(--rose-light);background:var(--rose-pale);border-radius:0 10px 10px 0;margin-bottom:2rem}
+.art-content{font-size:0.96rem;line-height:1.9}
+.art-content h2{font-size:1.3rem;font-weight:600;margin:2rem 0 0.8rem;padding-bottom:0.5rem;border-bottom:2px solid var(--rose-pale)}
+.art-content h3{font-size:1.1rem;font-weight:600;color:var(--rose);margin:1.5rem 0 0.6rem}
+.art-content p{margin-bottom:1.2rem}
+.art-content ul,.art-content ol{margin:0 0 1.2rem 1.5rem}
+.art-content li{margin-bottom:0.4rem}
+.art-content blockquote{border-left:4px solid var(--rose-light);padding:0.8rem 1.2rem;background:var(--rose-pale);border-radius:0 10px 10px 0;margin:1.5rem 0;color:var(--gray);font-style:italic}
+.art-content img{max-width:100%;border-radius:12px;margin:1rem 0}
+.art-content a{color:var(--rose);text-decoration:underline}
+.art-content strong{font-weight:600}
+.store-card{margin-top:2.5rem;background:white;border-radius:16px;border:1px solid var(--border);overflow:hidden;box-shadow:0 4px 16px rgba(200,86,106,0.06)}
+.store-hdr{background:linear-gradient(135deg,var(--rose),#e07a8a);padding:1rem 1.5rem;display:flex;align-items:center;gap:0.7rem}
+.store-hdr h2{font-size:1rem;font-weight:600;color:white}
+.store-body{padding:1.5rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.store-item{display:flex;gap:0.6rem;align-items:flex-start}
+.store-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px}
+.store-label{font-size:0.72rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.2rem}
+.store-val{font-size:0.9rem;line-height:1.5}
+.store-val a{color:var(--rose);text-decoration:none}
+.map-btn{display:inline-flex;align-items:center;gap:0.4rem;background:var(--rose-pale);color:var(--rose);padding:5px 12px;border-radius:50px;font-size:0.8rem;text-decoration:none;margin-top:0.4rem;transition:all 0.2s}
+.map-btn:hover{background:var(--rose);color:white}
+.full{grid-column:1/-1}
+.art-kw{margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border)}
+.art-kw h3{font-size:0.82rem;color:var(--gray);margin-bottom:0.8rem;text-transform:uppercase;letter-spacing:0.05em}
+.tags-wrap{display:flex;flex-wrap:wrap;gap:0.5rem}
+.tag{background:var(--rose-pale);color:var(--rose);padding:4px 14px;border-radius:50px;font-size:0.8rem;text-decoration:none;transition:all 0.2s}
+.tag:hover{background:var(--rose);color:white}
+.related{margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border)}
+.related h2{font-size:1rem;font-weight:600;margin-bottom:1.2rem}
+.related-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
+.related-card{background:white;border-radius:12px;overflow:hidden;border:1px solid var(--border);text-decoration:none;color:inherit;display:flex;gap:0.8rem;padding:0.8rem;transition:all 0.2s}
+.related-card:hover{box-shadow:0 4px 16px rgba(200,86,106,0.1);transform:translateY(-2px)}
+.related-thumb{width:72px;height:72px;border-radius:8px;overflow:hidden;flex-shrink:0;background:var(--rose-pale)}
+.related-thumb img{width:100%;height:100%;object-fit:cover}
+.related-cat{font-size:0.72rem;color:var(--rose);margin-bottom:0.2rem}
+.related-title{font-size:0.85rem;font-weight:500;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.share-bar{margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;align-items:center;gap:0.8rem;flex-wrap:wrap}
+.share-label{font-size:0.82rem;color:var(--gray)}
+.share-btn{display:inline-flex;align-items:center;gap:0.4rem;padding:6px 14px;border-radius:50px;font-size:0.82rem;cursor:pointer;border:1.5px solid var(--border);background:white;color:var(--dark);text-decoration:none;transition:all 0.2s;font-family:inherit}
+.share-btn:hover{background:var(--rose-pale);border-color:var(--rose-light);color:var(--rose)}
+.loading{height:380px;background:linear-gradient(90deg,#f0e8ea 25%,#f8f4f5 50%,#f0e8ea 75%);background-size:200% 100%;animation:sh 1.5s infinite;border-radius:12px;margin-bottom:2rem}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.not-found{text-align:center;padding:6rem 2rem;color:var(--gray)}
+.not-found h2{font-size:1.5rem;margin-bottom:1rem;color:var(--dark)}
+footer{background:var(--dark);color:rgba(255,255,255,0.6);padding:2rem;text-align:center;font-size:0.85rem}
+footer a{color:var(--rose-light);text-decoration:none}
+@media(max-width:600px){.store-body{grid-template-columns:1fr}.related-grid{grid-template-columns:1fr}.nav-links{display:none}}
+</style>
 </head>
 <body>
-<nav class="nav"><div class="nav-inner"><a class="nav-logo" href="/">Ivy<span>Life</span></a>
-<ul class="nav-links" id="navLinks">
-<li><a href="/category.html?cat=tastyfood">美食餐廳</a></li>
-<li><a href="/category.html?cat=hotel">飯店民宿</a></li>
-<li><a href="/category.html?cat=beauty">醫學美容</a></li>
-<li><a href="/category.html?cat=renovation">宅修清潔</a></li>
-<li><a href="/category.html?cat=furniture">設計推薦</a></li>
-<li><a href="/about.html">關於艾薇</a></li>
-</ul>
-<div class="nav-hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')"><span></span><span></span><span></span></div>
-</div></nav>
-<div id="loadingState" style="min-height:50vh;display:flex;align-items:center;justify-content:center">
-<div class="loading-state"><div class="loading-spinner"></div><p>載入文章中⋯</p></div>
-</div>
-<div id="articleContent" style="display:none">
-<nav class="breadcrumb">
-<a href="/">首頁</a><span>›</span>
-<a href="#" id="breadcrumbCat">分類</a><span>›</span>
-<span id="breadcrumbTitle" style="color:var(--text-mid)"></span>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="18" cy="18" r="17" fill="#fff0f2" stroke="#c8566a" stroke-width="1.2"/>
+        <path d="M18 30C18 30 8 23 8 15C8 10.5 12.5 7 18 7C23.5 7 28 10.5 28 15C28 23 18 30 18 30Z" fill="#f2a5b0" opacity="0.45"/>
+        <path d="M18 6C18 6 11 11 11 18C11 21.5 13.8 25 18 26.5C22.2 25 25 21.5 25 18C25 11 18 6 18 6Z" fill="#c8566a" opacity="0.85"/>
+        <ellipse cx="15.5" cy="16" rx="3.5" ry="5" transform="rotate(-20 15.5 16)" fill="white" opacity="0.5"/>
+      </svg>
+      <div class="logo-text"><span class="ivy">Ivy</span><span class="life">Life</span></div>
+    </a>
+    <ul class="nav-links" id="navCats"></ul>
+  </div>
 </nav>
-<div class="article-layout">
-<main>
-<header class="article-header">
-<span class="article-category-tag" id="articleCat"></span>
-<h1 class="article-title" id="articleTitle"></h1>
-<div class="article-meta"><span id="articleDate"></span><span>・</span><span>IvyLife 艾薇生活</span></div>
-</header>
-<div class="article-cover" id="articleCover"></div>
-<article class="article-content" id="articleBody"></article>
-<div style="margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border);text-align:center">
-<p style="font-size:0.875rem;color:var(--text-light)">喜歡這篇文章嗎？歡迎分享給朋友 ✨</p>
-<div style="display:flex;justify-content:center;gap:1rem;margin-top:1rem">
-<a href="/" class="btn-outline" style="font-size:0.875rem">← 回首頁</a>
-</div></div>
-</main>
-<aside class="sidebar">
-<div class="sidebar-card">
-<h4>✦ 關於艾薇</h4>
-<p style="font-size:0.875rem;color:var(--text-light)">熱愛生活的女孩，喜歡探索美食、旅遊、居家設計的各種可能性。</p>
-<a href="/about.html" class="btn-primary" style="margin-top:1rem;display:inline-block;font-size:0.8rem;padding:8px 20px">認識艾薇</a>
+<div id="coverSection"></div>
+<div class="art-wrap">
+  <div id="artBody"><div class="loading"></div></div>
 </div>
-<div class="sidebar-card"><h4>探索分類</h4><ul class="sidebar-list" id="sidebarCats"></ul></div>
-<div class="sidebar-card"><h4>最新文章</h4><ul class="sidebar-list" id="sidebarRecent"></ul></div>
-</aside>
-</div>
-</div>
-<div id="errorState" style="display:none;min-height:50vh;align-items:center;justify-content:center">
-<div class="error-state"><h2>文章不存在</h2><p>找不到這篇文章，可能已移除或網址有誤。</p><a href="/" class="btn-primary" style="margin-top:1.5rem;display:inline-block">回首頁</a></div>
-</div>
-<footer class="footer"><div class="footer-inner">
-<div class="footer-brand"><a class="nav-logo" href="/">Ivy<span>Life</span></a><p>艾薇的生活分享平台，記錄每一個值得珍藏的美好時刻。</p></div>
-<div><h5>分類</h5><ul><li><a href="/category.html?cat=tastyfood">美食餐廳</a></li><li><a href="/category.html?cat=hotel">飯店民宿</a></li><li><a href="/category.html?cat=beauty">醫學美容</a></li></ul></div>
-<div><h5>關於</h5><ul><li><a href="/about.html">關於艾薇</a></li><li><a href="/sitemap.xml">網站地圖</a></li></ul></div>
-</div><div class="footer-bottom"><p>© 2024 IvyLife 艾薇生活</p></div></footer>
-<script src="/js/supabase.js"></script>
+<footer><a href="/">IvyLife 艾薇生活</a> · 謝謝閱讀</footer>
 <script>
+const SB='https://zsebcpfblecwumbaxeaz.supabase.co';
+const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZWJjcGZibGVjd3VtYmF4ZWF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3OTUzMjcsImV4cCI6MjA4OTM3MTMyN30.g0rsqNO6cItp8Qw3ybveVwX2afjTSwtS7WFHL_320jQ';
+async function sbGet(p){const r=await fetch(SB+'/rest/v1/'+p,{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}});return r.json();}
+function esc(s){return s?s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
+function fmtDate(s){return s?new Date(s).toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric'}):'';}
+const slug=location.pathname.split('/article/')[1]?.replace(/\/$/,'');
 async function loadArticle(){
-  const slug=new URLSearchParams(window.location.search).get('slug');
-  if(!slug){showError();return;}
-  try{
-    const a=await getArticleBySlug(slug);
-    if(!a){showError();return;}
-    const title=a.meta_title||(a.title+' - IvyLife 艾薇生活');
-    const desc=a.meta_description||a.synopsis||'';
-    const url='https://ivylife.com.tw/'+slug+'.html';
-    document.getElementById('metaTitle').textContent=title;
-    document.querySelector('[name="description"]').content=desc;
-    document.getElementById('ogTitle').content=title;
-    document.getElementById('ogUrl').content=url;
-    document.getElementById('canonical').href=url;
-    const sd={"@context":"https://schema.org","@type":"BlogPosting","headline":a.title,"description":a.synopsis||'','url':url,"datePublished":a.created_at,"author":{"@type":"Person","name":"艾薇 Ivy"}};
-    const se=document.createElement('script');se.type='application/ld+json';se.textContent=JSON.stringify(sd);document.head.appendChild(se);
-    const cn=a.ivy_categories?.name||'生活';const cs=a.ivy_categories?.slug||'';
-    document.getElementById('articleCat').textContent=cn;
-    document.getElementById('articleTitle').textContent=a.title;
-    document.getElementById('articleDate').textContent=formatDate(a.created_at);
-    const bc=document.getElementById('breadcrumbCat');bc.textContent=cn;bc.href='/category.html?cat='+cs;
-    document.getElementById('breadcrumbTitle').textContent=a.title;
-    const cv=document.getElementById('articleCover');
-    if(a.cover_image){cv.innerHTML='<img src="'+a.cover_image+'" alt="'+a.title+'" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius)">';cv.style.background='none';}
-    else cv.textContent=categoryIcon(cn);
-    document.getElementById('articleBody').innerHTML=a.content||'<p>文章內容準備中⋯</p>';
-    document.getElementById('loadingState').style.display='none';
-    document.getElementById('articleContent').style.display='block';
-    loadSidebar();
-  }catch(e){showError(e.message);}
+  if(!slug){notFound();return;}
+  const[cats,arts]=await Promise.all([sbGet('ivy_categories?order=sort_order.asc'),sbGet('ivy_articles?slug=eq.'+encodeURIComponent(slug)+'&select=*,ivy_categories(name,slug,icon)')]);
+  document.getElementById('navCats').innerHTML=cats.slice(0,5).map(c=>'<li><a href="/category?cat='+c.slug+'">'+(c.icon||'')+' '+c.name+'</a></li>').join('');
+  const a=arts?.[0];
+  if(!a||!a.published){notFound();return;}
+  const mt=a.meta_title||a.title,md=a.meta_description||a.synopsis||'';
+  const kw=[a.keywords,a.city,a.ivy_categories?.name,'IvyLife','艾薇生活'].filter(Boolean).join(',');
+  const url=location.href;
+  document.title=mt+' - IvyLife 艾薇生活';
+  document.getElementById('pgTitle').textContent=document.title;
+  document.getElementById('pgDesc').content=md;
+  document.getElementById('pgKw').content=kw;
+  document.getElementById('pgCanon').href=url;
+  document.getElementById('ogT').content=mt;
+  document.getElementById('ogD').content=md;
+  document.getElementById('ogI').content=a.cover_image||'';
+  document.getElementById('ogU').content=url;
+  const ld={
+    '@context':'https://schema.org','@type':'Article',
+    headline:a.title,description:md,image:a.cover_image||'',
+    datePublished:a.created_at,dateModified:a.updated_at||a.created_at,
+    author:{'@type':'Person',name:'艾薇'},
+    publisher:{'@type':'Organization',name:'IvyLife 艾薇生活',logo:{'@type':'ImageObject',url:'https://glowing-pixie-fc3fe2.netlify.app/logo.svg'}},
+    mainEntityOfPage:{'@type':'WebPage','@id':url}
+  };
+  if(a.store_name)ld.mentions={'@type':'LocalBusiness',name:a.store_name,address:a.store_address||'',telephone:a.store_phone||'',openingHours:a.store_hours||''};
+  const s=document.createElement('script');s.type='application/ld+json';s.textContent=JSON.stringify(ld);document.head.appendChild(s);
+  document.getElementById('coverSection').innerHTML='<div class="cover-wrap">'+(a.cover_image?'<img class="cover-img" src="'+esc(a.cover_image)+'" alt="'+esc(a.title)+'" loading="eager">':'<div class="cover-ph">'+(a.ivy_categories?.icon||'📝')+'</div>')+'</div>';
+  const hasStore=a.store_name||a.store_address||a.store_phone||a.store_hours;
+  const storeCard=hasStore?'<div class="store-card" itemscope itemtype="https://schema.org/LocalBusiness"><div class="store-hdr"><span style="font-size:1.2rem">🏪</span><h2>'+esc(a.store_name||'店家資訊')+'</h2></div><div class="store-body">'+(a.store_name?'<div class="store-item full"><span class="store-icon">🏷️</span><div><div class="store-label">店家名稱</div><div class="store-val" itemprop="name"><strong>'+esc(a.store_name)+'</strong></div></div></div>':'')+(a.store_address?'<div class="store-item"><span class="store-icon">📍</span><div><div class="store-label">地址</div><div class="store-val" itemprop="address">'+esc(a.store_address)+'<br><a class="map-btn" href="https://www.google.com/maps/search/'+encodeURIComponent(a.store_address)+'" target="_blank" rel="noopener">🗺️ Google Maps</a></div></div></div>':'')+(a.store_phone?'<div class="store-item"><span class="store-icon">📞</span><div><div class="store-label">電話</div><div class="store-val" itemprop="telephone"><a href="tel:'+esc(a.store_phone)+'">'+esc(a.store_phone)+'</a></div></div></div>':'')+(a.store_hours?'<div class="store-item"><span class="store-icon">🕐</span><div><div class="store-label">營業時間</div><div class="store-val" itemprop="openingHours">'+esc(a.store_hours)+'</div></div></div>':'')+'</div></div>':'';
+  const tags=a.keywords?a.keywords.split(',').filter(Boolean):[];
+  const kwHtml=tags.length?'<div class="art-kw"><h3>🏷️ 標籤</h3><div class="tags-wrap">'+tags.map(t=>'<a href="/?kw='+encodeURIComponent(t.trim())+'" class="tag">'+esc(t.trim())+'</a>').join('')+'</div></div>':'';
+  const rel=await sbGet('ivy_articles?select=*,ivy_categories(name,slug,icon)&category_id=eq.'+a.category_id+'&slug=neq.'+slug+'&published=eq.true&limit=4&order=created_at.desc');
+  const relHtml=rel.length?'<div class="related"><h2>🔗 相關文章</h2><div class="related-grid">'+rel.slice(0,4).map(r=>'<a href="/article/'+r.slug+'" class="related-card"><div class="related-thumb">'+(r.cover_image?'<img src="'+esc(r.cover_image)+'" alt="'+esc(r.title)+'" loading="lazy">':'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:1.5rem">'+(r.ivy_categories?.icon||'📝')+'</div>')+'</div><div><div class="related-cat">'+(r.ivy_categories?.name||'')+'</div><div class="related-title">'+esc(r.title)+'</div></div></a>').join('')+'</div></div>':'';
+  const shareHtml='<div class="share-bar"><span class="share-label">分享：</span><a class="share-btn" href="https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url)+'" target="_blank" rel="noopener">📘 Facebook</a><a class="share-btn" href="https://line.me/R/msg/text/?'+encodeURIComponent(a.title+' '+url)+'" target="_blank" rel="noopener">💬 LINE</a><button class="share-btn" onclick="navigator.clipboard.writeText(location.href).then(()=>alert('連結已複製！'))">🔗 複製連結</button></div>';
+  document.getElementById('artBody').innerHTML='<a href="'+(a.ivy_categories?'/category?cat='+a.ivy_categories.slug:'/')+'" class="back-link">← '+(a.ivy_categories?.name||'返回')+'</a><div class="art-meta">'+(a.ivy_categories?'<a href="/category?cat='+a.ivy_categories.slug+'" class="cat-badge">'+a.ivy_categories.name+'</a>':'')+(a.city?'<span class="city-badge">📍 '+esc(a.city)+'</span>':'')+'<span class="art-date">🗓️ '+fmtDate(a.created_at)+'</span></div><h1 class="art-title">'+esc(a.title)+'</h1>'+(a.synopsis?'<div class="art-synopsis">'+esc(a.synopsis)+'</div>':'')+'<div class="art-content">'+(a.content||'')+'</div>'+storeCard+kwHtml+shareHtml+relHtml;
 }
-function showError(m){
-  document.getElementById('loadingState').style.display='none';
-  const e=document.getElementById('errorState');e.style.display='flex';
-  if(m)e.querySelector('p').textContent=m;
-}
-async function loadSidebar(){
-  try{
-    const[cats,recent]=await Promise.all([getCategories(),getArticles({limit:5})]);
-    document.getElementById('sidebarCats').innerHTML=cats.map(c=>'<li><a href="/category.html?cat='+c.slug+'">'+(c.icon||'')+' '+c.name+'</a></li>').join('');
-    document.getElementById('sidebarRecent').innerHTML=recent.map(a=>'<li><a href="/'+a.slug+'.html">'+a.title+'</a></li>').join('');
-  }catch{}
-}
+function notFound(){document.getElementById('artBody').innerHTML='<div class="not-found"><h2>😕 找不到文章</h2><p>這篇文章不存在或已被移除</p><br><a href="/" style="color:var(--rose)">← 回首頁</a></div>';}
 loadArticle();
 </script>
-</body></html>
+</body>
+</html>
