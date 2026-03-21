@@ -1,3 +1,174 @@
+
+
+function doLogin() {
+  if (document.getElementById('pwInput').value === PASS) {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('adminPage').style.display = 'block';
+    loadAll();
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+  }
+}
+document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+async function loadAll() {
+  try {
+    [cats, arts] = await Promise.all([
+      sb('ivy_categories?order=sort_order.asc'),
+      sb('ivy_articles?select=*,ivy_categories(name,slug)&order=created_at.desc')
+    ]);
+    renderDash(); renderArts(arts); renderCats(); fillCatOpts();
+    document.getElementById('lastUpdate').textContent = '更新於 ' + new Date().toLocaleTimeString('zh-TW');
+  } catch(e) { toast('載入失敗: ' + e.message, 1); }
+}
+
+function renderDash() {
+  document.getElementById('s1').textContent = arts.length;
+  document.getElementById('s2').textContent = arts.filter(a => a.published).length;
+  document.getElementById('s3').textContent = arts.filter(a => !a.published).length;
+  document.getElementById('s4').textContent = cats.length;
+  document.getElementById('dashRecent').innerHTML = arts.slice(0,10).map(a =>
+    '<tr><td><strong>' + esc(a.title) + '</strong></td><td>' + (a.ivy_categories ? a.ivy_categories.name : '-') + '</td><td>' +
+    badge(a.published) + '</td><td>' + fmtDate(a.created_at) + '</td></tr>'
+  ).join('') || '<tr><td colspan="4" class="empty-state">暫無文章</td></tr>';
+}
+
+function renderArts(list) {
+  document.getElementById('artList').innerHTML = list.map(a =>
+    '<tr><td><strong>' + esc(a.title) + '</strong></td>' +
+    '<td>' + (a.ivy_categories ? a.ivy_categories.name : '-') + '</td>' +
+    '<td><code style="font-size:0.75rem;color:#a08085">' + a.slug + '</code></td>' +
+    '<td>' + badge(a.published) + '</td>' +
+    '<td>' + fmtDate(a.created_at) + '</td>' +
+    '<td><div class="actions">' +
+      '<button class="btn btn-sm btn-outline" onclick="editArt(' + a.id + ')">編輯</button>' +
+      '<button class="btn btn-sm ' + (a.published ? 'btn-outline' : 'btn-success') + '" onclick="togglePub(' + a.id + ',' + a.published + ')">' + (a.published ? '下架' : '發布') + '</button>' +
+      '<button class="btn btn-sm btn-danger" onclick="delArt(' + a.id + ',\'' + a.title.replace(/'/g,'').substring(0,20) + '\')">刪除</button>' +
+    '</div></td></tr>'
+  ).join('') || '<tr><td colspan="6" class="empty-state">暫無文章</td></tr>';
+}
+
+function renderCats() {
+  document.getElementById('catList').innerHTML = cats.map(c => {
+    const cnt = arts.filter(a => a.category_id === c.id).length;
+    return '<tr><td style="font-size:1.4rem">' + (c.icon||'') + '</td><td><strong>' + c.name + '</strong></td>' +
+      '<td><code>' + c.slug + '</code></td><td style="color:#a08085">' + (c.description||'') + '</td>' +
+      '<td style="text-align:center">' + c.sort_order + '</td><td style="text-align:center"><strong>' + cnt + '</strong></td></tr>';
+  }).join('');
+}
+
+function fillCatOpts() {
+  const opts = cats.map(c => '<option value="' + c.id + '">' + (c.icon||'') + ' ' + c.name + '</option>').join('');
+  document.getElementById('edCat').innerHTML = '<option value="">-- 選擇分類 --</option>' + opts;
+  document.getElementById('filterCat').innerHTML = '<option value="">全部分類</option>' +
+    cats.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join('');
+}
+
+function filterList() {
+  const q = document.getElementById('searchQ').value.toLowerCase();
+  const cat = document.getElementById('filterCat').value;
+  const pub = document.getElementById('filterPub').value;
+  let list = arts;
+  if (q) list = list.filter(a => a.title.toLowerCase().includes(q) || a.slug.includes(q));
+  if (cat) list = list.filter(a => String(a.category_id) === cat);
+  if (pub !== '') list = list.filter(a => String(a.published) === pub);
+  renderArts(list);
+}
+
+function editArt(id) {
+  const a = arts.find(x => x.id === id);
+  if (!a) return;
+  document.getElementById('edId').value = a.id;
+  document.getElementById('edTitleInput').value = a.title || '';
+  document.getElementById('edSlug').value = a.slug || '';
+  document.getElementById('edCat').value = a.category_id || '';
+  document.getElementById('edSynopsis').value = a.synopsis || '';
+  document.getElementById('edContent').value = a.content || '';
+  document.getElementById('edCover').value = a.cover_image || '';
+  document.getElementById('edMetaT').value = a.meta_title || '';
+  document.getElementById('edMetaD').value = a.meta_description || '';
+  document.getElementById('edPub').checked = !!a.published;
+  document.getElementById('edTitle').textContent = '✏️ 編輯文章';
+  showPanel('new', document.querySelector('.sidebar-menu li:nth-child(3) a'));
+  window.scrollTo(0,0);
+}
+
+function resetForm() {
+  document.getElementById('edId').value = '';
+  ['edTitleInput','edSlug','edSynopsis','edContent','edCover','edMetaT','edMetaD'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('edCat').value = '';
+  document.getElementById('edPub').checked = true;
+  document.getElementById('edTitle').textContent = '✏️ 新增文章';
+  showPanel('articles', document.querySelector('.sidebar-menu li:nth-child(2) a'));
+}
+
+async function saveArt() {
+  const id = document.getElementById('edId').value;
+  const title = document.getElementById('edTitleInput').value.trim();
+  const slug = document.getElementById('edSlug').value.trim().replace(/[^a-zA-Z0-9一-鿿-_]/g, '');
+  if (!title) { toast('請填寫文章標題', 1); return; }
+  if (!slug) { toast('請填寫 Slug（網址）', 1); return; }
+  const data = {
+    title, slug,
+    synopsis: document.getElementById('edSynopsis').value.trim() || null,
+    content: document.getElementById('edContent').value.trim() || null,
+    category_id: document.getElementById('edCat').value || null,
+    cover_image: document.getElementById('edCover').value.trim() || null,
+    meta_title: document.getElementById('edMetaT').value.trim() || null,
+    meta_description: document.getElementById('edMetaD').value.trim() || null,
+    published: document.getElementById('edPub').checked,
+    updated_at: new Date().toISOString()
+  };
+  try {
+    if (id) {
+      await sb('ivy_articles?id=eq.' + id, { method: 'PATCH', body: JSON.stringify(data) });
+      toast('✅ 文章已更新！');
+    } else {
+      await sb('ivy_articles', { method: 'POST', body: JSON.stringify(data) });
+      toast('✅ 文章已新增！');
+    }
+    await loadAll();
+    resetForm();
+  } catch(e) { toast('儲存失敗: ' + e.message, 1); }
+}
+
+async function togglePub(id, cur) {
+  try {
+    await sb('ivy_articles?id=eq.' + id, { method: 'PATCH', body: JSON.stringify({ published: !cur }) });
+    toast(cur ? '文章已下架' : '✅ 文章已發布！');
+    await loadAll();
+  } catch(e) { toast('操作失敗: ' + e.message, 1); }
+}
+
+async function delArt(id, title) {
+  if (!confirm('確定刪除「' + title + '⋯」？此動作無法還原。')) return;
+  try {
+    await sb('ivy_articles?id=eq.' + id, { method: 'DELETE' });
+    toast('文章已刪除');
+    await loadAll();
+  } catch(e) { toast('刪除失敗: ' + e.message, 1); }
+}
+
+function showPanel(name, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+}
+
+function toast(msg, isErr) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = isErr ? '#e74c3c' : '#2d2020';
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function badge(pub) { return pub ? '<span class="badge badge-green">已發布</span>' : '<span class="badge badge-gray">草稿</span>'; }
+function fmtDate(s) { return s ? new Date(s).toLocaleDateString('zh-TW') : '-'; }
+function esc(s) { return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -201,175 +372,6 @@ async function sb(path, opt) {
   if (!r.ok) { const e = await r.text(); throw new Error(e); }
   try { return await r.json(); } catch { return []; }
 }
-
-function doLogin() {
-  if (document.getElementById('pwInput').value === PASS) {
-    document.getElementById('loginPage').style.display = 'none';
-    document.getElementById('adminPage').style.display = 'block';
-    loadAll();
-  } else {
-    document.getElementById('loginErr').style.display = 'block';
-  }
-}
-document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-
-async function loadAll() {
-  try {
-    [cats, arts] = await Promise.all([
-      sb('ivy_categories?order=sort_order.asc'),
-      sb('ivy_articles?select=*,ivy_categories(name,slug)&order=created_at.desc')
-    ]);
-    renderDash(); renderArts(arts); renderCats(); fillCatOpts();
-    document.getElementById('lastUpdate').textContent = '更新於 ' + new Date().toLocaleTimeString('zh-TW');
-  } catch(e) { toast('載入失敗: ' + e.message, 1); }
-}
-
-function renderDash() {
-  document.getElementById('s1').textContent = arts.length;
-  document.getElementById('s2').textContent = arts.filter(a => a.published).length;
-  document.getElementById('s3').textContent = arts.filter(a => !a.published).length;
-  document.getElementById('s4').textContent = cats.length;
-  document.getElementById('dashRecent').innerHTML = arts.slice(0,10).map(a =>
-    '<tr><td><strong>' + esc(a.title) + '</strong></td><td>' + (a.ivy_categories ? a.ivy_categories.name : '-') + '</td><td>' +
-    badge(a.published) + '</td><td>' + fmtDate(a.created_at) + '</td></tr>'
-  ).join('') || '<tr><td colspan="4" class="empty-state">暫無文章</td></tr>';
-}
-
-function renderArts(list) {
-  document.getElementById('artList').innerHTML = list.map(a =>
-    '<tr><td><strong>' + esc(a.title) + '</strong></td>' +
-    '<td>' + (a.ivy_categories ? a.ivy_categories.name : '-') + '</td>' +
-    '<td><code style="font-size:0.75rem;color:#a08085">' + a.slug + '</code></td>' +
-    '<td>' + badge(a.published) + '</td>' +
-    '<td>' + fmtDate(a.created_at) + '</td>' +
-    '<td><div class="actions">' +
-      '<button class="btn btn-sm btn-outline" onclick="editArt(' + a.id + ')">編輯</button>' +
-      '<button class="btn btn-sm ' + (a.published ? 'btn-outline' : 'btn-success') + '" onclick="togglePub(' + a.id + ',' + a.published + ')">' + (a.published ? '下架' : '發布') + '</button>' +
-      '<button class="btn btn-sm btn-danger" onclick="delArt(' + a.id + ',\'' + a.title.replace(/'/g,'').substring(0,20) + '\')">刪除</button>' +
-    '</div></td></tr>'
-  ).join('') || '<tr><td colspan="6" class="empty-state">暫無文章</td></tr>';
-}
-
-function renderCats() {
-  document.getElementById('catList').innerHTML = cats.map(c => {
-    const cnt = arts.filter(a => a.category_id === c.id).length;
-    return '<tr><td style="font-size:1.4rem">' + (c.icon||'') + '</td><td><strong>' + c.name + '</strong></td>' +
-      '<td><code>' + c.slug + '</code></td><td style="color:#a08085">' + (c.description||'') + '</td>' +
-      '<td style="text-align:center">' + c.sort_order + '</td><td style="text-align:center"><strong>' + cnt + '</strong></td></tr>';
-  }).join('');
-}
-
-function fillCatOpts() {
-  const opts = cats.map(c => '<option value="' + c.id + '">' + (c.icon||'') + ' ' + c.name + '</option>').join('');
-  document.getElementById('edCat').innerHTML = '<option value="">-- 選擇分類 --</option>' + opts;
-  document.getElementById('filterCat').innerHTML = '<option value="">全部分類</option>' +
-    cats.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join('');
-}
-
-function filterList() {
-  const q = document.getElementById('searchQ').value.toLowerCase();
-  const cat = document.getElementById('filterCat').value;
-  const pub = document.getElementById('filterPub').value;
-  let list = arts;
-  if (q) list = list.filter(a => a.title.toLowerCase().includes(q) || a.slug.includes(q));
-  if (cat) list = list.filter(a => String(a.category_id) === cat);
-  if (pub !== '') list = list.filter(a => String(a.published) === pub);
-  renderArts(list);
-}
-
-function editArt(id) {
-  const a = arts.find(x => x.id === id);
-  if (!a) return;
-  document.getElementById('edId').value = a.id;
-  document.getElementById('edTitleInput').value = a.title || '';
-  document.getElementById('edSlug').value = a.slug || '';
-  document.getElementById('edCat').value = a.category_id || '';
-  document.getElementById('edSynopsis').value = a.synopsis || '';
-  document.getElementById('edContent').value = a.content || '';
-  document.getElementById('edCover').value = a.cover_image || '';
-  document.getElementById('edMetaT').value = a.meta_title || '';
-  document.getElementById('edMetaD').value = a.meta_description || '';
-  document.getElementById('edPub').checked = !!a.published;
-  document.getElementById('edTitle').textContent = '✏️ 編輯文章';
-  showPanel('new', document.querySelector('.sidebar-menu li:nth-child(3) a'));
-  window.scrollTo(0,0);
-}
-
-function resetForm() {
-  document.getElementById('edId').value = '';
-  ['edTitleInput','edSlug','edSynopsis','edContent','edCover','edMetaT','edMetaD'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('edCat').value = '';
-  document.getElementById('edPub').checked = true;
-  document.getElementById('edTitle').textContent = '✏️ 新增文章';
-  showPanel('articles', document.querySelector('.sidebar-menu li:nth-child(2) a'));
-}
-
-async function saveArt() {
-  const id = document.getElementById('edId').value;
-  const title = document.getElementById('edTitleInput').value.trim();
-  const slug = document.getElementById('edSlug').value.trim().replace(/[^a-zA-Z0-9一-鿿-_]/g, '');
-  if (!title) { toast('請填寫文章標題', 1); return; }
-  if (!slug) { toast('請填寫 Slug（網址）', 1); return; }
-  const data = {
-    title, slug,
-    synopsis: document.getElementById('edSynopsis').value.trim() || null,
-    content: document.getElementById('edContent').value.trim() || null,
-    category_id: document.getElementById('edCat').value || null,
-    cover_image: document.getElementById('edCover').value.trim() || null,
-    meta_title: document.getElementById('edMetaT').value.trim() || null,
-    meta_description: document.getElementById('edMetaD').value.trim() || null,
-    published: document.getElementById('edPub').checked,
-    updated_at: new Date().toISOString()
-  };
-  try {
-    if (id) {
-      await sb('ivy_articles?id=eq.' + id, { method: 'PATCH', body: JSON.stringify(data) });
-      toast('✅ 文章已更新！');
-    } else {
-      await sb('ivy_articles', { method: 'POST', body: JSON.stringify(data) });
-      toast('✅ 文章已新增！');
-    }
-    await loadAll();
-    resetForm();
-  } catch(e) { toast('儲存失敗: ' + e.message, 1); }
-}
-
-async function togglePub(id, cur) {
-  try {
-    await sb('ivy_articles?id=eq.' + id, { method: 'PATCH', body: JSON.stringify({ published: !cur }) });
-    toast(cur ? '文章已下架' : '✅ 文章已發布！');
-    await loadAll();
-  } catch(e) { toast('操作失敗: ' + e.message, 1); }
-}
-
-async function delArt(id, title) {
-  if (!confirm('確定刪除「' + title + '⋯」？此動作無法還原。')) return;
-  try {
-    await sb('ivy_articles?id=eq.' + id, { method: 'DELETE' });
-    toast('文章已刪除');
-    await loadAll();
-  } catch(e) { toast('刪除失敗: ' + e.message, 1); }
-}
-
-function showPanel(name, el) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
-  document.getElementById('panel-' + name).classList.add('active');
-  if (el) el.classList.add('active');
-}
-
-function toast(msg, isErr) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.background = isErr ? '#e74c3c' : '#2d2020';
-  t.classList.add('show');
-  clearTimeout(window._toastTimer);
-  window._toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
-}
-
-function badge(pub) { return pub ? '<span class="badge badge-green">已發布</span>' : '<span class="badge badge-gray">草稿</span>'; }
-function fmtDate(s) { return s ? new Date(s).toLocaleDateString('zh-TW') : '-'; }
-function esc(s) { return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
 </script>
 </body>
 </html>
