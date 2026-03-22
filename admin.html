@@ -3,446 +3,116 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>IvyLife 後台管理</title>
+<title>IvyLife &#24460;&#21臺;&#31649;&#29702;</title>
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--rose:#c8566a;--rose-light:#f2a5b0;--rose-pale:#fff0f2;--gold:#c99960;--dark:#2d2020;--gray:#a08085;--bg:#f8f4f5;--green:#27ae60;--red:#e74c3c;--border:rgba(200,86,106,0.15)}
-body{font-family:'Noto Sans TC',system-ui,sans-serif;background:var(--bg);color:var(--dark);min-height:100vh}
-#loginPage{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#fff0f2,#fde8d8)}
-.login-box{background:white;border-radius:20px;padding:2.5rem;width:360px;box-shadow:0 12px 48px rgba(200,86,106,0.12);text-align:center}
-.ivy-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:0.3rem}
-.ivy-logo svg{width:44px;height:44px}
-.logo-txt{font-size:1.6rem;font-weight:700;letter-spacing:-0.5px}
-.logo-txt .ivy{color:var(--rose)}
-.logo-txt .life{color:var(--gold);font-style:italic}
-.login-sub{color:var(--gray);font-size:0.82rem;margin-bottom:1.8rem}
-.login-box input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:0.92rem;margin-bottom:1rem;outline:none;font-family:inherit;transition:border-color 0.2s}
+:root{--rose:#c8566a;--rose-light:#f2a5b0;--rose-pale:#fff0f2;--gold:#c99960;--dark:#2d2020;--gray:#a08085;--bg:#f8f4f5;--border:rgba(200,86,106,0.12)}
+body{font-family:'Noto Sans TC',system-ui,sans-serif;background:var(--bg);color:var(--dark)}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#fff0f2,#fde8d8)}
+.login-box{background:white;border-radius:20px;padding:2.5rem;width:340px;box-shadow:0 20px 60px rgba(200,86,106,0.15);text-align:center}
+.login-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:0.5rem}
+.login-logo svg{width:42px;height:42px}
+.login-logo .lt{font-size:1.6rem;font-weight:700}.lt .ivy{color:var(--rose)}.lt .life{color:var(--gold);font-style:italic}
+.login-sub{font-size:0.82rem;color:var(--gray);margin-bottom:1.8rem}
+.login-box input{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:10px;font-size:0.95rem;outline:none;font-family:inherit;margin-bottom:1rem}
 .login-box input:focus{border-color:var(--rose)}
-.btn-primary{width:100%;padding:12px;background:linear-gradient(135deg,var(--rose),#e07a8a);color:white;border:none;border-radius:50px;font-size:0.95rem;cursor:pointer;font-weight:500;transition:opacity 0.2s}
-.btn-primary:hover{opacity:0.88}
-.login-err{color:var(--rose);font-size:0.82rem;margin-top:0.5rem;display:none}
-#adminPage{display:none;min-height:100vh}
-.sidebar{position:fixed;left:0;top:0;width:230px;height:100vh;background:var(--dark);color:white;padding:1.5rem 0;z-index:10;display:flex;flex-direction:column}
-.sb-logo{padding:0 1.5rem 1.2rem;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:10px}
-.sb-logo svg{width:32px;height:32px}
-.sb-logo-txt{font-size:1.1rem;font-weight:700}
-.sb-logo-txt .ivy{color:var(--rose-light)}
-.sb-logo-txt .life{color:var(--gold);font-style:italic}
-.sb-menu{list-style:none;padding:0.8rem 0;flex:1}
-.sb-menu li a{display:flex;align-items:center;gap:0.7rem;padding:0.65rem 1.5rem;color:rgba(255,255,255,0.65);text-decoration:none;font-size:0.87rem;transition:all 0.2s;cursor:pointer}
-.sb-menu li a:hover,.sb-menu li a.active{background:rgba(242,165,176,0.15);color:white}
-.sb-foot{padding:1rem 1.5rem;border-top:1px solid rgba(255,255,255,0.08)}
-.sb-foot button{width:100%;padding:8px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.6);border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;transition:all 0.2s}
-.sb-foot button:hover{background:rgba(255,255,255,0.15);color:white}
-.main{margin-left:230px;padding:2rem;min-height:100vh}
-.page-hdr{margin-bottom:1.8rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
-.page-hdr h1{font-size:1.35rem;font-weight:500}
-.btn{padding:8px 20px;border-radius:50px;font-size:0.85rem;cursor:pointer;border:none;transition:all 0.2s;font-family:inherit}
-.btn-rose{background:linear-gradient(135deg,var(--rose),#e07a8a);color:white}
-.btn-rose:hover{opacity:0.88}
-.btn-outline{background:transparent;color:var(--rose);border:1.5px solid var(--rose)}
+.btn-primary{width:100%;padding:12px;background:linear-gradient(135deg,var(--rose),#e07a8a);color:white;border:none;border-radius:10px;font-size:1rem;font-family:inherit;cursor:pointer;font-weight:500}
+.admin-layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+.sidebar{background:var(--dark);color:white;padding:1.5rem 0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar-logo{display:flex;align-items:center;gap:8px;padding:0 1.5rem 1.5rem;border-bottom:1px solid rgba(255,255,255,0.08)}
+.sidebar-logo svg{width:32px;height:32px}
+.sidebar-logo .lt{font-size:1.2rem;font-weight:700}.sidebar-logo .lt .ivy{color:var(--rose-light)}.sidebar-logo .lt .life{color:var(--gold);font-style:italic}
+.sidebar-sub{font-size:0.72rem;color:rgba(255,255,255,0.4);margin-top:0.2rem}
+.sidebar-menu{padding:1rem 0;list-style:none}
+.sidebar-menu li a,.sidebar-menu li button{display:flex;align-items:center;gap:0.7rem;width:100%;padding:0.7rem 1.5rem;color:rgba(255,255,255,0.6);text-decoration:none;font-size:0.88rem;background:none;border:none;cursor:pointer;font-family:inherit;text-align:left;transition:all 0.2s}
+.sidebar-menu li a:hover,.sidebar-menu li button:hover,.sidebar-menu li.active a,.sidebar-menu li.active button{color:white;background:rgba(200,86,106,0.15)}
+.sidebar-menu li.active a,.sidebar-menu li.active button{border-left:3px solid var(--rose);padding-left:calc(1.5rem - 3px)}
+.main{background:var(--bg);overflow-y:auto}
+.topbar{background:white;border-bottom:1px solid var(--border);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.topbar h1{font-size:1.1rem;font-weight:600}
+.topbar-actions{display:flex;gap:0.8rem}
+.btn{padding:8px 18px;border-radius:8px;font-size:0.85rem;font-family:inherit;cursor:pointer;border:none;transition:all 0.2s;font-weight:500}
+.btn-outline{background:white;color:var(--rose);border:1.5px solid var(--rose-light)}
 .btn-outline:hover{background:var(--rose-pale)}
-.btn-sm{padding:5px 14px;font-size:0.78rem}
-.btn-danger{background:var(--red);color:white}
-.btn-success{background:var(--green);color:white}
+.btn-rose{background:linear-gradient(135deg,var(--rose),#e07a8a);color:white}
+.btn-rose:hover{opacity:0.9}
 .btn-gold{background:linear-gradient(135deg,var(--gold),#e0b070);color:white}
-.btn-gold:hover{opacity:0.88}
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
-.stat-card{background:white;border-radius:14px;padding:1.2rem 1.5rem;border:1px solid var(--border)}
-.stat-num{font-size:2rem;font-weight:500;color:var(--rose)}
-.stat-lbl{font-size:0.8rem;color:var(--gray);margin-top:0.2rem}
-.card{background:white;border-radius:14px;border:1px solid var(--border);overflow:hidden;margin-bottom:1.5rem}
-.card-hdr{padding:1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:0.9rem;font-weight:500}
-table{width:100%;border-collapse:collapse;font-size:0.84rem}
-th{padding:0.7rem 1.2rem;text-align:left;background:#fdf8f4;color:var(--gray);font-weight:400;font-size:0.77rem;text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap}
-td{padding:0.75rem 1.2rem;border-top:1px solid var(--border);vertical-align:middle}
-tr:hover td{background:#fdf8f4}
-.badge{display:inline-block;padding:2px 10px;border-radius:50px;font-size:0.72rem}
-.badge-green{background:#e8f5e9;color:#2e7d32}
-.badge-gray{background:#f5f5f5;color:#757575}
-.actions{display:flex;gap:0.4rem;flex-wrap:wrap}
-.toolbar{display:flex;gap:0.8rem;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
-.toolbar input,.toolbar select{padding:8px 14px;border:1.5px solid var(--border);border-radius:50px;font-size:0.85rem;outline:none;font-family:inherit;background:white}
-.toolbar input:focus,.toolbar select:focus{border-color:var(--rose)}
-.toolbar input{min-width:200px}
-.eform{padding:1.5rem;display:flex;flex-direction:column;gap:1.2rem}
-.frow{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-.fgrp{display:flex;flex-direction:column;gap:0.4rem}
-.fgrp label{font-size:0.82rem;color:var(--gray)}
-.fgrp label span{color:var(--rose)}
-.fgrp input,.fgrp select,.fgrp textarea{padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;font-family:inherit;outline:none;transition:border-color 0.2s;background:white;color:var(--dark)}
-.fgrp input:focus,.fgrp select:focus,.fgrp textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(200,86,106,0.08)}
-.fgrp textarea{min-height:100px;resize:vertical;line-height:1.7}
-.factions{display:flex;gap:0.8rem;padding-top:0.5rem;flex-wrap:wrap}
-.sec-title{font-size:0.82rem;font-weight:600;color:var(--rose);text-transform:uppercase;letter-spacing:0.08em;padding:0.8rem 0 0.4rem;border-top:1px solid var(--border);margin-top:0.5rem}
-.cover-area{display:flex;gap:0.6rem;align-items:flex-start;flex-wrap:wrap}
-.cover-area input[type=text]{flex:1;min-width:200px}
-.cover-btns{display:flex;gap:0.5rem;flex-shrink:0}
-#coverPreviewWrap{margin-top:0.5rem;display:none;align-items:center;gap:0.8rem}
-#coverPreview{max-width:240px;max-height:135px;object-fit:cover;border-radius:8px;border:1px solid var(--border)}
-#coverUploadStatus{font-size:0.78rem;color:var(--gray)}
-.ai-gen{display:none;align-items:center;gap:0.5rem;font-size:0.82rem;color:var(--rose);margin-top:0.4rem}
-.spinner{width:16px;height:16px;border:2px solid var(--rose-pale);border-top-color:var(--rose);border-radius:50%;animation:spin 0.8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.ql-container{font-size:0.9rem;font-family:inherit;border-radius:0 0 10px 10px;border-color:var(--border)!important}
-.ql-toolbar{border-radius:10px 10px 0 0;border-color:var(--border)!important;background:#fdf8f4}
-.ql-editor{min-height:260px;line-height:1.8}
-.store-sec{background:var(--rose-pale);border-radius:12px;padding:1.2rem;border:1px solid var(--border)}
-.store-sec h3{font-size:0.9rem;font-weight:600;color:var(--rose);margin-bottom:0.8rem}
-.toast{position:fixed;bottom:2rem;right:2rem;padding:12px 20px;background:var(--dark);color:white;border-radius:10px;font-size:0.85rem;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;max-width:320px}
-.toast.show{opacity:1}
-.panel{display:none}.panel.active{display:block}
-.empty-state{text-align:center;padding:3rem;color:var(--gray);font-size:0.9rem}
-.check-row{display:flex;align-items:center;gap:0.5rem}
-.check-row input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--rose)}
-.check-row label{font-size:0.9rem;cursor:pointer}
-.tag-wrap{display:flex;flex-wrap:wrap;gap:0.4rem;padding:8px 10px;border:1.5px solid var(--border);border-radius:10px;background:white;cursor:text;min-height:42px;align-items:center}
-.tag-wrap:focus-within{border-color:var(--rose);box-shadow:0 0 0 3px rgba(200,86,106,0.08)}
-.tag-item{display:inline-flex;align-items:center;gap:4px;background:var(--rose-pale);color:var(--rose);padding:2px 10px;border-radius:50px;font-size:0.78rem;white-space:nowrap}
-.tag-item button{background:none;border:none;cursor:pointer;color:var(--rose);font-size:0.9rem;line-height:1;padding:0}
-.tag-input{border:none;outline:none;font-family:inherit;font-size:0.85rem;color:var(--dark);min-width:120px;background:transparent}
-@media(max-width:768px){.stats-grid{grid-template-columns:repeat(2,1fr)}.frow{grid-template-columns:1fr}.sidebar{width:180px}.main{margin-left:180px}}
+.btn-sm{padding:5px 12px;font-size:0.78rem}
+.content{padding:2rem}
+.panel{background:white;border-radius:16px;border:1px solid var(--border);overflow:hidden;margin-bottom:1.5rem}
+.panel-hdr{padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.panel-hdr h2{font-size:0.95rem;font-weight:600}
+.panel-body{padding:1.5rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.form-row.full{grid-template-columns:1fr}
+.form-group{display:flex;flex-direction:column;gap:0.4rem}
+.form-group label{font-size:0.8rem;font-weight:500;color:var(--gray)}
+.form-group input,.form-group select,.form-group textarea{padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:0.88rem;outline:none;font-family:inherit;color:var(--dark);background:white;transition:border-color 0.2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--rose)}
+.form-group textarea{resize:vertical;min-height:80px}
+#quillEditor{min-height:280px;font-size:0.92rem}
+.ql-toolbar.ql-snow{border-color:var(--border)!important;border-radius:8px 8px 0 0}
+.ql-container.ql-snow{border-color:var(--border)!important;border-radius:0 0 8px 8px;font-family:inherit}
+.kw-input-row{display:flex;gap:0.5rem;align-items:center}
+.kw-input-row input{flex:1}
+.kw-chips{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem}
+.kw-chip{background:var(--rose-pale);color:var(--rose);padding:4px 12px;border-radius:50px;font-size:0.78rem;display:flex;align-items:center;gap:6px}
+.kw-chip button{background:none;border:none;color:var(--rose);cursor:pointer;font-size:0.9rem;padding:0;line-height:1}
+.cover-preview{width:100%;aspect-ratio:16/9;background:var(--rose-pale);border-radius:8px;overflow:hidden;margin-bottom:0.8rem;display:flex;align-items:center;justify-content:center;color:var(--gray);font-size:0.85rem}
+.cover-preview img{width:100%;height:100%;object-fit:cover}
+.cover-actions{display:flex;gap:0.5rem;flex-wrap:wrap}
+.art-list-item{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;border-bottom:1px solid var(--border);transition:background 0.15s}
+.art-list-item:last-child{border-bottom:none}
+.art-list-item:hover{background:var(--rose-pale)}
+.art-info{flex:1}
+.art-info .at{font-size:0.88rem;font-weight:600;margin-bottom:0.2rem}
+.art-info .am{font-size:0.75rem;color:var(--gray)}
+.art-actions{display:flex;gap:0.5rem}
+.badge{padding:2px 10px;border-radius:50px;font-size:0.72rem;font-weight:500}
+.badge-pub{background:#d1fae5;color:#065f46}
+.badge-draft{background:#fef3c7;color:#92400e}
+.toggle{position:relative;display:inline-block;width:42px;height:24px}
+.toggle input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;inset:0;background:#ccc;border-radius:12px;transition:.3s}
+.slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.3s}
+input:checked+.slider{background:var(--rose)}
+input:checked+.slider:before{transform:translateX(18px)}
+.empty-state{text-align:center;padding:3rem;color:var(--gray)}
+.ai-prompt-row{display:flex;gap:0.8rem;align-items:flex-end}
+.ai-prompt-row .form-group{flex:1}
+.toast{position:fixed;bottom:2rem;right:2rem;background:#1a1a1a;color:white;padding:12px 20px;border-radius:10px;font-size:0.85rem;z-index:1000;opacity:0;transform:translateY(10px);transition:all 0.3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.success{border-left:3px solid #10b981}
+.toast.error{border-left:3px solid #ef4444}
+.section-title{font-size:0.78rem;color:var(--rose);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.8rem}
+@media(max-width:768px){.admin-layout{grid-template-columns:1fr}.sidebar{display:none}.form-row{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<div id="loginPage">
-<div class="login-box">
-  <div class="ivy-logo">
-    <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="22" cy="22" r="21" fill="#fff0f2" stroke="#c8566a" stroke-width="1.5"/>
-      <path d="M22 36C22 36 10 28 10 19C10 13.477 15.477 9 22 9C28.523 9 34 13.477 34 19C34 28 22 36 22 36Z" fill="#f2a5b0" opacity="0.5"/>
-      <path d="M22 8C22 8 14 14 14 22C14 26 17.5 30 22 32C26.5 30 30 26 30 22C30 14 22 8 22 8Z" fill="#c8566a" opacity="0.85"/>
-      <ellipse cx="19" cy="20" rx="4.5" ry="6" transform="rotate(-20 19 20)" fill="white" opacity="0.6"/>
-      <ellipse cx="25" cy="18" rx="3.5" ry="5" transform="rotate(15 25 18)" fill="white" opacity="0.4"/>
-      <path d="M22 32V38" stroke="#c99960" stroke-width="1.5" stroke-linecap="round"/>
-    </svg>
-    <div class="logo-txt"><span class="ivy">Ivy</span><span class="life">Life</span></div>
-  </div>
-  <div class="login-sub">後台管理系統</div>
-  <input type="password" id="pwInput" placeholder="請輸入管理員密碼">
-  <button class="btn-primary" onclick="doLogin()">登入</button>
-  <div class="login-err" id="loginErr">密碼錯誤，請再試一次</div>
-</div>
-</div>
-<div id="adminPage">
-<nav class="sidebar">
-  <div class="sb-logo">
-    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M16 28C16 28 6 22 6 14C6 9 10.477 5 16 5C21.523 5 26 9 26 14C26 22 16 28 16 28Z" fill="#f2a5b0" opacity="0.4"/>
-      <path d="M16 4C16 4 10 9 10 16C10 19.5 12.5 23 16 24.5C19.5 23 22 19.5 22 16C22 9 16 4 16 4Z" fill="#f2a5b0"/>
-      <ellipse cx="14" cy="15" rx="3" ry="4.5" transform="rotate(-20 14 15)" fill="white" opacity="0.5"/>
-    </svg>
-    <div class="sb-logo-txt"><span class="ivy">Ivy</span><span class="life">Life</span> 後台</div>
-  </div>
-  <ul class="sb-menu">
-    <li><a class="active" onclick="showPanel('dashboard',this)">📊 總覽</a></li>
-    <li><a onclick="showPanel('articles',this)">📝 文章管理</a></li>
-    <li><a onclick="showPanel('new',this);resetForm()">✏️ 新增文章</a></li>
-    <li><a onclick="showPanel('categories',this)">🏷️ 分類管理</a></li>
-  </ul>
-  <div class="sb-foot"><button onclick="window.open('/','_blank')">↗ 前往前台</button></div>
-</nav>
-<main class="main">
-<div id="panel-dashboard" class="panel active">
-  <div class="page-hdr"><h1>📊 網站總覽</h1><span style="font-size:0.8rem;color:var(--gray)" id="lastUpdate"></span></div>
-  <div class="stats-grid">
-    <div class="stat-card"><div class="stat-num" id="s1">-</div><div class="stat-lbl">全部文章</div></div>
-    <div class="stat-card"><div class="stat-num" id="s2">-</div><div class="stat-lbl">已發布</div></div>
-    <div class="stat-card"><div class="stat-num" id="s3">-</div><div class="stat-lbl">草稿</div></div>
-    <div class="stat-card"><div class="stat-num" id="s4">-</div><div class="stat-lbl">分類數</div></div>
-  </div>
-  <div class="card">
-    <div class="card-hdr">最新 10 篇文章<button class="btn btn-sm btn-rose" onclick="showPanel('new',document.querySelector('.sb-menu li:nth-child(3) a'));resetForm()">+ 新增</button></div>
-    <table><thead><tr><th>標題</th><th>分類</th><th>縣市</th><th>狀態</th><th>日期</th></tr></thead><tbody id="dashRecent"></tbody></table>
+
+<!-- Login Page -->
+<div id="loginPage" class="login-wrap">
+  <div class="login-box">
+    <div class="login-logo">
+      <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="19" cy="19" r="18" fill="#fff0f2" stroke="#c8566a" stroke-width="1.2"/>
+        <path d="M19 32C19 32 9 25 9 17C9 12 13.5 8 19 8C24.5 8 29 12 29 17C29 25 19 32 19 32Z" fill="#f2a5b0" opacity="0.5"/>
+        <path d="M19 7C19 7 12 12.5 12 19C12 22.5 14.8 26.5 19 28C23.2 26.5 26 22.5 26 19C26 12.5 19 7 19 7Z" fill="#c8566a" opacity="0.85"/>
+        <ellipse cx="16.5" cy="17.5" rx="4" ry="5.5" transform="rotate(-20 16.5 17.5)" fill="white" opacity="0.55"/>
+        <path d="M19 28V33" stroke="#c99960" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      <div class="lt"><span class="ivy">Ivy</span><span class="life">Life</span></div>
+    </div>
+    <div class="login-sub">&#24460;&#21010;&#31649;&#29702;&#31995;&#32113;</div>
+    <input type="password" id="pwInput" placeholder="&#35831;&#36755;&#20837;&#31649;&#29702;&#21592;&#23494;&#30721;" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn-primary" onclick="doLogin()">&#30331;&#20837;</button>
   </div>
 </div>
-<div id="panel-articles" class="panel">
-  <div class="page-hdr"><h1>📝 文章管理</h1><button class="btn btn-rose" onclick="showPanel('new',document.querySelector('.sb-menu li:nth-child(3) a'));resetForm()">+ 新增文章</button></div>
-  <div class="toolbar">
-    <input type="text" id="searchQ" placeholder="搜尋標題或 slug…" oninput="filterList()">
-    <select id="filterCat" onchange="filterList()"><option value="">全部分類</option></select>
-    <select id="filterCity" onchange="filterList()">
-      <option value="">全部縣市</option>
-      <option>台北市</option><option>新北市</option><option>桃園市</option><option>台中市</option><option>台南市</option><option>高雄市</option>
-      <option>新竹市</option><option>新竹縣</option><option>苗栗縣</option><option>彰化縣</option><option>南投縣</option><option>雲林縣</option>
-      <option>嘉義市</option><option>嘉義縣</option><option>屏東縣</option><option>宜蘭縣</option><option>花蓮縣</option><option>台東縣</option>
-      <option>澎湖縣</option><option>金門縣</option><option>連江縣</option>
-    </select>
-    <select id="filterPub" onchange="filterList()"><option value="">全部狀態</option><option value="true">已發布</option><option value="false">草稿</option></select>
-  </div>
-  <div class="card"><table><thead><tr><th>標題</th><th>分類</th><th>縣市</th><th>Slug</th><th>狀態</th><th>日期</th><th>操作</th></tr></thead><tbody id="artList"></tbody></table></div>
-</div>
-<div id="panel-new" class="panel">
-  <div class="page-hdr"><h1 id="edTitle">✏️ 新增文章</h1><button class="btn btn-outline" onclick="resetForm()">× 取消</button></div>
-  <div class="card"><div class="eform">
-    <input type="hidden" id="edId">
-    <div class="fgrp"><label>文章標題 <span>*</span></label><input type="text" id="edTitleInput" placeholder="例：台南必吃美食推薦｜艾薇精選10家私藏餐廳"></div>
-    <div class="frow">
-      <div class="fgrp"><label>Slug（網址）<span>*</span> <span style="color:var(--gold);font-size:0.75rem">— 英文小寫+數字，如 tastyfood01</span></label><input type="text" id="edSlug" placeholder="tastyfood01"></div>
-      <div class="fgrp"><label>分類</label><select id="edCat"><option value="">-- 選擇分類 --</option></select></div>
-    </div>
-    <div class="frow">
-      <div class="fgrp">
-        <label>縣市</label>
-        <select id="edCity">
-          <option value="">-- 選擇縣市 --</option>
-          <option>台北市</option><option>新北市</option><option>桃園市</option><option>台中市</option><option>台南市</option><option>高雄市</option>
-          <option>新竹市</option><option>新竹縣</option><option>苗栗縣</option><option>彰化縣</option><option>南投縣</option><option>雲林縣</option>
-          <option>嘉義市</option><option>嘉義縣</option><option>屏東縣</option><option>宜蘭縣</option><option>花蓮縣</option><option>台東縣</option>
-          <option>澎湖縣</option><option>金門縣</option><option>連江縣</option>
-        </select>
-      </div>
-      <div class="fgrp">
-        <label>關鍵字 <span style="color:var(--gray);font-size:0.75rem">（Enter 新增）</span></label>
-        <div class="tag-wrap" id="tagWrap" onclick="document.getElementById('tagInput').focus()">
-          <input type="text" id="tagInput" class="tag-input" placeholder="輸入關鍵字後按 Enter">
-        </div>
-        <input type="hidden" id="edKeywords">
-      </div>
-    </div>
-    <div class="sec-title">🖼️ 封面圖片</div>
-    <div class="fgrp">
-      <label>封面圖</label>
-      <div class="cover-area">
-        <input type="text" id="edCover" placeholder="https://... 或使用下方按鈕上傳／AI生成">
-        <div class="cover-btns">
-          <label style="cursor:pointer;background:var(--rose);color:#fff;padding:0.45rem 0.9rem;border-radius:8px;font-size:0.82rem;white-space:nowrap;user-select:none">📸 上傳圖片<input type="file" id="coverFileInput" accept="image/*" style="display:none" onchange="uploadIvyCover(event)"></label>
-          <button class="btn btn-gold btn-sm" onclick="generateAICover()" id="aiCoverBtn">✨ AI 生成封面</button>
-        </div>
-      </div>
-      <div id="aiGen" class="ai-gen"><div class="spinner"></div>AI 正在生成封面圖...</div>
-      <div id="coverPreviewWrap" style="display:none;margin-top:0.5rem;align-items:center;gap:0.8rem">
-        <img id="coverPreview" style="max-width:240px;max-height:135px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
-        <span id="coverUploadStatus" style="font-size:0.78rem;color:var(--gray)"></span>
-      </div>
-    </div>
-    <div class="fgrp"><label>摘要（顯示在列表頁）</label><textarea id="edSynopsis" rows="3" placeholder="一段簡短描述，吸引讀者點開…"></textarea></div>
-    <div class="sec-title">📄 文章內文</div>
-    <div class="fgrp"><label>內文（富文本編輯器）</label><div id="quillEditor"></div><input type="hidden" id="edContent"></div>
-    <div class="sec-title">🏪 店家資訊</div>
-    <div class="store-sec">
-      <h3>📍 店家基本資料（選填）</h3>
-      <div class="frow">
-        <div class="fgrp"><label>店家名稱</label><input type="text" id="edStoreName" placeholder="例：好食餐廳"></div>
-        <div class="fgrp"><label>電話</label><input type="text" id="edStorePhone" placeholder="例：06-123-4567"></div>
-      </div>
-      <div class="fgrp"><label>地址</label><input type="text" id="edStoreAddress" placeholder="例：台南市中西區民生路一段123號"></div>
-      <div class="frow">
-        <div class="fgrp"><label>營業時間</label><input type="text" id="edStoreHours" placeholder="例：週一至週日 11:00–21:00"></div>
-        <div class="fgrp"><label>AI 封面提示（選填）</label><input type="text" id="edAiPrompt" placeholder="例：台南美食 南瓜濃湯 溫馨餐廳氛圍"></div>
-      </div>
-    </div>
-    <div class="sec-title">🔍 SEO 設定</div>
-    <div class="frow">
-      <div class="fgrp"><label>SEO 標題（選填）</label><input type="text" id="edMetaT" placeholder="SEO 用標題"></div>
-      <div class="fgrp"><label>SEO 描述（選填）</label><input type="text" id="edMetaD" placeholder="搜尋結果顯示的描述文字"></div>
-    </div>
-    <div class="check-row"><input type="checkbox" id="edPub" checked><label for="edPub">立刻發布（取消勾選則存為草稿）</label></div>
-    <div class="factions">
-      <button class="btn btn-rose" onclick="saveArt()">💾 儲存文章</button>
-      <button class="btn btn-outline" onclick="resetForm()">取消</button>
-    </div>
-  </div></div>
-</div>
-<div id="panel-categories" class="panel">
-  <div class="page-hdr"><h1>🏷️ 分類管理</h1><span style="font-size:0.82rem;color:var(--gray)">分類目前需透過 Supabase 管理</span></div>
-  <div class="card"><table><thead><tr><th>圖示</th><th>名稱</th><th>Slug</th><th>說明</th><th>排序</th><th>文章數</th></tr></thead><tbody id="catList"></tbody></table></div>
-</div>
-</main></div>
-<div class="toast" id="toast"></div>
-<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-<script>
-var SB='https://zsebcpfblecwumbaxeaz.supabase.co';
-var KEY='sb_publishable_L2DOfeM0cAJqwlVCr1LwtA_jE9MBNDn';
-var PASS='ivy2024admin';
-var quill=null,keywords=[],coverUrl='',editingId=null;
 
-function sbFetch(path,opts){
-  var h={apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json'};
-  if(opts&&opts.headers)Object.assign(h,opts.headers);
-  return fetch(SB+'/rest/v1/'+path,Object.assign({headers:h},opts||{}));
-}
-
-function doLogin(){
-  var pw=document.getElementById('pwInput').value;
-  if(pw===PASS){
-    document.getElementById('loginPage').style.display='none';
-    document.getElementById('adminPage').style.display='grid';
-    initQuill();loadArtList();
-  } else {
-    document.getElementById('pwInput').style.borderColor='red';
-    setTimeout(function(){document.getElementById('pwInput').style.borderColor='';},1000);
-  }
-}
-
-function doLogout(){
-  document.getElementById('loginPage').style.display='flex';
-  document.getElementById('adminPage').style.display='none';
-  document.getElementById('pwInput').value='';
-}
-
-function initQuill(){
-  if(quill)return;
-  var kw=document.getElementById('kwInput');if(kw)kw.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();addKw();}});
-  quill=new Quill('#quillEditor',{
-    theme:'snow',
-    placeholder:'Write article content here...',
-    modules:{toolbar:[[{header:[2,3,false]}],['bold','italic','underline','strike'],[{color:[]},{background:[]}],[{list:'ordered'},{list:'bullet'}],['link','blockquote'],['clean']]}
-  });
-}
-
-function showSection(sec){
-  document.getElementById('secNew').style.display=sec==='new'?'block':'none';
-  document.getElementById('secList').style.display=sec==='list'?'block':'none';
-  document.getElementById('menuNew').className=sec==='new'?'active':'';
-  document.getElementById('menuList').className=sec==='list'?'active':'';
-  var titles={new:'New Article',list:'Article List'};
-  document.getElementById('topbarTitle').textContent=titles[sec]||sec;
-  if(sec==='list')loadArtList();
-}
-
-function addKw(){
-  var v=document.getElementById('kwInput').value.trim();
-  if(!v||keywords.indexOf(v)>-1)return;
-  keywords.push(v);
-  document.getElementById('kwInput').value='';
-  renderKwChips();
-}
-
-function removeKw(k){keywords=keywords.filter(function(x){return x!==k;});renderKwChips();}
-
-function renderKwChips(){
-  document.getElementById('kwChips').innerHTML=keywords.map(function(k){
-    return '<span class="kw-chip">'+esc(k)+'<button onclick="removeKw(\''+esc(k)+'\')">'+String.fromCharCode(215)+'</button></span>';
-  }).join('');
-}
-
-function uploadCover(input){
-  var file=input.files[0];if(!file)return;
-  showToast('Uploading...','');
-  var fname=Date.now()+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
-  fetch(SB+'/storage/v1/object/ivy-images/'+fname,{
-    method:'POST',
-    headers:{apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':file.type},
-    body:file
-  }).then(function(r){return r.json();}).then(function(d){
-    if(d.Key||d.path||d.fullPath){
-      coverUrl=SB+'/storage/v1/object/public/ivy-images/'+fname;
-      document.getElementById('coverPreview').innerHTML='<img src="'+coverUrl+'" alt="cover">';
-      showToast('Cover uploaded!','success');
-    } else {showToast('Upload failed','error');}
-  }).catch(function(e){showToast('Error: '+e.message,'error');});
-}
-
-function genAICover(){
-  var prompt=document.getElementById('aiPrompt').value.trim()||(document.getElementById('artTitle').value.trim()+' lifestyle photo taiwan');
-  showToast('Generating AI prompt...','');
-  fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:'Generate a detailed image prompt for a blog cover about: '+prompt+'. Reply with only the image prompt in English, max 100 words.'}]})
-  }).then(function(r){return r.json();}).then(function(d){
-    var txt=d.content&&d.content[0]?d.content[0].text:'';
-    if(txt){document.getElementById('aiPrompt').value=txt;showToast('AI prompt ready!','success');}
-    else{showToast('AI generation failed','error');}
-  }).catch(function(e){showToast('Error: '+e.message,'error');});
-}
-
-function getFormData(){
-  return {
-    title:document.getElementById('artTitle').value.trim(),
-    synopsis:document.getElementById('artSynopsis').value.trim(),
-    content:quill?quill.root.innerHTML:'',
-    category_id:parseInt(document.getElementById('artCat').value)||null,
-    city:document.getElementById('citySelect').value||null,
-    keywords:keywords.join(',')||null,
-    cover_image:coverUrl||null,
-    store_name:document.getElementById('storeName').value.trim()||null,
-    store_phone:document.getElementById('storePhone').value.trim()||null,
-    store_address:document.getElementById('storeAddress').value.trim()||null,
-    store_hours:document.getElementById('storeHours').value.trim()||null,
-    ai_cover_prompt:document.getElementById('aiPrompt').value.trim()||null
-  };
-}
-
-function saveDraft(){var d=getFormData();if(!d.title){showToast('Please enter title','error');return;}d.published=false;saveArticle(d);}
-function publishArt(){var d=getFormData();if(!d.title){showToast('Please enter title','error');return;}if(!d.category_id){showToast('Please select category','error');return;}d.published=true;saveArticle(d);}
-
-function saveArticle(data){
-  showToast('Saving...','');
-  if(!editingId){
-    data.slug='art-'+Date.now();
-    sbFetch('ivy_articles',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(data)})
-    .then(function(r){return r.json();}).then(function(d){
-      if(Array.isArray(d)&&d[0]){editingId=d[0].id;showToast(data.published?'Published!':'Draft saved!','success');loadArtList();}
-      else{showToast('Save failed: '+JSON.stringify(d).substring(0,80),'error');}
-    }).catch(function(e){showToast('Error: '+e.message,'error');});
-  } else {
-    sbFetch('ivy_articles?id=eq.'+editingId,{method:'PATCH',headers:{'Prefer':'return=representation'},body:JSON.stringify(data)})
-    .then(function(r){return r.json();}).then(function(){
-      showToast(data.published?'Published!':'Draft saved!','success');loadArtList();
-    }).catch(function(e){showToast('Error: '+e.message,'error');});
-  }
-}
-
-function loadArtList(){
-  sbFetch('ivy_articles?select=*,ivy_categories(name)&order=created_at.desc')
-  .then(function(r){return r.json();})
-  .then(function(arts){
-    var el=document.getElementById('artList');
-    if(!arts||!arts.length){el.innerHTML='<div class="empty-state">No articles yet.</div>';return;}
-    el.innerHTML=arts.map(function(a){
-      var cat=a.ivy_categories?a.ivy_categories.name:'';
-      return '<div class="art-list-item">'+
-        '<div class="art-info"><div class="at">'+esc(a.title)+'</div>'+
-        '<div class="am">'+(cat?esc(cat)+' &middot; ':'')+fmtDate(a.created_at)+(a.city?' &middot; '+esc(a.city):'')+
-        '</div></div><div class="art-actions">'+
-        '<span class="badge '+(a.published?'badge-pub':'badge-draft')+'">'+(a.published?'Published':'Draft')+'</span>'+
-        '<button class="btn btn-outline btn-sm" onclick="editArt('+a.id+')">Edit</button>'+
-        '<button class="btn btn-sm" style="background:#fee2e2;color:#991b1b" onclick="deleteArt('+a.id+')">Delete</button>'+
-        '</div></div>';
-    }).join('');
-  });
-}
-
-function editArt(id){
-  sbFetch('ivy_articles?id=eq.'+id).then(function(r){return r.json();}).then(function(data){
-    if(!data||!data[0])return;
-    var a=data[0];editingId=id;
-    document.getElementById('artTitle').value=a.title||'';
-    document.getElementById('artSynopsis').value=a.synopsis||'';
-    document.getElementById('artCat').value=a.category_id||'';
-    document.getElementById('citySelect').value=a.city||'';
-    document.getElementById('storeName').value=a.store_name||'';
-    document.getElementById('storePhone').value=a.store_phone||'';
-    document.getElementById('storeAddress').value=a.store_address||'';
-    document.getElementById('storeHours').value=a.store_hours||'';
-    document.getElementById('aiPrompt').value=a.ai_cover_prompt||'';
-    keywords=a.keywords?a.keywords.split(',').filter(Boolean):[];
-    renderKwChips();
-    if(a.cover_image){coverUrl=a.cover_image;document.getElementById('coverPreview').innerHTML='<img src="'+esc(coverUrl)+'" alt="cover">';}
-    if(quill)quill.root.innerHTML=a.content||'';
-    showSection('new');
-    document.getElementById('topbarTitle').textContent='Edit Article';
-  });
-}
-
-function deleteArt(id){
-  if(!confirm('Delete this article?'))return;
-  sbFetch('ivy_articles?id=eq.'+id,{method:'DELETE'}).then(function(){showToast('Deleted','success');loadArtList();});
-}
-
-function showToast(msg,type){
-  var t=document.getElementById('toast');
-  t.textContent=msg;
-  t.className='toast show'+(type?' '+type:'');
-  clearTimeout(window._tt);
-  window._tt=setTimeout(function(){t.className='toast';},3000);
-}
-
-function fmtDate(s){return s?new Date(s).toLocaleDateString('zh-TW'):''}
-function esc(s){if(!s)return '';return s.split('&').join('&amp;').split('<').join('&lt;').split('>').join('&gt;');}
-</script>
-</body>
-</html>
+<!-- Admin Page -->
+<div id="adminPage" class="admin-layout" style="display:none">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="19" cy="19" r="18" fill="rgba(200,86,106,0.3)" stroke="#f2a5b0" stroke-width="1
