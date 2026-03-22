@@ -112,7 +112,7 @@ footer a{color:var(--rose-light);text-decoration:none}
 <footer><a href="/">IvyLife 艾薇生活</a> · 謝謝閱讀</footer>
 <script>
 const SB='https://zsebcpfblecwumbaxeaz.supabase.co';
-const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZWJjcGZibGVjd3VtYmF4ZWF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3OTUzMjcsImV4cCI6MjA4OTM3MTMyN30.g0rsqNO6cItp8Qw3ybveVwX2afjTSwtS7WFHL_320jQ';
+const KEY='sb_publishable_L2DOfeM0cAJqwlVCr1LwtA_jE9MBNDn';
 async function sbGet(p){const r=await fetch(SB+'/rest/v1/'+p,{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}});return r.json();}
 function esc(s){return s?s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
 function fmtDate(s){return s?new Date(s).toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric'}):'';}
