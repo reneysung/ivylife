@@ -253,221 +253,196 @@ tr:hover td{background:#fdf8f4}
 <div class="toast" id="toast"></div>
 <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 <script>
-const SB='https://zsebcpfblecwumbaxeaz.supabase.co';
-const KEY='sb_publishable_L2DOfeM0cAJqwlVCr1LwtA_jE9MBNDn';
-const PASS='ivy2024admin';
-let arts=[],cats=[],quill;
+var SB='https://zsebcpfblecwumbaxeaz.supabase.co';
+var KEY='sb_publishable_L2DOfeM0cAJqwlVCr1LwtA_jE9MBNDn';
+var PASS='ivy2024admin';
+var quill=null,keywords=[],coverUrl='',editingId=null;
 
-function initQuill(){if(quill)return;quill=new Quill('#quillEditor',{theme:'snow',placeholder:'Write article content here...',modules:{toolbar:[[{header:[2,3,false]}],['bold','italic','underline','strike'],[{color:[]},{background:[]}],[{list:'ordered'},{list:'bullet'}],['blockquote','code-block'],['link','image'],['clean']]}});}
+function sbFetch(path,opts){
+  var h={apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json'};
+  if(opts&&opts.headers)Object.assign(h,opts.headers);
+  return fetch(SB+'/rest/v1/'+path,Object.assign({headers:h},opts||{}));
+}
 
 function doLogin(){
-  if(document.getElementById('pwInput').value===PASS){
+  var pw=document.getElementById('pwInput').value;
+  if(pw===PASS){
     document.getElementById('loginPage').style.display='none';
-    document.getElementById('adminPage').style.display='block';
-    initQuill();loadAll();
-  }else{document.getElementById('loginErr').style.display='block';}
-}
-document.getElementById('pwInput').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
-
-async function sb(path,opt){
-  opt=opt||{};
-  const r=await fetch(SB+'/rest/v1/'+path,Object.assign({},opt,{headers:Object.assign({'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=representation'},opt.headers||{})}));
-  if(!r.ok){const e=await r.text();throw new Error(e);}
-  try{return await r.json();}catch{return[];}
+    document.getElementById('adminPage').style.display='grid';
+    initQuill();loadArtList();
+    document.getElementById('kwInput').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();addKw();}});
+  } else {
+    document.getElementById('pwInput').style.borderColor='red';
+    setTimeout(function(){document.getElementById('pwInput').style.borderColor='';},1000);
+  }
 }
 
-async function loadAll(){
-  try{
-    [cats,arts]=await Promise.all([sb('ivy_categories?order=sort_order.asc'),sb('ivy_articles?select=*,ivy_categories(name,slug)&order=created_at.desc')]);
-    renderDash();renderArts(arts);renderCats();fillCatOpts();
-    document.getElementById('lastUpdate').textContent='更新於 '+new Date().toLocaleTimeString('zh-TW');
-  }catch(e){toast('載入失敗：'+e.message,1);}
+function doLogout(){
+  document.getElementById('loginPage').style.display='flex';
+  document.getElementById('adminPage').style.display='none';
+  document.getElementById('pwInput').value='';
 }
 
-function renderDash(){
-  document.getElementById('s1').textContent=arts.length;
-  document.getElementById('s2').textContent=arts.filter(a=>a.published).length;
-  document.getElementById('s3').textContent=arts.filter(a=>!a.published).length;
-  document.getElementById('s4').textContent=cats.length;
-  document.getElementById('dashRecent').innerHTML=arts.slice(0,10).map(a=>'<tr><td><strong>'+esc(a.title)+'</strong></td><td>'+(a.ivy_categories?a.ivy_categories.name:'-')+'</td><td>'+(a.city||'-')+'</td><td>'+badge(a.published)+'</td><td>'+fmtDate(a.created_at)+'</td></tr>').join('')||'<tr><td colspan="5" class="empty-state">暫無文章</td></tr>';
+function initQuill(){
+  if(quill)return;
+  quill=new Quill('#quillEditor',{
+    theme:'snow',
+    placeholder:'Write article content here...',
+    modules:{toolbar:[[{header:[2,3,false]}],['bold','italic','underline','strike'],[{color:[]},{background:[]}],[{list:'ordered'},{list:'bullet'}],['link','blockquote'],['clean']]}
+  });
 }
 
-function renderArts(list){
-  document.getElementById('artList').innerHTML=list.map(a=>'<tr><td><strong>'+esc(a.title)+'</strong></td><td>'+(a.ivy_categories?a.ivy_categories.name:'-')+'</td><td>'+(a.city||'-')+'</td><td><code style="font-size:0.75rem;color:var(--gray)">'+a.slug+'</code></td><td>'+badge(a.published)+'</td><td>'+fmtDate(a.created_at)+'</td><td><div class="actions"><button class="btn btn-sm btn-outline" onclick="editArt('+a.id+')">編輯</button><button class="btn btn-sm '+(a.published?'btn-outline':'btn-success')+'" onclick="togglePub('+a.id+','+a.published+')">'+(a.published?'下架':'發布')+'</button><button class="btn btn-sm btn-danger" onclick="delArt('+a.id+',''+a.title.replace(/'/g,'').substring(0,20)+'')">刪除</button></div></td></tr>').join('')||'<tr><td colspan="7" class="empty-state">暫無文章</td></tr>';
+function showSection(sec){
+  document.getElementById('secNew').style.display=sec==='new'?'block':'none';
+  document.getElementById('secList').style.display=sec==='list'?'block':'none';
+  document.getElementById('menuNew').className=sec==='new'?'active':'';
+  document.getElementById('menuList').className=sec==='list'?'active':'';
+  var titles={new:'New Article',list:'Article List'};
+  document.getElementById('topbarTitle').textContent=titles[sec]||sec;
+  if(sec==='list')loadArtList();
 }
 
-function renderCats(){
-  document.getElementById('catList').innerHTML=cats.map(c=>{const cnt=arts.filter(a=>a.category_id===c.id).length;return '<tr><td style="font-size:1.4rem">'+(c.icon||'')+'</td><td><strong>'+c.name+'</strong></td><td><code>'+c.slug+'</code></td><td style="color:var(--gray)">'+(c.description||'')+'</td><td style="text-align:center">'+c.sort_order+'</td><td style="text-align:center"><strong>'+cnt+'</strong></td></tr>';}).join('');
+function addKw(){
+  var v=document.getElementById('kwInput').value.trim();
+  if(!v||keywords.indexOf(v)>-1)return;
+  keywords.push(v);
+  document.getElementById('kwInput').value='';
+  renderKwChips();
 }
 
-function fillCatOpts(){
-  const opts=cats.map(c=>'<option value="'+c.id+'">'+(c.icon||'')+' '+c.name+'</option>').join('');
-  document.getElementById('edCat').innerHTML='<option value="">-- 選擇分類 --</option>'+opts;
-  document.getElementById('filterCat').innerHTML='<option value="">全部分類</option>'+cats.map(c=>'<option value="'+c.id+'">'+c.name+'</option>').join('');
+function removeKw(k){keywords=keywords.filter(function(x){return x!==k;});renderKwChips();}
+
+function renderKwChips(){
+  document.getElementById('kwChips').innerHTML=keywords.map(function(k){
+    return '<span class="kw-chip">'+esc(k)+'<button onclick="removeKw(\''+esc(k)+'\')">'+String.fromCharCode(215)+'</button></span>';
+  }).join('');
 }
 
-function filterList(){
-  const q=document.getElementById('searchQ').value.toLowerCase();
-  const cat=document.getElementById('filterCat').value;
-  const city=document.getElementById('filterCity').value;
-  const pub=document.getElementById('filterPub').value;
-  let list=arts;
-  if(q)list=list.filter(a=>a.title.toLowerCase().includes(q)||a.slug.includes(q));
-  if(cat)list=list.filter(a=>String(a.category_id)===cat);
-  if(city)list=list.filter(a=>a.city===city);
-  if(pub!=='')list=list.filter(a=>String(a.published)===pub);
-  renderArts(list);
+function uploadCover(input){
+  var file=input.files[0];if(!file)return;
+  showToast('Uploading...','');
+  var fname=Date.now()+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+  fetch(SB+'/storage/v1/object/ivy-images/'+fname,{
+    method:'POST',
+    headers:{apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':file.type},
+    body:file
+  }).then(function(r){return r.json();}).then(function(d){
+    if(d.Key||d.path||d.fullPath){
+      coverUrl=SB+'/storage/v1/object/public/ivy-images/'+fname;
+      document.getElementById('coverPreview').innerHTML='<img src="'+coverUrl+'" alt="cover">';
+      showToast('Cover uploaded!','success');
+    } else {showToast('Upload failed','error');}
+  }).catch(function(e){showToast('Error: '+e.message,'error');});
 }
 
-function getTags(){return Array.from(document.querySelectorAll('.tag-item')).map(t=>t.dataset.val);}
-function addTag(val){
-  val=val.trim();if(!val||getTags().includes(val))return;
-  const wrap=document.getElementById('tagWrap'),inp=document.getElementById('tagInput');
-  const span=document.createElement('span');span.className='tag-item';span.dataset.val=val;
-  span.innerHTML=val+'<button onclick="this.parentElement.remove();updateKw()">×</button>';
-  wrap.insertBefore(span,inp);inp.value='';updateKw();
+function genAICover(){
+  var prompt=document.getElementById('aiPrompt').value.trim()||(document.getElementById('artTitle').value.trim()+' lifestyle photo taiwan');
+  showToast('Generating AI prompt...','');
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:'Generate a detailed image prompt for a blog cover about: '+prompt+'. Reply with only the image prompt in English, max 100 words.'}]})
+  }).then(function(r){return r.json();}).then(function(d){
+    var txt=d.content&&d.content[0]?d.content[0].text:'';
+    if(txt){document.getElementById('aiPrompt').value=txt;showToast('AI prompt ready!','success');}
+    else{showToast('AI generation failed','error');}
+  }).catch(function(e){showToast('Error: '+e.message,'error');});
 }
-function updateKw(){document.getElementById('edKeywords').value=getTags().join(',');}
-function setTags(str){
-  const wrap=document.getElementById('tagWrap'),inp=document.getElementById('tagInput');
-  wrap.querySelectorAll('.tag-item').forEach(t=>t.remove());
-  if(str)str.split(',').filter(Boolean).forEach(addTag);
+
+function getFormData(){
+  return {
+    title:document.getElementById('artTitle').value.trim(),
+    synopsis:document.getElementById('artSynopsis').value.trim(),
+    content:quill?quill.root.innerHTML:'',
+    category_id:parseInt(document.getElementById('artCat').value)||null,
+    city:document.getElementById('citySelect').value||null,
+    keywords:keywords.join(',')||null,
+    cover_image:coverUrl||null,
+    store_name:document.getElementById('storeName').value.trim()||null,
+    store_phone:document.getElementById('storePhone').value.trim()||null,
+    store_address:document.getElementById('storeAddress').value.trim()||null,
+    store_hours:document.getElementById('storeHours').value.trim()||null,
+    ai_cover_prompt:document.getElementById('aiPrompt').value.trim()||null
+  };
 }
-document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('tagInput').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===','){e.preventDefault();addTag(e.target.value);}});
-});
+
+function saveDraft(){var d=getFormData();if(!d.title){showToast('Please enter title','error');return;}d.published=false;saveArticle(d);}
+function publishArt(){var d=getFormData();if(!d.title){showToast('Please enter title','error');return;}if(!d.category_id){showToast('Please select category','error');return;}d.published=true;saveArticle(d);}
+
+function saveArticle(data){
+  showToast('Saving...','');
+  if(!editingId){
+    data.slug='art-'+Date.now();
+    sbFetch('ivy_articles',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(data)})
+    .then(function(r){return r.json();}).then(function(d){
+      if(Array.isArray(d)&&d[0]){editingId=d[0].id;showToast(data.published?'Published!':'Draft saved!','success');loadArtList();}
+      else{showToast('Save failed: '+JSON.stringify(d).substring(0,80),'error');}
+    }).catch(function(e){showToast('Error: '+e.message,'error');});
+  } else {
+    sbFetch('ivy_articles?id=eq.'+editingId,{method:'PATCH',headers:{'Prefer':'return=representation'},body:JSON.stringify(data)})
+    .then(function(r){return r.json();}).then(function(){
+      showToast(data.published?'Published!':'Draft saved!','success');loadArtList();
+    }).catch(function(e){showToast('Error: '+e.message,'error');});
+  }
+}
+
+function loadArtList(){
+  sbFetch('ivy_articles?select=*,ivy_categories(name)&order=created_at.desc')
+  .then(function(r){return r.json();})
+  .then(function(arts){
+    var el=document.getElementById('artList');
+    if(!arts||!arts.length){el.innerHTML='<div class="empty-state">No articles yet.</div>';return;}
+    el.innerHTML=arts.map(function(a){
+      var cat=a.ivy_categories?a.ivy_categories.name:'';
+      return '<div class="art-list-item">'+
+        '<div class="art-info"><div class="at">'+esc(a.title)+'</div>'+
+        '<div class="am">'+(cat?esc(cat)+' &middot; ':'')+fmtDate(a.created_at)+(a.city?' &middot; '+esc(a.city):'')+
+        '</div></div><div class="art-actions">'+
+        '<span class="badge '+(a.published?'badge-pub':'badge-draft')+'">'+(a.published?'Published':'Draft')+'</span>'+
+        '<button class="btn btn-outline btn-sm" onclick="editArt('+a.id+')">Edit</button>'+
+        '<button class="btn btn-sm" style="background:#fee2e2;color:#991b1b" onclick="deleteArt('+a.id+')">Delete</button>'+
+        '</div></div>';
+    }).join('');
+  });
+}
 
 function editArt(id){
-  const a=arts.find(x=>x.id===id);if(!a)return;
-  ['edId','edTitleInput','edSlug','edSynopsis','edCover','edMetaT','edMetaD','edStoreName','edStorePhone','edStoreAddress','edStoreHours','edAiPrompt'].forEach(k=>document.getElementById(k).value=a[k.replace('ed','').replace(/([A-Z])/g,c=>'_'+c.toLowerCase()).replace('_id','id').replace('_title_input','title').replace('_slug','slug').replace('_synopsis','synopsis').replace('_cover','cover_image').replace('_meta_t','meta_title').replace('_meta_d','meta_description').replace('_store_name','store_name').replace('_store_phone','store_phone').replace('_store_address','store_address').replace('_store_hours','store_hours').replace('_ai_prompt','ai_cover_prompt')]||'');
-  document.getElementById('edId').value=a.id;
-  document.getElementById('edTitleInput').value=a.title||'';
-  document.getElementById('edSlug').value=a.slug||'';
-  document.getElementById('edCat').value=a.category_id||'';
-  document.getElementById('edCity').value=a.city||'';
-  document.getElementById('edSynopsis').value=a.synopsis||'';
-  document.getElementById('edCover').value=a.cover_image||'';
-  document.getElementById('edMetaT').value=a.meta_title||'';
-  document.getElementById('edMetaD').value=a.meta_description||'';
-  document.getElementById('edStoreName').value=a.store_name||'';
-  document.getElementById('edStorePhone').value=a.store_phone||'';
-  document.getElementById('edStoreAddress').value=a.store_address||'';
-  document.getElementById('edStoreHours').value=a.store_hours||'';
-  document.getElementById('edAiPrompt').value=a.ai_cover_prompt||'';
-  document.getElementById('edPub').checked=!!a.published;
-  setTags(a.keywords||'');
-  if(quill)quill.root.innerHTML=a.content||'';
-  if(a.cover_image){document.getElementById('coverPreview').src=a.cover_image;document.getElementById('coverPreviewWrap').style.display='flex';}
-  document.getElementById('edTitle').textContent='✏️ 編輯文章';
-  showPanel('new',document.querySelector('.sb-menu li:nth-child(3) a'));window.scrollTo(0,0);
+  sbFetch('ivy_articles?id=eq.'+id).then(function(r){return r.json();}).then(function(data){
+    if(!data||!data[0])return;
+    var a=data[0];editingId=id;
+    document.getElementById('artTitle').value=a.title||'';
+    document.getElementById('artSynopsis').value=a.synopsis||'';
+    document.getElementById('artCat').value=a.category_id||'';
+    document.getElementById('citySelect').value=a.city||'';
+    document.getElementById('storeName').value=a.store_name||'';
+    document.getElementById('storePhone').value=a.store_phone||'';
+    document.getElementById('storeAddress').value=a.store_address||'';
+    document.getElementById('storeHours').value=a.store_hours||'';
+    document.getElementById('aiPrompt').value=a.ai_cover_prompt||'';
+    keywords=a.keywords?a.keywords.split(',').filter(Boolean):[];
+    renderKwChips();
+    if(a.cover_image){coverUrl=a.cover_image;document.getElementById('coverPreview').innerHTML='<img src="'+esc(coverUrl)+'" alt="cover">';}
+    if(quill)quill.root.innerHTML=a.content||'';
+    showSection('new');
+    document.getElementById('topbarTitle').textContent='Edit Article';
+  });
 }
 
-function resetForm(){
-  document.getElementById('edId').value='';
-  ['edTitleInput','edSlug','edSynopsis','edCover','edMetaT','edMetaD','edStoreName','edStorePhone','edStoreAddress','edStoreHours','edAiPrompt'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('edCat').value='';document.getElementById('edCity').value='';
-  document.getElementById('edPub').checked=true;setTags('');
-  if(quill)quill.setText('');
-  document.getElementById('coverPreviewWrap').style.display='none';
-  document.getElementById('edTitle').textContent='✏️ 新增文章';
-  showPanel('articles',document.querySelector('.sb-menu li:nth-child(2) a'));
+function deleteArt(id){
+  if(!confirm('Delete this article?'))return;
+  sbFetch('ivy_articles?id=eq.'+id,{method:'DELETE'}).then(function(){showToast('Deleted','success');loadArtList();});
 }
 
-async function saveArt(){
-  const id=document.getElementById('edId').value;
-  const title=document.getElementById('edTitleInput').value.trim();
-  const slug=document.getElementById('edSlug').value.trim().replace(/[^a-zA-Z0-9一-鿿-_]/g,'');
-  if(!title){toast('請填寫文章標題',1);return;}
-  if(!slug){toast('請填寫 Slug（網址）',1);return;}
-  if(quill)document.getElementById('edContent').value=quill.root.innerHTML;
-  const data={title,slug,synopsis:document.getElementById('edSynopsis').value.trim()||null,content:document.getElementById('edContent').value.trim()||null,category_id:document.getElementById('edCat').value||null,cover_image:document.getElementById('edCover').value.trim()||null,meta_title:document.getElementById('edMetaT').value.trim()||null,meta_description:document.getElementById('edMetaD').value.trim()||null,published:document.getElementById('edPub').checked,city:document.getElementById('edCity').value||null,keywords:document.getElementById('edKeywords').value||null,store_name:document.getElementById('edStoreName').value.trim()||null,store_phone:document.getElementById('edStorePhone').value.trim()||null,store_address:document.getElementById('edStoreAddress').value.trim()||null,store_hours:document.getElementById('edStoreHours').value.trim()||null,ai_cover_prompt:document.getElementById('edAiPrompt').value.trim()||null,updated_at:new Date().toISOString()};
-  try{
-    if(id){await sb('ivy_articles?id=eq.'+id,{method:'PATCH',body:JSON.stringify(data)});toast('✅ 文章已更新！');}
-    else{await sb('ivy_articles',{method:'POST',body:JSON.stringify(data)});toast('✅ 文章已新增！');}
-    await loadAll();resetForm();
-  }catch(e){toast('儲存失敗：'+e.message,1);}
+function showToast(msg,type){
+  var t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast show'+(type?' '+type:'');
+  clearTimeout(window._tt);
+  window._tt=setTimeout(function(){t.className='toast';},3000);
 }
 
-async function uploadIvyCover(e){
-  const file=e.target.files?.[0];if(!file)return;
-  const status=document.getElementById('coverUploadStatus'),preview=document.getElementById('coverPreview'),wrap=document.getElementById('coverPreviewWrap');
-  preview.src=URL.createObjectURL(file);wrap.style.display='flex';
-  status.textContent='⏳ 上傳中...';status.style.color='#888';
-  const ext=file.name.split('.').pop()||'jpg';
-  const fname='cover-'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;
-  try{
-    const r=await fetch(SB+'/storage/v1/object/ivy-images/'+fname,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':file.type},body:file});
-    if(!r.ok){const t=await r.text();throw new Error(t);}
-    const url=SB+'/storage/v1/object/public/ivy-images/'+fname;
-    document.getElementById('edCover').value=url;
-    status.textContent='✅ 上傳成功';status.style.color='#4caf50';
-  }catch(err){status.textContent='❌ '+err.message.substring(0,40);status.style.color='#f44336';}
-  e.target.value='';
-}
-
-async function generateAICover(){
-  const title=document.getElementById('edTitleInput').value.trim();
-  const synopsis=document.getElementById('edSynopsis').value.trim();
-  const customPrompt=document.getElementById('edAiPrompt').value.trim();
-  const city=document.getElementById('edCity').value;
-  const catId=document.getElementById('edCat').value;
-  const catName=catId?(cats.find(c=>String(c.id)===catId)?.name||''):'';
-  if(!title&&!customPrompt){toast('請先填寫文章標題再生成封面',1);return;}
-  const btn=document.getElementById('aiCoverBtn'),gen=document.getElementById('aiGen');
-  btn.disabled=true;gen.style.display='flex';toast('✨ AI 正在生成封面圖，請稍候…');
-  const prompt=customPrompt||title+(city?' '+city:'')+(catName?' '+catName:'')+(synopsis?' '+synopsis.substring(0,60):'');
-  try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,messages:[{role:'user',content:'請為以下文章生成精美封面圖 SVG（1200x630px）。
-標題：'+title+'
-分類：'+(catName||'生活風格')+'
-縣市：'+(city||'台灣')+'
-提示：'+prompt+'
-要求：1.輸出純SVG代碼以<svg開頭</svg結尾 2.viewBox="0 0 1200 630" 3.玫瑰粉/珊瑚/金色系漸層背景 4.中央顯示文章標題中文字體48-56px白色 5.右下角分類名稱 6.左下角IvyLife品牌名稱 7.加入適合主題的裝飾性幾何或花卉圖案 8.只輸出SVG代碼不要說明'}]})});
-    if(!resp.ok)throw new Error('API 請求失敗：'+resp.status);
-    const data=await resp.json();
-    const text=data.content?.[0]?.text||'';
-    const svgMatch=text.match(/<svg[sS]*?</svg>/i);
-    if(!svgMatch)throw new Error('未能取得 SVG 內容');
-    const svgCode=svgMatch[0];
-    const blob=new Blob([svgCode],{type:'image/svg+xml'});
-    const fname='ai-cover-'+Date.now()+'.svg';
-    const uploadResp=await fetch(SB+'/storage/v1/object/ivy-images/'+fname,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'image/svg+xml'},body:blob});
-    if(!uploadResp.ok){const t=await uploadResp.text();throw new Error(t);}
-    const url=SB+'/storage/v1/object/public/ivy-images/'+fname;
-    document.getElementById('edCover').value=url;
-    const preview=document.getElementById('coverPreview'),wrap=document.getElementById('coverPreviewWrap'),status=document.getElementById('coverUploadStatus');
-    preview.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svgCode);
-    wrap.style.display='flex';status.textContent='✅ AI 封面已生成';status.style.color='#4caf50';
-    toast('✅ AI 封面生成完成！');
-  }catch(err){toast('AI 生成失敗：'+err.message.substring(0,60),1);console.error(err);}
-  finally{btn.disabled=false;gen.style.display='none';}
-}
-
-async function togglePub(id,cur){
-  try{await sb('ivy_articles?id=eq.'+id,{method:'PATCH',body:JSON.stringify({published:!cur})});toast(cur?'文章已下架':'✅ 文章已發布！');await loadAll();}
-  catch(e){toast('操作失敗：'+e.message,1);}
-}
-
-async function delArt(id,title){
-  if(!confirm('確定刪除「'+title+'…」？此動作無法還原。'))return;
-  try{await sb('ivy_articles?id=eq.'+id,{method:'DELETE'});toast('文章已刪除');await loadAll();}
-  catch(e){toast('刪除失敗：'+e.message,1);}
-}
-
-function showPanel(name,el){
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.sb-menu a').forEach(a=>a.classList.remove('active'));
-  document.getElementById('panel-'+name).classList.add('active');
-  if(el)el.classList.add('active');
-}
-
-function toast(msg,isErr){
-  const t=document.getElementById('toast');t.textContent=msg;t.style.background=isErr?'#e74c3c':'#2d2020';
-  t.classList.add('show');clearTimeout(window._tt);window._tt=setTimeout(()=>t.classList.remove('show'),3000);
-}
-function badge(pub){return pub?'<span class="badge badge-green">已發布</span>':'<span class="badge badge-gray">草稿</span>';}
-function fmtDate(s){return s?new Date(s).toLocaleDateString('zh-TW'):'-';}
-function esc(s){return s?s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
+function fmtDate(s){return s?new Date(s).toLocaleDateString('zh-TW'):''}
+function esc(s){if(!s)return '';return s.split('&').join('&amp;').split('<').join('&lt;').split('>').join('&gt;');}
 </script>
 </body>
 </html>
