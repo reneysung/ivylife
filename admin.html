@@ -270,7 +270,6 @@ function doLogin(){
     document.getElementById('loginPage').style.display='none';
     document.getElementById('adminPage').style.display='grid';
     initQuill();loadArtList();
-    document.getElementById('kwInput').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();addKw();}});
   } else {
     document.getElementById('pwInput').style.borderColor='red';
     setTimeout(function(){document.getElementById('pwInput').style.borderColor='';},1000);
@@ -285,6 +284,7 @@ function doLogout(){
 
 function initQuill(){
   if(quill)return;
+  var kw=document.getElementById('kwInput');if(kw)kw.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();addKw();}});
   quill=new Quill('#quillEditor',{
     theme:'snow',
     placeholder:'Write article content here...',
