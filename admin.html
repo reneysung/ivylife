@@ -258,7 +258,7 @@ const KEY='sb_publishable_L2DOfeM0cAJqwlVCr1LwtA_jE9MBNDn';
 const PASS='ivy2024admin';
 let arts=[],cats=[],quill;
 
-function initQuill(){if(quill)return;quill=new Quill('#quillEditor',{theme:'snow',placeholder:'在此輸入文章內文，支援標題、粗體、清單、連結等…',modules:{toolbar:[[{header:[2,3,false]}],['bold','italic','underline','strike'],[{color:[]},{background:[]}],[{list:'ordered'},{list:'bullet'}],['blockquote','code-block'],['link','image'],['clean']]}});}
+function initQuill(){if(quill)return;quill=new Quill('#quillEditor',{theme:'snow',placeholder:'Write article content here...',modules:{toolbar:[[{header:[2,3,false]}],['bold','italic','underline','strike'],[{color:[]},{background:[]}],[{list:'ordered'},{list:'bullet'}],['blockquote','code-block'],['link','image'],['clean']]}});}
 
 function doLogin(){
   if(document.getElementById('pwInput').value===PASS){
