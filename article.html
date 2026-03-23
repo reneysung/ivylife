@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title id="pgTitle">IvyLife è¾èçæ´»</title>
-<meta name="description" id="pgDesc" content="IvyLife è¾èçæ´»">
-<meta name="keywords" id="pgKw" content="IvyLife,è¾èçæ´»">
+<title id="pgTitle">IvyLife 艾薇生活</title>
+<meta name="description" id="pgDesc" content="IvyLife 艾薇生活">
+<meta name="keywords" id="pgKw" content="IvyLife,艾薇生活">
 <meta name="robots" content="index, follow">
 <link rel="canonical" id="pgCanon" href="">
 <meta property="og:type" content="article">
@@ -13,7 +13,7 @@
 <meta property="og:description" id="ogD" content="">
 <meta property="og:image" id="ogI" content="">
 <meta property="og:url" id="ogU" content="">
-<meta property="og:site_name" content="IvyLife è¾èçæ´»">
+<meta property="og:site_name" content="IvyLife 艾薇生活">
 <meta name="twitter:card" content="summary_large_image">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -109,7 +109,7 @@ footer a{color:var(--rose-light);text-decoration:none}
 <div class="art-wrap">
   <div id="artBody"><div class="loading"></div></div>
 </div>
-<footer><a href="/">IvyLife è¾èçæ´»</a> Â· è¬è¬é±è®</footer>
+<footer><a href="/">IvyLife 艾薇生活</a> · 謝謝閱讀</footer>
 <script>
 const SB='https://zsebcpfblecwumbaxeaz.supabase.co';
 const KEY='sb_publishable_L2DOfeM0cAJqwlVCr1LwtA_jE9MBNDn';
@@ -124,9 +124,9 @@ async function loadArticle(){
   const a=arts?.[0];
   if(!a||!a.published){notFound();return;}
   const mt=a.meta_title||a.title,md=a.meta_description||a.synopsis||'';
-  const kw=[a.keywords,a.city,a.ivy_categories?.name,'IvyLife','è¾èçæ´»'].filter(Boolean).join(',');
+  const kw=[a.keywords,a.city,a.ivy_categories?.name,'IvyLife','艾薇生活'].filter(Boolean).join(',');
   const url=location.href;
-  document.title=mt+' - IvyLife è¾èçæ´»';
+  document.title=mt+' - IvyLife 艾薇生活';
   document.getElementById('pgTitle').textContent=document.title;
   document.getElementById('pgDesc').content=md;
   document.getElementById('pgKw').content=kw;
@@ -139,23 +139,23 @@ async function loadArticle(){
     '@context':'https://schema.org','@type':'Article',
     headline:a.title,description:md,image:a.cover_image||'',
     datePublished:a.created_at,dateModified:a.updated_at||a.created_at,
-    author:{'@type':'Person',name:'è¾è'},
-    publisher:{'@type':'Organization',name:'IvyLife è¾èçæ´»',logo:{'@type':'ImageObject',url:'https://glowing-pixie-fc3fe2.netlify.app/logo.svg'}},
+    author:{'@type':'Person',name:'艾薇'},
+    publisher:{'@type':'Organization',name:'IvyLife 艾薇生活',logo:{'@type':'ImageObject',url:'https://glowing-pixie-fc3fe2.netlify.app/logo.svg'}},
     mainEntityOfPage:{'@type':'WebPage','@id':url}
   };
   if(a.store_name)ld.mentions={'@type':'LocalBusiness',name:a.store_name,address:a.store_address||'',telephone:a.store_phone||'',openingHours:a.store_hours||''};
   const s=document.createElement('script');s.type='application/ld+json';s.textContent=JSON.stringify(ld);document.head.appendChild(s);
-  document.getElementById('coverSection').innerHTML='<div class="cover-wrap">'+(a.cover_image?'<img class="cover-img" src="'+esc(a.cover_image)+'" alt="'+esc(a.title)+'" loading="eager">':'<div class="cover-ph">'+(a.ivy_categories?.icon||'ð')+'</div>')+'</div>';
+  document.getElementById('coverSection').innerHTML='<div class="cover-wrap">'+(a.cover_image?'<img class="cover-img" src="'+esc(a.cover_image)+'" alt="'+esc(a.title)+'" loading="eager">':'<div class="cover-ph">'+(a.ivy_categories?.icon||'📝')+'</div>')+'</div>';
   const hasStore=a.store_name||a.store_address||a.store_phone||a.store_hours;
-  const storeCard=hasStore?'<div class="store-card" itemscope itemtype="https://schema.org/LocalBusiness"><div class="store-hdr"><span style="font-size:1.2rem">ðª</span><h2>'+esc(a.store_name||'åºå®¶è³è¨')+'</h2></div><div class="store-body">'+(a.store_name?'<div class="store-item full"><span class="store-icon">ð·ï¸</span><div><div class="store-label">åºå®¶åç¨±</div><div class="store-val" itemprop="name"><strong>'+esc(a.store_name)+'</strong></div></div></div>':'')+(a.store_address?'<div class="store-item"><span class="store-icon">ð</span><div><div class="store-label">å°å</div><div class="store-val" itemprop="address">'+esc(a.store_address)+'<br><a class="map-btn" href="https://www.google.com/maps/search/'+encodeURIComponent(a.store_address)+'" target="_blank" rel="noopener">ðºï¸ Google Maps</a></div></div></div>':'')+(a.store_phone?'<div class="store-item"><span class="store-icon">ð</span><div><div class="store-label">é»è©±</div><div class="store-val" itemprop="telephone"><a href="tel:'+esc(a.store_phone)+'">'+esc(a.store_phone)+'</a></div></div></div>':'')+(a.store_hours?'<div class="store-item"><span class="store-icon">ð</span><div><div class="store-label">çæ¥­æé</div><div class="store-val" itemprop="openingHours">'+esc(a.store_hours)+'</div></div></div>':'')+'</div></div>':'';
+  const storeCard=hasStore?'<div class="store-card" itemscope itemtype="https://schema.org/LocalBusiness"><div class="store-hdr"><span style="font-size:1.2rem">🏪</span><h2>'+esc(a.store_name||'店家資訊')+'</h2></div><div class="store-body">'+(a.store_name?'<div class="store-item full"><span class="store-icon">🏷️</span><div><div class="store-label">店家名稱</div><div class="store-val" itemprop="name"><strong>'+esc(a.store_name)+'</strong></div></div></div>':'')+(a.store_address?'<div class="store-item"><span class="store-icon">📍</span><div><div class="store-label">地址</div><div class="store-val" itemprop="address">'+esc(a.store_address)+'<br><a class="map-btn" href="https://www.google.com/maps/search/'+encodeURIComponent(a.store_address)+'" target="_blank" rel="noopener">🗺️ Google Maps</a></div></div></div>':'')+(a.store_phone?'<div class="store-item"><span class="store-icon">📞</span><div><div class="store-label">電話</div><div class="store-val" itemprop="telephone"><a href="tel:'+esc(a.store_phone)+'">'+esc(a.store_phone)+'</a></div></div></div>':'')+(a.store_hours?'<div class="store-item"><span class="store-icon">🕐</span><div><div class="store-label">營業時間</div><div class="store-val" itemprop="openingHours">'+esc(a.store_hours)+'</div></div></div>':'')+'</div></div>':'';
   const tags=a.keywords?a.keywords.split(',').filter(Boolean):[];
-  const kwHtml=tags.length?'<div class="art-kw"><h3>ð·ï¸ æ¨ç±¤</h3><div class="tags-wrap">'+tags.map(t=>'<a href="/?kw='+encodeURIComponent(t.trim())+'" class="tag">'+esc(t.trim())+'</a>').join('')+'</div></div>':'';
+  const kwHtml=tags.length?'<div class="art-kw"><h3>🏷️ 標籤</h3><div class="tags-wrap">'+tags.map(t=>'<a href="/?kw='+encodeURIComponent(t.trim())+'" class="tag">'+esc(t.trim())+'</a>').join('')+'</div></div>':'';
   const rel=await sbGet('ivy_articles?select=*,ivy_categories(name,slug,icon)&category_id=eq.'+a.category_id+'&slug=neq.'+slug+'&published=eq.true&limit=4&order=created_at.desc');
-  const relHtml=rel.length?'<div class="related"><h2>ð ç¸éæç« </h2><div class="related-grid">'+rel.slice(0,4).map(r=>'<a href="/article/'+r.slug+'" class="related-card"><div class="related-thumb">'+(r.cover_image?'<img src="'+esc(r.cover_image)+'" alt="'+esc(r.title)+'" loading="lazy">':'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:1.5rem">'+(r.ivy_categories?.icon||'ð')+'</div>')+'</div><div><div class="related-cat">'+(r.ivy_categories?.name||'')+'</div><div class="related-title">'+esc(r.title)+'</div></div></a>').join('')+'</div></div>':'';
-  const shareHtml='<div class="share-bar"><span class="share-label">åäº«ï¼</span><a class="share-btn" href="https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url)+'" target="_blank" rel="noopener">ð Facebook</a><a class="share-btn" href="https://line.me/R/msg/text/?'+encodeURIComponent(a.title+' '+url)+'" target="_blank" rel="noopener">ð¬ LINE</a><button class="share-btn" onclick="navigator.clipboard.writeText(location.href).then(()=>alert('é£çµå·²è¤è£½ï¼'))">ð è¤è£½é£çµ</button></div>';
-  document.getElementById('artBody').innerHTML='<a href="'+(a.ivy_categories?'/category?cat='+a.ivy_categories.slug:'/')+'" class="back-link">â '+(a.ivy_categories?.name||'è¿å')+'</a><div class="art-meta">'+(a.ivy_categories?'<a href="/category?cat='+a.ivy_categories.slug+'" class="cat-badge">'+a.ivy_categories.name+'</a>':'')+(a.city?'<span class="city-badge">ð '+esc(a.city)+'</span>':'')+'<span class="art-date">ðï¸ '+fmtDate(a.created_at)+'</span></div><h1 class="art-title">'+esc(a.title)+'</h1>'+(a.synopsis?'<div class="art-synopsis">'+esc(a.synopsis)+'</div>':'')+'<div class="art-content">'+(a.content||'')+'</div>'+storeCard+kwHtml+shareHtml+relHtml;
+  const relHtml=rel.length?'<div class="related"><h2>🔗 相關文章</h2><div class="related-grid">'+rel.slice(0,4).map(r=>'<a href="/article/'+r.slug+'" class="related-card"><div class="related-thumb">'+(r.cover_image?'<img src="'+esc(r.cover_image)+'" alt="'+esc(r.title)+'" loading="lazy">':'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:1.5rem">'+(r.ivy_categories?.icon||'📝')+'</div>')+'</div><div><div class="related-cat">'+(r.ivy_categories?.name||'')+'</div><div class="related-title">'+esc(r.title)+'</div></div></a>').join('')+'</div></div>':'';
+  const shareHtml='<div class="share-bar"><span class="share-label">分享：</span><a class="share-btn" href="https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url)+'" target="_blank" rel="noopener">📘 Facebook</a><a class="share-btn" href="https://line.me/R/msg/text/?'+encodeURIComponent(a.title+' '+url)+'" target="_blank" rel="noopener">💬 LINE</a><button class="share-btn" onclick="navigator.clipboard.writeText(location.href).then(()=>alert('\u9023\u7d50\u5df2\u8907\u88fd\uff01'))">🔗 複製連結</button></div>';
+  document.getElementById('artBody').innerHTML='<a href="'+(a.ivy_categories?'/category?cat='+a.ivy_categories.slug:'/')+'" class="back-link">← '+(a.ivy_categories?.name||'返回')+'</a><div class="art-meta">'+(a.ivy_categories?'<a href="/category?cat='+a.ivy_categories.slug+'" class="cat-badge">'+a.ivy_categories.name+'</a>':'')+(a.city?'<span class="city-badge">📍 '+esc(a.city)+'</span>':'')+'<span class="art-date">🗓️ '+fmtDate(a.created_at)+'</span></div><h1 class="art-title">'+esc(a.title)+'</h1>'+(a.synopsis?'<div class="art-synopsis">'+esc(a.synopsis)+'</div>':'')+'<div class="art-content">'+(a.content||'')+'</div>'+storeCard+kwHtml+shareHtml+relHtml;
 }
-function notFound(){document.getElementById('artBody').innerHTML='<div class="not-found"><h2>ð æ¾ä¸å°æç« </h2><p>éç¯æç« ä¸å­å¨æå·²è¢«ç§»é¤</p><br><a href="/" style="color:var(--rose)">â åé¦é </a></div>';}
+function notFound(){document.getElementById('artBody').innerHTML='<div class="not-found"><h2>😕 找不到文章</h2><p>這篇文章不存在或已被移除</p><br><a href="/" style="color:var(--rose)">← 回首頁</a></div>';}
 loadArticle();
 </script>
 </body>
