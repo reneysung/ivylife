@@ -290,7 +290,7 @@ async function uploadCover(e){
   const ext=file.name.split('.').pop()||'jpg';
   const fn='cover-'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;
   try{
-    const r=await fetch(SB+'/storage/v1/object/ivy-images/'+fn,{method:'POST',headers:{'apikey':K,'Authorization':'Bearer '+K,'Content-Type':file.type},body:file});
+    const r=await fetch(SB+'/storage/v1/object/ivy-images/'+fn,{method:'POST',headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZWJjcGZibGVjd3VtYmF4ZWF6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc5NTMyNywiZXhwIjoyMDg5MzcxMzI3fQ.g0rsqNO6cItp8Qw3ybveVwX2afjTSWtS7WFHL_320jQ','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZWJjcGZibGVjd3VtYmF4ZWF6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc5NTMyNywiZXhwIjoyMDg5MzcxMzI3fQ.g0rsqNO6cItp8Qw3ybveVwX2afjTSWtS7WFHL_320jQ','Content-Type':file.type},body:file});
     if(!r.ok){const t=await r.text();throw new Error(t);}
     const ec=document.getElementById('ecov');if(ec)ec.value=SB+'/storage/v1/object/public/ivy-images/'+fn;
     if(cs){cs.textContent='✅ 上傳成功';cs.style.color='#4caf50';}
