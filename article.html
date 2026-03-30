@@ -78,7 +78,7 @@ h1.art-title{font-size:clamp(1.5rem,4vw,2rem);font-weight:700;line-height:1.35;m
 .related-cat{font-size:0.72rem;color:var(--rose);margin-bottom:0.2rem}
 .related-title{font-size:0.85rem;font-weight:500;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .share-bar{margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;align-items:center;gap:0.8rem;flex-wrap:wrap}
-.share-label{font-size:0.82rem;color:var(--gray)}
+.share-label{font-size:0.82rem;color:var(--gra
 .share-btn{display:inline-flex;align-items:center;gap:0.4rem;padding:6px 14px;border-radius:50px;font-size:0.82rem;cursor:pointer;border:1.5px solid var(--border);background:white;color:var(--dark);text-decoration:none;transition:all 0.2s;font-family:inherit}
 .share-btn:hover{background:var(--rose-pale);border-color:var(--rose-light);color:var(--rose)}
 .loading{height:380px;background:linear-gradient(90deg,#f0e8ea 25%,#f8f4f5 50%,#f0e8ea 75%);background-size:200% 100%;animation:sh 1.5s infinite;border-radius:12px;margin-bottom:2rem}
@@ -116,8 +116,7 @@ const KEY='sb_publishable_L2DOfeM0cAJqwlVCr1LwtA_jE9MBNDn';
 async function sbGet(p){const r=await fetch(SB+'/rest/v1/'+p,{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}});return r.json();}
 function esc(s){return s?s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
 function fmtDate(s){return s?new Date(s).toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric'}):'';}
-const slug=(new URLSearchParams(location.search)).get('slug')||location.pathname.split('/article/')[1]?.replace(/\/$/,'');
-async function loadArticle(){
+const slug=(new URLSearchParams(location.search)).get('slug')||decodeURIComponent(location.pathname.split('/article/')[1]?.replace(/\/$/,'')||'');async function loadArticle(){
   if(!slug){notFound();return;}
   const[cats,arts]=await Promise.all([sbGet('ivy_categories?order=sort_order.asc'),sbGet('ivy_articles?slug=eq.'+encodeURIComponent(slug)+'&select=*,ivy_categories(name,slug,icon)')]);
   document.getElementById('navCats').innerHTML=cats.slice(0,5).map(c=>'<li><a href="/category?cat='+c.slug+'">'+(c.icon||'')+' '+c.name+'</a></li>').join('');
