@@ -118,7 +118,7 @@ function esc(s){return s?s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>
 function fmtDate(s){return s?new Date(s).toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric'}):'';}
 const slug=(new URLSearchParams(location.search)).get('slug')||decodeURIComponent(location.pathname.split('/article/')[1]?.replace(/\/$/,'')||'');async function loadArticle(){
   if(!slug){notFound();return;}
-  const[cats,arts]=await Promise.all([sbGet('ivy_categories?order=sort_order.asc'),sbGet('ivy_articles?slug=eq.'+encodeURIComponent(slug)+'&select=*,ivy_categories(name,slug,icon)')]);
+  const[cats,arts]=await Promise.all([sbGet('ivy_categories?order=sort_order.asc'),sbGet('ivy_articles?'+(_isId?'id=eq.'+slug:'slug=eq.'+encodeURIComponent(slug))+'&select=*,ivy_categories(name,slug,icon)')]);
   document.getElementById('navCats').innerHTML=cats.slice(0,5).map(c=>'<li><a href="/category?cat='+c.slug+'">'+(c.icon||'')+' '+c.name+'</a></li>').join('');
   const a=arts?.[0];
   if(!a||!a.published){notFound();return;}
