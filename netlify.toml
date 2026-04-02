@@ -11,6 +11,12 @@
   force = false
 
 [[redirects]]
+  from = "/admin.html"
+  to = "/admin.html"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/:slug.html"
   to = "/article.html?slug=:slug"
   status = 200
