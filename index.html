@@ -8,11 +8,11 @@
 <meta name="keywords" content="IvyLife,艾薇生活,台灣美食,台南美食,台北美食,飯店推薦,醫美,生活風格">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://glowing-pixie-fc3fe2.netlify.app/">
-<meta property="og:type" content="website">
+<meta property="og:type" content="website"
 <meta property="og:title" content="IvyLife 艾薇生活 - 美食旅遊生活風格分享">
 <meta property="og:description" content="分享台灣各地美食、旅遊、居家、美容等生活風格內容。">
 <meta property="og:url" content="https://glowing-pixie-fc3fe2.netlify.app/">
-<meta property="og:site_name" content="IvyLife 艾薇生活">
+<meta property="og:site_name" content="IvyLife艾薇生活">
 <meta property="og:locale" content="zh_TW">
 <meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"IvyLife 艾薇生活","url":"https://glowing-pixie-fc3fe2.netlify.app/","description":"分享台灣各地美食餐廳、飯店民宿、醫學美容、居家設計等生活風格內容"}</script>
@@ -132,11 +132,10 @@ footer{background:var(--dark);color:rgba(255,255,255,0.7);padding:3rem 2rem 2rem
   </div>
 </nav>
 <section class="hero">
-  <div class="hero-eyebrow">✦ <span>艾薇</span>の生活日記 ✦</div>
+  <div class="hero-eyebrow">✦ <span>艾薇</span>の生活日記 ✦</div
   <h1>用心感受<em>每一刻</em><br>美好的生活體驗</h1>
   <p>從美食餐廳到居家美學，艾薇帶你探索台灣最值得珍藏的每個瞬間。</p>
-  <div class="hero-btns">
-    <a href="#latest" class="btn-hero btn-primary">探索最新文章</a>
+  <div class="hero-btns">    <a href="#latest" class="btn-hero btn-primary">探索最新文章</a>
     <a href="/about.html" class="btn-hero btn-outline">認識艾薇</a>
   </div>
 </section>
@@ -227,7 +226,7 @@ function applyFilter(){
   var list=allArts;
   if(curCat)list=list.filter(function(a){return String(a.category_id)===curCat;});
   if(curCity)list=list.filter(function(a){return a.city===curCity;});
-  if(q)list=list.filter(function(a){return a.title.toLowerCase().indexOf(q)>-1||(a.synopsis||"").toLowerCase().indexOf(q)>-1||(a.keywords||"").toLowerCase().indexOf(q)>-1||(a.city||"").indexOf(q)>-1;});
+  if(q)list=list.filter(function(a){return a.title.toLowerCase().indexOf(q)>-1||(stripHtml(a.synopsis||"")).toLowerCase().indexOf(q)>-1||(a.keywords||"").toLowerCase().indexOf(q)>-1});
   if(curKw)list=list.filter(function(a){return(a.keywords||"").indexOf(curKw)>-1;});
   if(srt==="old")list=list.slice().reverse();
   filtered=list;
@@ -246,7 +245,7 @@ function renderPage(){
     h+="</div><div class=\"art-body\">";
     h+="<div class=\"art-cat\">"+(cat?esc(cat.name):"")+"</div>";
     h+="<div class=\"art-title\">"+esc(a.title)+"</div>";
-    h+=a.synopsis?"<div class=\"art-synopsis\">"+esc(a.synopsis)+"</div>":"";
+    h+=a.synopsis?"<div class=\"art-synopsis\">"+esc(stripHtml(a.synopsis))+"</div>":"";
     h+=tags.length?"<div class=\"art-tags\">"+tags.map(function(t){return"<span class=\"art-tag\">"+esc(t.trim())+"</span>";}).join("")+"</div>":"";
     h+="<div class=\"art-footer\"><span>"+fmtDate(a.created_at)+"</span>"+(a.city?"<span>&#128205;"+esc(a.city)+"</span>":"")+"</div></div></a>";
     return h;
@@ -266,5 +265,6 @@ function goPage(n){curPage=n;renderPage();document.getElementById("latest").scro
 function fmtDate(s){return s?new Date(s).toLocaleDateString("zh-TW"):"";}
 function esc(s){if(!s)return "";return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");}
 init();</script>
+  function stripHtml(h){if(!h)return'';var d=document.createElement('div');d.innerHTML=h;return(d.textContent||d.innerText||'').trim();}
 </body>
 </html>
