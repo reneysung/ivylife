@@ -33,7 +33,7 @@ async function supabaseQuery(table, params) {
 async function getArticleBySlug(slug) {
   const rows = await supabaseQuery('ivy_articles', {
     select: '*,ivy_categories(name,slug)',
-    eq: { slug: slug, published: 'true' }
+    eq: /^\d+$/.test(slug) ? { id: parseInt(slug), published: 'true' } : { slug: slug, published: 'true' }
   });
   return rows[0] || null;
 }
