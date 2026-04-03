@@ -1,4 +1,4 @@
-/article/:slug  /articles/article.html?slug=:slug  200
+/article/:slug  /articles/article?slug=:slug  302
 /ivy-cms  /ivy-cms/index.html  200
 # 舊網址 301 redirect（SEO 保留）
 /shopx.php?id=1  /article/tastyfood01  301
