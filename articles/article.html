@@ -58,8 +58,10 @@
     document.getElementById('navLinks')?.classList.toggle('open');
   });
 async function load(){
+  const params = new URLSearchParams(location.search);
+  const slugFromQuery = params.get('slug');
   const parts = location.pathname.split('/').filter(Boolean);
-  const slug = decodeURIComponent(parts[parts.length-1]);
+  const slug = slugFromQuery || decodeURIComponent(parts[parts.length-1]);
   const wrap = document.getElementById('art-wrap');
   if(!slug){ wrap.innerHTML='<div class="error-state"><h2>找不到文章</h2><p><a href="/">回首頁</a></p></div>'; return; }
   try{
