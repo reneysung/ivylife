@@ -268,49 +268,16 @@ async function editArt(id){
 }
 
 
-function initQuill() {
-    const t = document.getElementById('econtent');
-    if (!t || window.q) return;
-    window.q = new Quill(t, {
-      theme: 'snow',
-      modules: {
-        toolbar: {
-          container: [
-            [{ 'header': [1, 2, 3, false] }],
-            ['bold', 'italic', 'underline', 'strike'],
-            [{ 'color': [] }, { 'background': [] }],
-            [{ 'align': [] }],
-            ['blockquote', 'code-block'],
-            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-            ['link', 'image'],
-            ['clean']
-          ],
-          handlers: {
-            image: function() {
-              const input = document.createElement('input');
-              input.setAttribute('type', 'file');
-              input.setAttribute('accept', 'image/*');
-              input.click();
-              input.onchange = async () => {
-                const file = input.files[0];
-                if (!file) return;
-                const ext = file.name.split('.').pop();
-                const fn = 'article-' + Date.now() + '.' + ext;
-                const { data, error } = await supabase.storage
-                  .from('ivy-images')
-                  .upload(fn, file, { upsert: true });
-                if (error) { alert('圖片上傳失敗：' + error.message); return; }
-                const { data: { publicUrl } } = supabase.storage
-                  .from('ivy-images')
-                  .getPublicUrl(fn);
-                const range = window.q.getSelection(true);
-                window.q.insertEmbed(range.index, 'image', publicUrl);
-              };
-            }
-          }
-        }
-      },
-      placeholder: '在這裡輸入文章內容...'
+function initQuill(){
+  if(document.getElementById('qe')&&!window.q){
+    window.q=new Quill('#qe',{
+      theme:'snow',
+      placeholder:'請輸入文章內容...',
+      modules:{toolbar:[['bold','italic','underline'],['blockquote'],
+        [{'header':1},{'header':2},{'header':3}],
+        [{'list':'ordered'},{'list':'bullet'}],
+        ['link'],['clean']
+      ]}
     });
   }
 }
@@ -399,7 +366,7 @@ async function delCat(id){
   r.ok?toast('已刪除',0):toast('刪除失敗',1);loadCA();
 }
 function editCat(id,name,slug,sort){
-  const n=prompt('分類名稱',name);if(n===null)return;
+  const n=prompt('分類名稱',name);if(n===null)return
   const s=prompt('Slug',slug);if(s===null)return;
   const o=parseInt(prompt('排序',sort))||sort;
   fetch(SB+`/rest/v1/ivy_categories?id=eq.${id}`,{method:'PATCH',headers:{'Content-Type':'application/json',apikey:K,'Authorization':'Bearer '+K},body:JSON.stringify({name:n,slug:s,sort_order:o})}).then(r=>{r.ok?toast('已更新',0):toast('更新失敗',1);loadCA();});
@@ -420,4 +387,3 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 </script>
 </body></html>
- 
