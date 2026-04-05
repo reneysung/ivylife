@@ -277,7 +277,7 @@ async function saveArt(){
   if(!slug){toast('請填寫 Slug',1);return;}
   const data={title,slug,
     synopsis:document.getElementById('esyn')?.value.trim()||null,
-    content:q?q.root.innerHTML:'',
+    content:window.q?window.q.root.innerHTML:'',
     category_id:parseInt(document.getElementById('ecat')?.value)||null,
     cover_image:document.getElementById('ecov')?.value.trim()||null,
     city:document.getElementById('ecity')?.value.trim()||null,
