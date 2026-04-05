@@ -255,7 +255,7 @@ async function editArt(id){
   eid=id;go('na');await loadCatSel();
   try{
     const [a]=await sb('/rest/v1/ivy_articles?id=eq.'+id+'&select=*');
-    const t=document.getElementById('ftt');if(t)t.textContent='✏️ 編輯文章';
+    const t=document.getElementById('ftt');if(t)t.texContent='✏️ 編輯文章';
     const sv=(i,v)=>{const e=document.getElementById(i);if(e)e.value=v||'';};
     sv('eid',a.id);sv('eti',a.title);sv('esl',a.slug);sv('esyn',a.synopsis);
     sv('ecov',a.cover_image);sv('emt',a.meta_title);sv('emd',a.meta_description);
