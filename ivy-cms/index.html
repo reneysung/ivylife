@@ -226,7 +226,7 @@ function row(a){
     +'<td style="font-size:0.78rem;color:#888">'+(a.ivy_categories?.name||'')+'</td>'
     +'<td><span class="bp2 '+(a.published?'pu':'dr')+'">'+(a.published?'已發布':'草稿')+'</span></td>'
     +'<td style="font-size:0.78rem;color:#888">'+new Date(a.created_at).toLocaleDateString('zh-TW')+'</td>'
-    +'<td><button class="btn bo bs" onclick="event.stopPropagation();editArt('+a.id+')">編輯</button> <button style="background:#e74c3c;color:white;border:none;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:0.82rem" onclick="event.stopPropagation();delArt(''+a.id+'')">🗑 刪除</button></td></tr>';
+    +'<td><button class="btn bo bs" onclick="event.stopPropagation();editArt('+a.id+')">編輯</button> <button style="background:#e74c3c;color:white;border:none;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:0.82rem" onclick="event.stopPropagation();delArt('+a.id+')">🗑 刪除</button></td></tr>';
 }
 
 async function loadCatSel(){
