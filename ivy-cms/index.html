@@ -263,12 +263,12 @@ async function editArt(id){
       const ci=document.getElementById('cpi');if(ci)ci.src=a.cover_image;
       const cw=document.getElementById('cpw');if(cw)cw.style.display='flex';
     }
-    setTimeout(function(){if(window.q&&a.content){window.q.clipboard.dangerouslyPasteHTML(a.content);}},200);
+    if(window.q){window.q.setContents([]);if(a.content)window.q.clipboard.dangerouslyPasteHTML(0,a.content);}
   }catch(e){toast('載入失敗：'+e.message,1);}
 }
 
 
-function initQuill(){if(document.getElementById('qe')&&!window.q){window.q=new Quill('#qe',{theme:'snow',placeholder:'在這裡輸入文章內容...',modules:{toolbar:{container:[[{header:[1,2,3,false]}],['bold','italic','underline','strike'],[{color:[]},{background:[]}],[{align:[]}],['blockquote','code-block'],[{list:'ordered'},{list:'bullet'}],['link','image'],['clean']],handlers:{image:function(){const inp=document.createElement('input');inp.setAttribute('type','file');inp.setAttribute('accept','image/*');document.body.appendChild(inp);inp.click();inp.onchange=function(){const file=inp.files[0];document.body.removeChild(inp);if(!file)return;const ext=file.name.split('.').pop();const fn='img-'+Date.now()+'.'+ext;const ts=document.getElementById('ts');if(ts){ts.className='ts sh';ts.textContent='⏳ 圖片上傳中...';}const xhr=new XMLHttpRequest();xhr.open('POST',SB+'/storage/v1/object/ivy-images/'+fn);xhr.setRequestHeader('Authorization','Bearer '+K);xhr.setRequestHeader('Content-Type',file.type);xhr.upload.onprogress=function(e){if(e.lengthComputable&&ts){ts.textContent='⏳ '+Math.round(e.loaded/e.total*100)+'%';}};xhr.onload=function(){if(xhr.status>=200&&xhr.status<300){const url=SB+'/storage/v1/object/public/ivy-images/'+fn;const range=window.q.getSelection(true);window.q.insertEmbed(range?range.index:0,'image',url);if(ts){ts.className='ts sh ok';ts.textContent='圖片插入成功 ✅';setTimeout(function(){ts.className='ts';},2500);}}else{if(ts){ts.className='ts sh';ts.textContent='圖片上傳失敗';}}};xhr.send(file);};}}}}});}}
+function initQuill(){if(document.getElementById('qe')&&!window.q){window.q=new Quill('#qe',{theme:'snow',placeholder:'在這裡輸入文章內容...',modules:{toolbar:{container:[[{header:[1,2,3,false]}],['bold','italic','underline','strike'],[{color:[]},{background:[]}],[{align:[]}],['blockquote','code-block'],[{list:'ordered'},{list:'bullet'}],['link','image'],['clean']],handlers:{image:function(){const inp=document.createElement('input');inp.setAttribute('type','file');inp.setAttribute('accept','image/*');const qfi=document.getElementById('qfi');if(!qfi)return;qfi.value='';qfi.onchange=function(){const file=qfi.files[0];qfi.value='';if(!file)return;const ext=file.name.split('.').pop();const fn='img-'+Date.now()+'.'+ext;const ts=document.getElementById('ts');if(ts){ts.className='ts sh';ts.textContent='⏳ 圖片上傳中...';}const xhr=new XMLHttpRequest();xhr.open('POST',SB+'/storage/v1/object/ivy-images/'+fn);xhr.setRequestHeader('Authorization','Bearer '+K);xhr.setRequestHeader('Content-Type',file.type);xhr.upload.onprogress=function(e){if(e.lengthComputable&&ts){ts.textContent='⏳ '+Math.round(e.loaded/e.total*100)+'%';}};xhr.onload=function(){if(xhr.status>=200&&xhr.status<300){const url=SB+'/storage/v1/object/public/ivy-images/'+fn;const range=window.q.getSelection(true);window.q.insertEmbed(range?range.index:0,'image',url);if(ts){ts.className='ts sh ok';ts.textContent='圖片插入成功 ✅';setTimeout(function(){ts.className='ts';},2500);}}else{if(ts){ts.className='ts sh';ts.textContent='圖片上傳失敗';}}};xhr.send(file);qfi.onchange=null;};qfi.click();}}}}});}}
 async function saveArt(){
   const id=document.getElementById('eid')?.value;
   const title=document.getElementById('eti')?.value.trim();
@@ -374,4 +374,4 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
 });
 </script>
-</body></html>
+<input type="file" id="qfi" accept="image/*" style="position:fixed;opacity:0;width:1px;height:1px;top:-9999px"></body></html>
