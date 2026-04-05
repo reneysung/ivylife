@@ -189,7 +189,7 @@ function logout(){sessionStorage.removeItem('ia');location.reload();}
 async function sb(path,opts={}){
   const r=await fetch(SB+path,{...opts,headers:{'apikey':K,'Authorization':'Bearer '+K,'Content-Type':'application/json',...(opts.headers||{})}});
   if(!r.ok){const e=await r.text();throw new Error(e);}
-  return r.status===204?null:r.json();
+  return (r.status===204||r.status===201)?null:r.json();
 }
 
 function go(p){
@@ -268,7 +268,7 @@ async function editArt(id){
 }
 
 
-function initQuill(){if(document.getElementById('qe')&&!window.q){window.q=new Quill('#qe',{theme:'snow',placeholder:'在這裡輸入文章內容...',modules:{toolbar:{container:[[{header:[1,2,3,false]}],['bold','italic','underline','strike'],[{color:[]},{background:[]}],[{align:[]}],['blockquote','code-block'],[{list:'ordered'},{list:'bullet'}],['link','image'],['clean']],handlers:{image:function(){const inp=document.createElement('input');inp.setAttribute('type','file');inp.setAttribute('accept','image/*');inp.click();inp.onchange=function(){const file=inp.files[0];if(!file)return;const ext=file.name.split('.').pop();const fn='img-'+Date.now()+'.'+ext;supabase.storage.from('ivy-images').upload(fn,file,{upsert:true}).then(function(res){if(res.error){toast('圖片上傳失敗',0);return;}const url=supabase.storage.from('ivy-images').getPublicUrl(fn).data.publicUrl;const range=window.q.getSelection(true);window.q.insertEmbed(range.index,'image',url);});};}}}}});}}
+function initQuill(){if(document.getElementById('qe')&&!window.q){window.q=new Quill('#qe',{theme:'snow',placeholder:'在這裡輸入文章內容...',modules:{toolbar:{container:[[{header:[1,2,3,false]}],['bold','italic','underline','strike'],[{color:[]},{background:[]}],[{align:[]}],['blockquote','code-block'],[{list:'ordered'},{list:'bullet'}],['link','image'],['clean']],handlers:{image:function(){const inp=document.createElement('input');inp.setAttribute('type','file');inp.setAttribute('accept','image/*');inp.click();inp.onchange=function(){const file=inp.files[0];if(!file)return;const ext=file.name.split('.').pop();const fn='img-'+Date.now()+'.'+ext;fetch(SB+'/storage/v1/object/ivy-images/'+fn,{method:'POST',headers:{Authorization:'Bearer '+K,'Content-Type':file.type},body:file}).then(function(res){if(!res.ok){toast('圖片上傳失敗',0);return;}const url=SB+'/storage/v1/object/public/ivy-images/'+fn;const range=window.q.getSelection(true);window.q.insertEmbed(range.index,'image',url);});};}}}}});}}
 async function saveArt(){
   const id=document.getElementById('eid')?.value;
   const title=document.getElementById('eti')?.value.trim();
