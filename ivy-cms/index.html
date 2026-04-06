@@ -238,6 +238,383 @@ async function loadCatSel(){
 }
 
 async function initNA(){
+  eid=null;
+  const t=document.getElementById('ftt');if(t)t.textContent='✏️ 新增文章';
+  ['eid','eti','esl','esyn','ecov','emt','emd','ecity','ekw','esn','esp','esa','esh'].forEach(i=>{const e=document.getElementById(i);if(e)e.value='';});
+  const ep=document.getElementById('epub');if(ep)ep.checked=true;
+  const cw=document.getElementById('cpw');if(cw)cw.style.display='none';
+  await loadCatSel();
+  initQuill();
+  if(window.q){window.q.setContents([]);window.q.history.clear();}
+}
+
+async function delArt(id){if(!confirm('確定要刪除這篇文章？此動作無法復原'))return;try{await sb('/rest/v1/ivy_articles?id=eq.'+id,{method:'DELETE'});toast('文章已刪除',1);loadAR();}catch(e){toast('刪除失敗：'+e.message,0);}}
+async function editArt(id){
+  eid=id;go('na');await loadCatSel();
+  try{
+    const [a]=await sb('/rest/v1/ivy_articles?id=eq.'+id+'&select=*');
+    const t=document.getElementById('ftt');if(t)t.texContent='✏️ 編輯文章';
+    const sv=(i,v)=>{const e=document.getElementById(i);if(e)e.value=v||'';};
+    sv('eid',a.id);sv('eti',a.title);sv('esl',a.slug);sv('esyn',a.synopsis);
+    sv('ecov',a.cover_image);sv('emt',a.meta_title);sv('emd',a.meta_description);sv('ecity',a.city);sv('ekw',a.keywords);sv('esn',a.store_name);sv('esp',a.store_phone);sv('esa',a.store_address);sv('esh',a.store_hours);
+    const ep=document.getElementById('epub');if(ep)ep.checked=!!a.published;
+    const ec=document.getElementById('ecat');if(ec)ec.value=a.category_id||'';
+    if(a.cover_image){
+      const ci=document.getElementById('cpi');if(ci)ci.src=a.cover_image;
+      const cw=document.getElementById('cpw');if(cw)cw.style.display='flex';
+    }
+    if(window.q){if(a.content){window.q.root.innerHTML=a.content;window.q.history.clear();}else{window.q.setContents([]);window.q.history.clear();}}
+  }catch(e){toast('載入失敗：'+e.message,1);}
+}
+
+
+function initQuill(){if(document.getElementById('qe')&&!window.q){window.q=new Quill('#qe',{theme:'snow',placeholder:'在這裡輸入文章內容...',modules:{toolbar:{container:[[{header:[1,2,3,false]}],['bold','italic','underline','strike'],[{color:[]},{background:[]}],[{align:[]}],['blockquote','code-block'],[{list:'ordered'},{list:'bullet'}],['link','image'],['clean']],handlers:{image:function(){const inp=document.createElement('input');inp.setAttribute('type','file');inp.setAttribute('accept','image/*');const qfi=document.getElementById('qfi');if(!qfi)return;window.q.focus();const range=window.q.getSelection()||{index:window.q.getLength(),length:0};qfi.value='';qfi.onchange=null;qfi.onchange=function(){const file=qfi.files[0];if(!file)return;qfi.onchange=null;const ext=file.name.split('.').pop();const fn='img-'+Date.now()+'.'+ext;const ts=document.getElementById('ts');if(ts){ts.className='ts sh';ts.textContent='⏳ 圖片上傳中...';}const xhr=new XMLHttpRequest();xhr.open('POST',SB+'/storage/v1/object/ivy-images/'+fn);xhr.setRequestHeader('Authorization','Bearer '+K);xhr.setRequestHeader('Content-Type',file.type);xhr.upload.onprogress=function(e){if(e.lengthComputable&&ts){ts.textContent='⏳ '+Math.round(e.loaded/e.total*100)+'%';}};xhr.onload=function(){if(xhr.status>=200&&xhr.status<300){const url=SB+'/storage/v1/object/public/ivy-images/'+fn;window.q.focus();window.q.insertEmbed(range.index,'image',url);window.q.insertText(range.index+1,'\n');window.q.setSelection(range.index+2,0);setTimeout(function(){const imgs=window.q.root.querySelectorAll('img');if(imgs.length)imgs[imgs.length-1].scrollIntoView({behavior:'smooth',block:'center'});},100);if(ts){ts.className='ts sh ok';ts.textContent='圖片插入成功 ✅';setTimeout(function(){ts.className='ts';},2500);}}else{if(ts){ts.className='ts sh';ts.textContent='圖片上傳失敗';}}};xhr.send(file);};qfi.click();}}}}});}}
+async function saveArt(){
+  const id=document.getElementById('eid')?.value;
+  const title=document.getElementById('eti')?.value.trim();
+  const slug=document.getElementById('esl')?.value.trim();
+  if(!title){toast('請填寫文章標題',1);return;}
+  if(!slug){toast('請填寫 Slug',1);return;}
+  const data={title,slug,
+    synopsis:document.getElementById('esyn')?.value.trim()||null,
+    content:window.q?window.q.root.innerHTML:'',
+    category_id:parseInt(document.getElementById('ecat')?.value)||null,
+    cover_image:document.getElementById('ecov')?.value.trim()||null,
+    city:document.getElementById('ecity')?.value.trim()||null,
+    keywords:document.getElementById('ekw')?.value.trim()||null,
+    store_name:document.getElementById('esn')?.value.trim()||null,
+    store_phone:document.getElementById('esp')?.value.trim()||null,
+    store_address:document.getElementById('esa')?.value.trim()||null,
+    store_hours:document.getElementById('esh')?.value.trim()||null,
+    meta_title:document.getElementById('emt')?.value.trim()||null,
+    meta_description:document.getElementById('emd')?.value.trim()||null,
+    published:document.getElementById('epub')?.checked,
+    updated_at:new Date().toISOString()};
+  try{
+    if(id){await sb('/rest/v1/ivy_articles?id=eq.'+id,{method:'PATCH',body:JSON.stringify(data)});toast('文章已更新 ✅');}
+    else{await sb('/rest/v1/ivy_articles',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify(data)});toast('文章已建立 ✅');}
+    go('ar');
+  }catch(e){toast('儲存失敗：'+e.message,1);}
+}
+
+async function uploadCover(e){
+  const file=e.target.files?.[0];if(!file)return;
+  const cs=document.getElementById('cps'),ci=document.getElementById('cpi'),cw=document.getElementById('cpw');
+  if(ci)ci.src=URL.createObjectURL(file);if(cw)cw.style.display='flex';
+  if(cs){cs.textContent='⏫ 上傳中...';cs.style.color='#888';}
+  const ext=file.name.split('.').pop()||'jpg';
+  const fn='cover-'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;
+  try{
+    const r=await fetch(SB+'/storage/v1/object/ivy-images/'+fn,{method:'POST',headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZWJjcGZibGVjd3VtYmF4ZWF6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc5NTMyNywiZXhwIjoyMDg5MzcxMzI3fQ.g0rsqNO6cItp8Qw3ybveVwX2afjTSWtS7WFHL_320jQ','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZWJjcGZibGVjd3VtYmF4ZWF6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc5NTMyNywiZXhwIjoyMDg5MzcxMzI3fQ.g0rsqNO6cItp8Qw3ybveVwX2afjTSWtS7WFHL_320jQ','Content-Type':file.type},body:file});
+    if(!r.ok){const t=await r.text();throw new Error(t);}
+    const ec=document.getElementById('ecov');if(ec)ec.value=SB+'/storage/v1/object/public/ivy-images/'+fn;
+    if(cs){cs.textContent='✅ 上傳成功';cs.style.color='#4caf50';}
+  }catch(err){if(cs){cs.textContent='❌ 上傳失敗';cs.style.color='#ef4444';}}
+  e.target.value='';
+}
+
+async function loadCA(){
+  try{const cats=await sb('/rest/v1/ivy_categories?select=id,name,slug,sort_order&order=sort_order');
+  const el=document.getElementById('cl');
+  if(el)el.innerHTML=cats.map(c=>`<tr style="border-top:1px solid #f0e8e8"><td style="padding:12px 16px;font-weight:600">${c.name}</td><td style="padding:12px 16px;color:var(--gray)">${c.slug}</td><td style="padding:12px 16px;text-align:center">${c.sort_order}</td><td style="padding:12px 16px;text-align:center"><button class="btn bs" style="margin-right:6px;font-size:12px" onclick="editCat(${c.id},'${c.name}','${c.slug}',${c.sort_order})">✏️</button><button class="btn" style="background:#e05a5a;font-size:12px;padding:4px 10px" onclick="delCat(${c.id})">🗑️</button></td></tr>`).join('');
+  const sel=document.getElementById('ecat');
+  if(sel)sel.innerHTML='<option value="">-- 選擇分類 --</option>'+cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  }catch(e){toast('載入分類失敗',1);}
+}
+async function addCat(){
+  const name=document.getElementById('cn-name')?.value.trim();
+  const slug=document.getElementById('cn-slug')?.value.trim();
+  const sort=parseInt(document.getElementById('cn-sort')?.value)||1;
+  if(!name||!slug){toast('請填寫名稱和Slug',1);return;}
+  const r=await fetch(SB+'/rest/v1/ivy_categories',{method:'POST',headers:{'Content-Type':'application/json',apikey:K,'Authorization':'Bearer '+K,'Prefer':'return=representation'},body:JSON.stringify({name,slug,sort_order:sort})});
+  if(r.ok){document.getElementById('cn-name').value='';document.getElementById('cn-slug').value='';document.getElementById('cn-sort').value='1';toast('分類新增成功！',0);loadCA();}else toast('新增失敗',1);
+}
+async function delCat(id){
+  if(!confirm('確定刪除此分類？'))return;
+  const r=await fetch(SB+`/rest/v1/ivy_categories?id=eq.${id}`,{method:'DELETE',headers:{apikey:K,'Authorization':'Bearer '+K}});
+  r.ok?toast('已刪除',0):toast('刪除失敗',1);loadCA();
+}
+function editCat(id,name,slug,sort){
+  const n=prompt('分類名稱',name);if(n===null)return;
+  const s=prompt('Slug',slug);if(s===null)return;
+  const o=parseInt(prompt('排序',sort))||sort;
+  fetch(SB+`/rest/v1/ivy_categories?id=eq.${id}`,{method:'PATCH',headers:{'Content-Type':'application/json',apikey:K,'Authorization':'Bearer '+K},body:JSON.stringify({name:n,slug:s,sort_order:o})}).then(r=>{r.ok?toast('已更新',0):toast('更新失敗',1);loadCA();});
+}
+async function addCat(){
+  const name=document.getElementById('cn-name')?.value.trim();
+  const slug=document.getElementById('cn-slug')?.value.trim();
+  const sort=parseInt(document.getElementById('cn-sort')?.value)||1;
+  if(!name||!slug){toast('請填寫名稱和Slug',1);return;}
+  const r=await fetch(SB+'/rest/v1/ivy_categories',{method:'POST',headers:{'Content-Type':'application/json',apikey:K,'Authorization':'Bearer '+K,'Prefer':'return=representation'},body:JSON.stringify({name,slug,sort_order:sort})});
+  if(r.ok){document.getElementById('cn-name').value='';document.getElementById('cn-slug').value='';document.getElementById('cn-sort').value='1';toast('分類新增成功！',0);loadCA();}else toast('新增失敗',1);
+}
+async function delCat(id){
+  if(!confirm('確定刪除此分類？'))return;
+  const r=await fetch(SB+`/rest/v1/ivy_categories?id=eq.${id}`,{method:'DELETE',headers:{apikey:K,'Authorization':'Bearer '+K}});
+  r.ok?toast('已刪除',0):toast('刪除失敗',1);loadCA();
+}
+function editCat(id,name,slug,sort){
+  const n=prompt('分類名稱',name);if(n===null)return
+  const s=prompt('Slug',slug);if(s===null)return;
+  const o=parseInt(prompt('排序',sort))||sort;
+  fetch(SB+`/rest/v1/ivy_categories?id=eq.${id}`,{method:'PATCH',headers:{'Content-Type':'application/json',apikey:K,'Authorization':'Bearer '+K},body:JSON.stringify({name:n,slug:s,sort_order:o})}).then(r=>{r.ok?toast('已更新',0):toast('更新失敗',1);loadCA();});
+}
+
+function toast(msg,t=0){
+  const el=document.getElementById('ts');el.textContent=msg;
+  el.className='ts sh '+(t?'er':'ok');
+  setTimeout(()=>el.className='ts',2500);
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  if(sessionStorage.getItem('ia')){
+    document.getElementById('lp').style.display='none';
+    document.getElementById('ap').style.display='grid';
+    go('db');
+  }
+});
+</script>
+<input type="file" id="qfi" accept="image/*" style="position:fixed;opacity:0;width:1px;height:1px;top:-9999px"></body></html>
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>IvyLife 後台管理</title>
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--rose:#c8566a;--rose-l:#f2a5b0;--rose-p:#fff0f2;--gold:#c99960;--dark:#2d2020;--gray:#a08085;--bg:#f8f4f5;--bd:rgba(200,86,106,0.12)}
+body{font-family:'Noto Sans TC',system-ui,sans-serif;background:var(--bg);color:var(--dark)}
+.lw{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#fff0f2,#fde8d8)}
+.lb{background:white;border-radius:20px;padding:2.5rem;width:340px;box-shadow:0 20px 60px rgba(200,86,106,0.15);text-align:center}
+.ll{font-size:1.6rem;font-weight:700;margin-bottom:0.3rem}.ll .ivy{color:var(--rose)}.ll .life{color:var(--gold);font-style:italic}
+.ls{font-size:0.82rem;color:var(--gray);margin-bottom:18rem}
+.lb input{width:100%;padding:12px 16px;border:1.5px solid var(--bd);border-radius:10px;font-size:0.95rem;outline:none;font-family:inherit;margin-bottom:1rem}
+.lb input:focus{border-color:var(--rose)}
+.bp{width:100%;padding:12px;background:linear-gradient(135deg,var(--rose),#e07a8a);color:white;border:none;border-radius:10px;font-size:1rem;font-family:inherit;cursor:pointer;font-weight:500}
+.al{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+.sb{background:var(--dark);color:white;padding:1.5rem 0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+.sl{display:flex;align-items:center;gap:8px;padding:0 1.5rem 1.5rem;border-bottom:1px solid rgba(255,255,255,0.08);font-size:1.2rem;font-weight:700}
+.sl .ivy{color:var(--rose-l)}.sl .life{color:var(--gold);font-style:italic}
+.sm{padding:1rem 0;list-style:none;flex:1}
+.sm li button{display:flex;align-items:center;gap:0.7rem;width:100%;padding:0.7rem 1.5rem;color:rgba(255,255,255,0.6);font-size:0.88rem;background:none;border:none;cursor:pointer;font-family:inherit;transition:all 0.2s}
+.sm li.ac button{color:white;background:rgba(200,86,106,0.2);border-left:3px solid var(--rose)}
+.sm li button:hover{color:white;background:rgba(200,86,106,0.1)}
+.sf{padding:0 1.5rem 1.5rem;margin-top:auto}
+.ma{background:var(--bg);overflow-y:auto}
+.tb{background:white;border-bottom:1px solid var(--bd);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.tb h1{font-size:1.1rem;font-weight:600}
+.btn{padding:8px 18px;border-radius:8px;font-size:0.85rem;font-family:inherit;cursor:pointer;border:none;font-weight:500;transition:all 0.2s}
+.bo{background:white;color:var(--rose);border:1.5px solid var(--rose-l)!important}
+.br{background:linear-gradient(135deg,var(--rose),#e07a8a);color:white;border:none}
+.bs{padding:5px 12px;font-size:0.78rem}
+.ct{padding:2rem}
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+.sc{background:white;border-radius:12px;padding:1.2rem 1.5rem;border:1px solid var(--bd)}
+.sc .n{font-size:2rem;font-weight:700;color:var(--rose)}.sc .l{font-size:0.78rem;color:var(--gray);margin-top:0.2rem}
+.pn{background:white;border-radius:16px;border:1px solid var(--bd);overflow:hidden;margin-bottom:1.5rem}
+.ph{padding:1.2rem 1.5rem;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.ph h2{font-size:0.95rem;font-weight:600}
+.pb{padding:1.5rem}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.fg{display:flex;flex-direction:column;gap:0.4rem;margin-bottom:1rem}
+.fg label{font-size:0.8rem;font-weight:500;color:var(--gray)}
+.fg input,.fg select,.fg textarea{padding:10px 14px;border:1.5px solid var(--bd);border-radius:8px;font-size:0.88rem;outline:none;font-family:inherit;color:var(--dark);background:white;transition:border-color 0.2s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--rose)}
+.fg textarea{resize:vertical;min-height:80px}
+#qe{min-height:400px;font-size:0.92rem}#qe .ql-editor{min-height:350px;font-size:0.95rem;line-height:1.8}#qe .ql-editor img{max-width:100%;height:auto;display:block;margin:8px 0}
+.ql-toolbar.ql-snow{border-color:var(--bd)!important;border-radius:8px 8px 0 0}
+.ql-container.ql-snow{border-color:var(--bd)!important;border-radius:0 0 8px 8px;font-family:inherit}
+.cu-row{display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap}
+.cu-row input{flex:1;min-width:200px}
+.cu-btn{cursor:pointer;background:var(--rose);color:white;padding:0.45rem 0.9rem;border-radius:7px;font-size:0.82rem;white-space:nowrap;font-family:inherit;font-weight:500}
+.cp-wrap{display:none;align-items:center;gap:0.8rem;margin-top:0.5rem}
+.cp-wrap img{max-width:160px;max-height:100px;object-fit:cover;border-radius:6px;border:1px solid var(--bd)}
+table{width:100%;border-collapse:collapse}
+thead th{font-size:0.75rem;font-weight:600;color:var(--gray);padding:0.6rem 1rem;text-align:left;border-bottom:1px solid var(--bd)}
+tbody tr{border-bottom:1px solid var(--bd);cursor:pointer;transition:background 0.15s}
+tbody tr:hover{background:var(--rose-p)}
+tbody td{padding:0.8rem 1rem;font-size:0.88rem}
+.bp2{padding:2px 10px;border-radius:50px;font-size:0.72rem;font-weight:500}
+.bp2.pu{background:#d1fae5;color:#065f46}.bp2.dr{background:#fef3c7;color:#92400e}
+.tg{position:relative;display:inline-block;width:42px;height:24px}
+.tg input{opacity:0;width:0;height:0}
+.sl2{position:absolute;cursor:pointer;inset:0;background:#ccc;border-radius:12px;transition:.3s}
+.sl2:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.3s}
+input:checked+.sl2{background:var(--rose)}
+input:checked+.sl2:before{transform:translateX(18px)}
+.ts{position:fixed;bottom:2rem;right:2rem;background:#1a1a1a;color:white;padding:12px 20px;border-radius:10px;font-size:0.85rem;z-index:1000;opacity:0;transform:translateY(10px);transition:all 0.3s;pointer-events:none}
+.ts.sh{opacity:1;transform:translateY(0)}.ts.ok{border-left:3px solid #10b981}.ts.er{border-left:3px solid #ef4444}
+@media(max-width:768px){.al{grid-template-columns:1fr}.sb{display:none}.fr{grid-template-columns:1fr}.sg{grid-template-columns:1fr 1fr}}
+.fc.half{width:calc(50% - 8px)}.fg{margin-bottom:14px}.fg>.lb{display:block}.fg.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}.fg.two>div{margin-bottom:0}.fg{margin-bottom:14px}.fg>.lb{display:block}.fg.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}.fg.two>div{margin-bottom:0}#p-ca .tb{overflow-x:auto}#p-ca table{width:100%;min-width:400px;border-collapse:collapse}#p-ca table th,#p-ca table td{padding:8px 12px;text-align:left;border-bottom:1px solid #eee;white-space:nowrap;word-break:normal}#p-ca table th{background:var(--rose);color:white;font-weight:600}
+</style></head>
+<body>
+<div id="lp" class="lw">
+  <div class="lb">
+    <div class="ll"><span class="ivy">Ivy</span><span class="life">Life</span></div>
+    <div class="ls">後台管理系統</div>
+    <input type="password" id="pwIn" placeholder="請輸入管理員密碼" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="bp" onclick="doLogin()">登入</button>
+  </div>
+</div>
+<div id="ap" class="al" style="display:none">
+  <aside class="sb">
+    <div class="sl"><span class="ivy">Ivy</span><span class="life">Life</span></div>
+    <ul class="sm" id="nav">
+      <li data-p="db" class="ac"><button onclick="go('db')">📊 總覽</button></li>
+      <li data-p="ar"><button onclick="go('ar')">📝 文章管理</button></li>
+      <li data-p="na"><button onclick="go('na')">✏️ 新增文章</button></li>
+      <li data-p="ca"><button onclick="go('ca')">🏷️ 分類管理</button></li>
+    </ul>
+    <div class="sf">
+      <a href="/" target="_blank" class="btn bo" style="display:block;text-align:center;font-size:0.82rem;padding:8px;text-decoration:none;margin-bottom:0.5rem">↗ 前往前台</a>
+      <button onclick="logout()" style="display:block;width:100%;text-align:center;font-size:0.82rem;padding:6px;background:none;color:rgba(255,255,255,0.4);border:none;cursor:pointer;font-family:inherit">登出</button>
+    </div>
+  </aside>
+  <main class="ma">
+    <div id="p-db">
+      <div class="tb"><h1>📊 網站總覽</h1><span id="upd" style="font-size:0.78rem;color:var(--gray)"></span></div>
+      <div class="ct">
+        <div class="sg">
+          <div class="sc"><div class="n" id="st">-</div><div class="l">篇文章</div></div>
+          <div class="sc"><div class="n" id="sp">-</div><div class="l">已發布</div></div>
+          <div class="sc"><div class="n" id="sd">-</div><div class="l">草稿</div></div>
+          <div class="sc"><div class="n" id="sc2">-</div><div class="l">個分類</div></div>
+        </div>
+        <div class="pn"><div class="ph"><h2>最新文章</h2><button class="btn br bs" onclick="go('na')">+ 新增</button></div>
+        <table><thead><tr><th>標題</th><th>分類</th><th>狀態</th><th>日期</th><th>操作</th></tr></thead><tbody id="rl"></tbody></table></div>
+      </div>
+    </div>
+    <div id="p-ar" style="display:none">
+      <div class="tb"><h1>📝 文章管理</h1><button class="btn br bs" onclick="go('na')">+ 新增文章</button></div>
+      <div class="ct"><div class="pn">
+        <table><thead><tr><th>標題</th><th>分類</th><th>狀態</th><th>日期</th><th>操作</th></tr></thead><tbody id="al2"></tbody></table>
+      </div></div>
+    </div>
+    <div id="p-na" style="display:none">
+      <div class="tb"><h1 id="ftt">✏️ 新增文章</h1><button class="btn bo bs" onclick="go('db')">✕ 取消</button></div>
+      <div class="ct"><div class="pn"><div class="pb">
+        <input type="hidden" id="eid">
+        <div class="fr">
+          <div class="fg"><label>文章標題 *</label><input type="text" id="eti" placeholder="例：台南必吃美食推薦"></div>
+          <div class="fg"><label>分類</label><select id="ecat"><option value="">-- 選擇分類 --</option></select></div>
+        </div>
+        <div class="fr">
+          <div class="fg"><label>Slug（網址）*</label><input type="text" id="esl" placeholder="例：tastyfood01"></div>
+          <div class="fg"><label>SEO 標題（選填）</label><input type="text" id="emt" placeholder="留空自動帶入標題"></div>
+        </div>
+        <div class="fg"><label>摘要</label><textarea id="esyn" rows="3" placeholder="一段簡短描述…"></textarea></div>
+        <div class="fg"><label>SEO 描述</label><input type="text" id="emd" placeholder="留空自動帶入摘要"></div>
+        <div class="fg">
+          <label>封面圖片</label>
+          <div class="cu-row">
+            <input type="text" id="ecov" placeholder="https://... 或點擊上傳">
+            <label class="cu-btn">📸 上傳圖片<input type="file" id="cfi" accept="image/*" style="display:none" onchange="uploadCover(event)"></label>
+          </div>
+          <div class="cp-wrap" id="cpw"><img id="cpi" src="" alt="封面預覽"><span id="cps" style="font-size:0.78rem;color:#888"></span></div>
+        </div>
+        <div style="border-top:1.5px solid var(--bd);margin:0.5rem 0 1rem;padding-top:1rem"><span style="font-size:0.75rem;font-weight:600;color:var(--rose);letter-spacing:0.08em">📍 店家資訊</span></div>
+<div class="fr">
+<div class="fg"><label>城市</label><select id="ecity"><option value="">-- 選擇城市 --</option><option value="台北市">台北市</option><option value="新北市">新北市</option><option value="桃園市">桃園市</option><option value="台中市">台中市</option><option value="台南市">台南市</option><option value="高雄市">高雄市</option><option value="基隆市">基隆市</option><option value="新竹市">新竹市</option><option value="嘉義市">嘉義市</option><option value="新竹縣">新竹縣</option><option value="苗栗縣">苗栗縣</option><option value="彰化縣">彰化縣</option><option value="南投縣">南投縣</option><option value="雲林縣">雲林縣</option><option value="嘉義縣">嘉義縣</option><option value="屏東縣">屏東縣</option><option value="宜蘭縣">宜蘭縣</option><option value="花蓮縣">花蓮縣</option><option value="台東縣">台東縣</option><option value="澎湖縣">澎湖縣</option><option value="金門縣">金門縣</option><option value="連江縣">連江縣</option></select></div>
+<div class="fg"><label>關鍵字</label><input type="text" id="ekw" placeholder="例：台南美食,拉麵,東區"></div>
+</div>
+<div class="fr">
+<div class="fg"><label>店家名稱</label><input type="text" id="esn" placeholder="例：美味拉麵店"></div>
+<div class="fg"><label>電話</label><input type="text" id="esp" placeholder="例：06-1234567"></div>
+</div>
+<div class="fg"><label>店家地址</label><input type="text" id="esa" placeholder="例：台南市東區東門路一段100號"></div>
+<div class="fg"><label>營業時間</label><input type="text" id="esh" placeholder="例：週二至週日 11:00-21:00（週一公休）"></div>
+<div class="fg"><label>文章內文</label><div id="qe"></div></div>
+        <div class="fg" style="margin-top:0.5rem">
+          <div style="display:flex;align-items:center;gap:0.7rem">
+            <label class="tg"><input type="checkbox" id="epub" checked><span class="sl2"></span></label>
+            <span style="font-size:0.88rem">立即發布</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:0.8rem;margin-top:1rem">
+          <button class="btn br" onclick="saveArt()">💾 儲存文章</button>
+          <button class="btn bo" onclick="go('ar')">取消</button>
+        </div>
+      </div></div></div>
+    </div>
+    <div id="p-ca" style="display:none"><div class="tb"><h1 class="tb h1">🗂️ 分類管理</h1><div style="background:#fff;padding:16px;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:16px"><div class="fg two"><div><label class="lb">分類名稱</label><div class="lb"><input type="text" id="cn-name" placeholder="例：美食餐廳"></div></div><div><label class="lb">Slug</label><div class="lb"><input type="text" id="cn-slug" placeholder="例：tastyfood"></div></div></div><div style="display:flex;gap:12px;align-items:flex-end"><div><label class="lb">排序</label><div class="lb"><input type="number" id="cn-sort" value="1" style="width:80px"></div></div><button class="btn br" onclick="addCat()" style="margin-bottom:1px;height:38px">＋ 新增分類</button></div></div><div style="background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.08);overflow:hidden"><table style="width:100%;border-collapse:collapse"><thead><tr style="background:#f9f0f0"><th style="padding:12px 16px;text-align:left;font-size:13px;color:var(--gray)">名稱</th><th style="padding:12px 16px;text-align:left;font-size:13px;color:var(--gray)">Slug</th><th style="padding:12px 16px;text-align:center;font-size:13px;color:var(--gray)">排序</th><th style="padding:12px 16px;text-align:center;font-size:13px;color:var(--gray)">操作</th></tr></thead><tbody id="cl"></tbody></table></div></div></div>
+    </div>
+  </main>
+</div>
+<div class="ts" id="ts"></div>
+<script>
+const SB='https://zsebcpfblecwumbaxeaz.supabase.co';
+const K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZWJjcGZibGVjd3VtYmF4ZWF6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc5NTMyNywiZXhwIjoyMDg5MzcxMzI3fQ.g0rsqNO6cItp8Qw3ybveVwX2afjTSWtS7WFHL_320jQ';
+const PW='ivy2024admin';
+let eid=null,q=null;
+
+function doLogin(){
+  const pw=document.getElementById('pwIn').value;
+  if(pw===PW){
+    sessionStorage.setItem('ia','1');
+    document.getElementById('lp').style.display='none';
+    document.getElementById('ap').style.display='grid';
+    go('db');
+  } else {
+    const el=document.getElementById('pwIn');
+    el.style.borderColor='#ef4444';el.value='';el.placeholder='密碼錯誤，請重試';
+    setTimeout(()=>{el.style.borderColor='';el.placeholder='請輸入管理員密碼';},1500);
+  }
+}
+function logout(){sessionStorage.removeItem('ia');location.reload();}
+
+async function sb(path,opts={}){
+  const r=await fetch(SB+path,{...opts,headers:{'apikey':K,'Authorization':'Bearer '+K,'Content-Type':'application/json',...(opts.headers||{})}});
+  if(!r.ok){const e=await r.text();throw new Error(e);}
+  return (r.status===204||r.status===201)?null:r.json();
+}
+
+function go(p){
+  ['db','ar','na','ca'].forEach(x=>{const e=document.getElementById('p-'+x);if(e)e.style.display=x===p?'block':'none';});
+  document.querySelectorAll('#nav li').forEach(li=>li.classList.toggle('ac',li.dataset.p===p));
+  if(p==='db')loadDB();
+  else if(p==='ar')loadAR();
+  else if(p==='na')initNA();
+  else if(p==='ca')loadCA();
+}
+
+async function loadDB(){
+  try{
+    const [arts,cats]=await Promise.all([sb('/rest/v1/ivy_articles?select=id,published'),sb('/rest/v1/ivy_categories?select=id')]);
+    const s=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+    s('st',arts.length);s('sp',arts.filter(a=>a.published).length);s('sd',arts.filter(a=>!a.published).length);s('sc2',cats.length);
+    const u=document.getElementById('upd');if(u)u.textContent='更新於 '+new Date().toLocaleTimeString('zh-TW');
+    const rec=await sb('/rest/v1/ivy_articles?select=id,title,published,created_at,ivy_categories(name)&order=created_at.desc&limit=10');
+    const el=document.getElementById('rl');if(el)el.innerHTML=rec.map(row).join('');
+  }catch(e){toast('載入失敗：'+e.message,1);}
+}
+
+async function loadAR(){
+  try{
+    const arts=await sb('/rest/v1/ivy_articles?select=id,title,published,created_at,ivy_categories(name)&order=created_at.desc');
+    const el=document.getElementById('al2');if(el)el.innerHTML=arts.map(row).join('');
+  }catch(e){toast('載入失敗：'+e.message,1);}
+}
+
+function row(a){
+  return '<tr onclick="editArt('+a.id+')">'
+    +'<td style="font-weight:500">'+a.title+'</td>'
+    +'<td style="font-size:0.78rem;color:#888">'+(a.ivy_categories?.name||'')+'</td>'
+    +'<td><span class="bp2 '+(a.published?'pu':'dr')+'">'+(a.published?'已發布':'草稿')+'</span></td>'
+    +'<td style="font-size:0.78rem;color:#888">'+new Date(a.created_at).toLocaleDateString('zh-TW')+'</td>'
+    +'<td><button class="btn bo bs" onclick="event.stopPropagation();editArt('+a.id+')">編輯</button> <button style="background:#e74c3c;color:white;border:none;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:0.82rem" onclick="event.stopPropagation();delArt('+a.id+')">🗑 刪除</button></td></tr>';
+}
+
+async function loadCatSel(){
+  const cats=await sb('/rest/v1/ivy_categories?select=id,name&order=sort_order');
+  const sel=document.getElementById('ecat');if(!sel)return;
+  const v=sel.value;
+  sel.innerHTML='<option value="">-- 選擇分類 --</option>'+cats.map(c=>'<option value="'+c.id+'">'+c.name+'</option>').join('');
+  if(v)sel.value=v;
+}
+
+async function initNA(){
   setTimeout(initQuill,50);
   eid=null;
   const t=document.getElementById('ftt');if(t)t.textContent='✏️ 新增文章';
