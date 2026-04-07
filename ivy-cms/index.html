@@ -36,7 +36,7 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;background:var(--bg);color:
 .sg{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
 .sc{background:white;border-radius:12px;padding:1.2rem 1.5rem;border:1px solid var(--bd)}
 .sc .n{font-size:2rem;font-weight:700;color:var(--rose)}.sc .l{font-size:0.78rem;color:var(--gray);margin-top:0.2rem}
-.pn{background:white;border-radius:16px;border:1px solid var(--bd);overflow:hidden;margin-bottom:1.5rem}
+.pn{background:white;border-radius:16px;border:1px solid var(--bd);overflow:clip;margin-bottom:1.5rem}
 .ph{padding:1.2rem 1.5rem;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
 .ph h2{font-size:0.95rem;font-weight:600}
 .pb{padding:1.5rem}
@@ -47,7 +47,7 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;background:var(--bg);color:
 .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--rose)}
 .fg textarea{resize:vertical;min-height:80px}
 #qe{min-height:400px;font-size:0.92rem}#qe .ql-editor{min-height:350px;font-size:0.95rem;line-height:1.8}#qe .ql-editor img{max-width:100%;height:auto;display:block;margin:8px 0}
-.ql-toolbar.ql-snow{border-color:var(--bd)!important;border-radius:8px 8px 0 0;position:sticky;top:0;z-index:50;background:white}
+.ql-toolbar.ql-snow{border-color:var(--bd)!important;border-radius:8px 8px 0 0;position:sticky;top:0;z-index:100;background:white;box-shadow:0 2px 8px rgba(0,0,0,.08)}
 .ql-container.ql-snow{border-color:var(--bd)!important;border-radius:0 0 8px 8px;font-family:inherit}
 .cu-row{display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap}
 .cu-row input{flex:1;min-width:200px}
