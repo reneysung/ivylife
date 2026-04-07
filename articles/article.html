@@ -88,13 +88,13 @@ async function load(){
       <a class="art-back" href="${catSlug?'/category.html?cat='+catSlug:'/'}">← ${catName||'返回首頁'}</a>
       <h1 class="art-title">${data.title||''}</h1>
       ${catName?`<div><span class="art-cat-badge">${catName}</span></div>`:''}
-      ${data.cover_image?`<img class="art-cover" src="${data.cover_image}" alt="${data.title||''}" onerror="this.style.display='none'">`:''}
+      ${data.cover_image?`<img class="art-cover" src="${data.cover_image.replace(/\(/g,'%28').replace(/\)/g,'%29').replace(/ /g,'%20')}" alt="${data.title||''}" onerror="this.style.display='none'">`:''}
       
       <div class="art-meta">
         ${pubDate?`<span>📅 ${pubDate}</span>`:''}
         ${catName?`<span>📁 ${catName}</span>`:''}
       </div>
-      ${(data.synopsis&&data.content&&data.content.indexOf(data.synopsis)<0)?`<p class="art-synopsis">${data.synopsis}</p>`:''}
+      ${(data.synopsis&&data.content&&(function(){var t=document.createElement("div");t.innerHTML=data.content;return t.textContent.indexOf(data.synopsis)<0;})())?`<p class="art-synopsis">${data.synopsis}</p>`:''}
       <div class="art-content" id="art-body"></div>
       </div>
       <div class="art-footer-line">感謝閱讀 · 艾薇生活</div>
@@ -109,7 +109,7 @@ async function load(){
         tmp.innerHTML=c;
         tmp.querySelectorAll("img").forEach(function(img){
           var s=img.getAttribute("src")||"";
-          if(s===data.cover_image||s.indexOf(fn)>-1||data.cover_image.indexOf(s.split("/").pop().split("?")[0])>-1) img.remove();
+          var sfn=decodeURIComponent(s.split("/").pop().split("?")[0]);if(s===data.cover_image||sfn===fn||s.indexOf(fn)>-1||fn.indexOf(sfn)>-1) img.remove();
         });
         c=tmp.innerHTML;
       }
@@ -121,6 +121,12 @@ async function load(){
         c+="<div class=\"art-keywords\">" +khtml+"</div>";
       }
       ab.innerHTML=c;
+      // hide synopsis if it appears in content text
+      var synEl=document.querySelector(".art-synopsis");
+      if(synEl&&synEl.textContent.trim()){
+        var tmp2=document.createElement("div");tmp2.innerHTML=c;
+        if(tmp2.textContent.indexOf(synEl.textContent.trim())>-1) synEl.style.display="none";
+      }
     }
 
   }catch(e){
