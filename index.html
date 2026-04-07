@@ -240,7 +240,7 @@ function renderPage(){
   g.innerHTML=page.map(function(a){
     var cat=a.ivy_categories,tags=a.keywords?a.keywords.split(",").filter(Boolean).slice(0,3):[];
     var h="<a href=\"/article/"+a.id+"\" class=\"art-card\"><div class=\"art-thumb\">";
-    h+=a.cover_image?"<img src=\""+esc(a.cover_image)+"\" alt=\""+esc(a.title)+"\" loading=\"lazy\">":"<div class=\"art-ph\">"+(cat&&cat.icon?cat.icon:"&#128221;")+"</div>";
+    var _ti=a.cover_image||(a.content||"").match(/<img[^>]+src=["'](https?:[^"']+)["']/)?.[1]||"";h+=_ti?'<img src="'+esc(_ti)+'" alt="'+esc(a.title)+'" loading="lazy">':"<div class=\"art-ph\">"+(cat&&cat.icon?cat.icon:"&#128247;")+"</div>"
     h+=cat?"<span class=\"art-badge\">"+esc(cat.name)+"</span>":"";
     h+=a.city?"<span class=\"art-city\">&#128205;"+esc(a.city)+"</span>":"";
     h+="</div><div class=\"art-body\">";
