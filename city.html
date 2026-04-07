@@ -89,8 +89,8 @@ function fmtDate(s) {
 }
 
 function cardHtml(a) {
-  const img = a.cover_image
-    ? '<img class="card-img" src="' + a.cover_image + '" alt="' + a.title + '" loading="lazy">'
+  var _ci=a.cover_image||(a.content||'').match(/<img[^>]+src=["'](https?:[^"'>]+)["']/)?.[1]||'';const img = _ci
+    ? '<img class="card-img" src="' + _ci + '" alt="' + a.title + '" loading="lazy">'
     : '<div class="card-img">' + (a.emoji || '📝') + '</div>';
   return '<a class="card" href="/articles/' + a.slug + '">' +
     img +
