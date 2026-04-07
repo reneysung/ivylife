@@ -95,10 +95,32 @@ async function load(){
         ${catName?`<span>📁 ${catName}</span>`:''}
       </div>
       ${data.synopsis?`<p class="art-synopsis">${data.synopsis}</p>`:''}
-      ${data.keywords?`<div class="art-keywords">${data.keywords.split(",").map(k=>"<a class=\"art-kw-tag\" href=\"/index.html?kw="+k.trim()+"\">"+k.trim()+"</a>").join("")}</div>":''}
-      <div class="art-content">${(()=>{var c=data.content||'<p>內容準備中…</p>';if(data.cover_image){c=c.replace(/<img[^>]+>/gi,function(m){return m.indexOf(data.cover_image.split('/').pop())>-1?'':m;});}return c;})()}</div>
+      <div class="art-content" id="art-body"></div>
+      </div>
       <div class="art-footer-line">感謝閱讀 · 艾薇生活</div>
     `;
+    // post-process: fill content + keywords + dedup cover
+    var ab=document.getElementById("art-body");
+    if(ab){
+      var c=data.content||"";
+      if(data.cover_image){
+        var fn=data.cover_image.split("/").pop();
+        var tmp=document.createElement("div");
+        tmp.innerHTML=c;
+        var fi=tmp.querySelector("img");
+        if(fi&&fi.src.indexOf(fn)>-1) fi.remove();
+        c=tmp.innerHTML;
+      }
+      if(data.keywords){
+        var khtml=data.keywords.split(",").map(function(k){
+          var t=k.trim();
+          return "<a class=\"art-kw-tag\" href=\"/index.html?kw="+encodeURIComponent(t)+"\">" +t+"</a>";
+        }).join("");
+        c+="<div class=\"art-keywords\">" +khtml+"</div>";
+      }
+      ab.innerHTML=c;
+    }
+
   }catch(e){
     console.error('load error:', e);
     wrap.innerHTML='<div class="error-state"><h2>載入失敗</h2><p>'+e.message+'</p><p><a href="/">回首頁</a></p></div>';
