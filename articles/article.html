@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="/css/style.css">
 <style>
 .art-wrap{max-width:780px;margin:0 auto;padding:2rem 1.5rem 4rem}
-.art-keywords{display:flex;flex-wrap:wrap;gap:6px;margin-top:1.5rem}.art-kw-tag{background:#f9f0f2;color:#c8566a;border-radius:50px;padding:4px 12px;font-size:0.78rem;text-decoration:none}.art-kw-tag:hover{background:#c8566a;color:white}
+.art-keywords{display:flex;flex-wrap:wrap;gap:6px;margin-top:1.5rem}.art-kw-tag{background:#f9f0f2;color:#c8566a;border-radius:50px;padding:4px 12px;font-size:0.78rem;text-decoration:none}.art-kw-tag:hover{background:#c8566a;color:white}.yt-wrap{position:relative;padding-bottom:56.25%;height:0;margin:1.5rem 0;border-radius:12px;overflow:hidden}.yt-iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
 .art-cover{width:100%;max-height:450px;object-fit:cover;border-radius:12px;margin-bottom:2rem;display:block}
 .art-cat-badge{display:inline-block;font-size:0.78rem;color:var(--rose-deep,#c9697a);font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.6rem;background:rgba(242,160,147,0.1);padding:0.2rem 0.7rem;border-radius:20px}
 .art-title{font-family:var(--font-serif,serif);font-size:clamp(1.6rem,4vw,2.4rem);font-weight:600;line-height:1.3;margin-bottom:1rem;color:var(--text-dark,#2c2c2c)}
@@ -104,12 +104,12 @@ async function load(){
     if(ab){
       var c=data.content||"";
       if(data.cover_image){
-        var fn=data.cover_image.split("/").pop().split("?")[0];
+        var fn=data.cover_image.split("/").pop().split("?")[0];var firstSbImg=tmp.querySelector("img[src*=\"supabase.co\"]");
         var tmp=document.createElement("div");
         tmp.innerHTML=c;
         tmp.querySelectorAll("img").forEach(function(img){
           var s=img.getAttribute("src")||"";
-          var sfn=decodeURIComponent(s.split("/").pop().split("?")[0]);if(s===data.cover_image||sfn===fn||s.indexOf(fn)>-1||fn.indexOf(sfn)>-1) img.remove();
+          var sfn=decodeURIComponent(s.split("/").pop().split("?")[0]);if(s===data.cover_image||sfn===fn||s.indexOf(fn)>-1||fn.indexOf(sfn)>-1||(img===firstSbImg)) img.remove();
         });
         c=tmp.innerHTML;
       }
@@ -120,6 +120,14 @@ async function load(){
         }).join("");
         c+="<div class=\"art-keywords\">" +khtml+"</div>";
       }
+      // YouTube→iframe
+      var _ytd=document.createElement("div");_ytd.innerHTML=c;
+      _ytd.querySelectorAll("a").forEach(function(a){
+        var h=a.getAttribute("href")||"";
+        var m=h.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+        if(m){var d=document.createElement("div");d.className="yt-wrap";d.innerHTML='<iframe class="yt-iframe" src="https://www.youtube.com/embed/'+m[1]+'" frameborder="0" allowfullscreen loading="lazy"></iframe>';a.parentNode.replaceChild(d,a);}
+      });
+      c=_ytd.innerHTML;
       ab.innerHTML=c;
       // hide synopsis if it appears in content text
       var synEl=document.querySelector(".art-synopsis");
