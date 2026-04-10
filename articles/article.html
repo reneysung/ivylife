@@ -132,16 +132,30 @@ async function load(){
           if(sFn&&sFn===cFn) img.remove();
         });
       }
-      // YouTube 連結轉 iframe
-      document.querySelectorAll('#art-body a').forEach(function(a){
-        var href=a.getAttribute('href')||'';
-        var m=href.match(/(?:youtube\.com\/watch\?(?:.*&)?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-        if(m){
-          var w=document.createElement('div');w.className='yt-wrap';
-          w.innerHTML='<iframe class="yt-iframe" src="https://www.youtube.com/embed/'+m[1]+'" frameborder="0" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"></iframe>';
-          a.parentNode.replaceChild(w,a);
-        }
-      });
+      // YouTube 連結轉 iframe（<a> 連結 + 純文字 URL）
+      (function(){
+        var ytRe=/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?(?:[\w=&]*&)?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+        // 掃 <a> 標籤
+        document.querySelectorAll('#art-body a').forEach(function(a){
+          var href=a.getAttribute('href')||'';
+          var m=href.match(ytRe);
+          if(m){
+            var w=document.createElement('div');w.className='yt-wrap';
+            w.innerHTML='<iframe class="yt-iframe" src="https://www.youtube.com/embed/'+m[1]+'" frameborder="0" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"></iframe>';
+            a.parentNode.replaceChild(w,a);
+          }
+        });
+        // 掃純文字段落（Quill 存的 URL 是純文字）
+        document.querySelectorAll('#art-body p, #art-body div').forEach(function(el){
+          var txt=(el.textContent||'').trim();
+          var m=txt.match(ytRe);
+          if(m && el.children.length===0){
+            var w=document.createElement('div');w.className='yt-wrap';
+            w.innerHTML='<iframe class="yt-iframe" src="https://www.youtube.com/embed/'+m[1]+'" frameborder="0" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"></iframe>';
+            el.parentNode.replaceChild(w,el);
+          }
+        });
+      })();
       // hide synopsis if it appears in content text
       var synEl=document.querySelector(".art-synopsis");
       if(synEl&&synEl.textContent.trim()){
