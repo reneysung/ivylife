@@ -201,7 +201,10 @@ async function load(){
         setTimeout(function(){
           var hid=location.hash.slice(1);
           var tgt=document.getElementById(hid)||document.querySelector('[name="'+hid+'"]');
-          if(tgt) tgt.scrollIntoView({behavior:'smooth',block:'start'});
+          if(tgt){
+            var top=tgt.getBoundingClientRect().top+window.pageYOffset-80;
+            window.scrollTo({top:top,behavior:'smooth'});
+          }
         },300);
       }
       // fix: anchor links click handler
@@ -211,7 +214,10 @@ async function load(){
           e.preventDefault();
           var hid=this.getAttribute('href').slice(1);
           var tgt=document.getElementById(hid)||document.querySelector('[name="'+hid+'"]');
-          if(tgt) tgt.scrollIntoView({behavior:'smooth',block:'start'});
+          if(tgt){
+            var top=tgt.getBoundingClientRect().top+window.pageYOffset-80;
+            window.scrollTo({top:top,behavior:'smooth'});
+          }
         });
       });
       // hide synopsis if it appears in content text
