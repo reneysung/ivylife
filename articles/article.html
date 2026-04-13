@@ -156,6 +156,46 @@ async function load(){
           }
         });
       })();
+      // Fix TOC: 痞客邦目錄跳轉修復
+      // Quill 會刪掉 <a name="xxx"> 錨點，需在前台重建 id
+      (function(){
+        var tocLinks=[...ab.querySelectorAll('a[href^="#"]')];
+        if(!tocLinks.length) return;
+        var headings=[...ab.querySelectorAll('h2,h3,h4,h5')];
+        // Step1: 還原任何殘留的 name 屬性
+        ab.querySelectorAll('a[name]').forEach(function(a){
+          if(!a.id) a.id=a.getAttribute('name');
+        });
+        // Step2: 對每個 TOC 連結找對應標題
+        tocLinks.forEach(function(link){
+          var tid=link.getAttribute('href').substring(1);
+          if(!tid) return;
+          // 如果 id 已存在就不用處理
+          if(document.getElementById(tid)||ab.querySelector('[id="'+tid+'"]')) return;
+          var lt=link.textContent.trim();
+          if(!lt) return;
+          var best=null,bestScore=0;
+          headings.forEach(function(h){
+            if(h.id) return; // 已有 id 不重複指派
+            var ht=h.textContent.trim();
+            if(ht===lt){best=h;bestScore=100;return;}
+            // 包含比對
+            if(ht.includes(lt)||lt.includes(ht)){
+              var score=Math.min(ht.length,lt.length)/Math.max(ht.length,lt.length)*99;
+              if(score>bestScore){best=h;bestScore=score;}
+            }
+          });
+          if(best&&bestScore>50) best.id=tid;
+        });
+        // Step3: 讓 TOC 連結平滑捲動
+        tocLinks.forEach(function(link){
+          link.addEventListener('click',function(e){
+            var tid=link.getAttribute('href').substring(1);
+            var el=document.getElementById(tid);
+            if(el){e.preventDefault();el.scrollIntoView({behavior:'smooth',block:'start'});}
+          });
+        });
+      })();
       // hide synopsis if it appears in content text
       var synEl=document.querySelector(".art-synopsis");
       if(synEl&&synEl.textContent.trim()){
