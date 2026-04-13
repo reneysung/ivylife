@@ -196,6 +196,24 @@ async function load(){
           });
         });
       })();
+      // fix: hash scroll after async content load
+      if(location.hash){
+        setTimeout(function(){
+          var hid=location.hash.slice(1);
+          var tgt=document.getElementById(hid)||document.querySelector('[name="'+hid+'"]');
+          if(tgt) tgt.scrollIntoView({behavior:'smooth',block:'start'});
+        },300);
+      }
+      // fix: anchor links click handler
+      document.querySelectorAll('#art-body a[href^="#"]').forEach(function(a){
+        a.removeAttribute('target');
+        a.addEventListener('click',function(e){
+          e.preventDefault();
+          var hid=this.getAttribute('href').slice(1);
+          var tgt=document.getElementById(hid)||document.querySelector('[name="'+hid+'"]');
+          if(tgt) tgt.scrollIntoView({behavior:'smooth',block:'start'});
+        });
+      });
       // hide synopsis if it appears in content text
       var synEl=document.querySelector(".art-synopsis");
       if(synEl&&synEl.textContent.trim()){
