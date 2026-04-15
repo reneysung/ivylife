@@ -7,12 +7,17 @@
 <script type="module">
 import{Editor}from'https://esm.sh/@tiptap/core@2.1.13';
 import StarterKit from'https://esm.sh/@tiptap/starter-kit@2.1.13';
+import{Heading}from'https://esm.sh/@tiptap/extension-heading@2.1.13';
 import{Color}from'https://esm.sh/@tiptap/extension-color@2.1.13';
 import{TextStyle}from'https://esm.sh/@tiptap/extension-text-style@2.1.13';
 import Underline from'https://esm.sh/@tiptap/extension-underline@2.1.13';
 import{Link}from'https://esm.sh/@tiptap/extension-link@2.1.13';
 import{Image}from'https://esm.sh/@tiptap/extension-image@2.1.13';
-window._TT={Editor,StarterKit,Color,TextStyle,Underline,Link,Image};
+// Extend Heading to preserve id + style attributes (for TOC anchors)
+const CustomHeading=Heading.extend({addAttributes(){return{...this.parent?.(),id:{default:null,parseHTML:el=>el.getAttribute('id')||null,renderHTML:a=>a.id?{id:a.id}:{}},style:{default:null,parseHTML:el=>el.getAttribute('style')||null,renderHTML:a=>a.style?{style:a.style}:{}}};},});
+// Extend Link to preserve name + id attributes (for <a name="anchor">)
+const CustomLink=Link.extend({addAttributes(){return{...this.parent?.(),name:{default:null,parseHTML:el=>el.getAttribute('name')||null,renderHTML:a=>a.name?{name:a.name}:{}},id:{default:null,parseHTML:el=>el.getAttribute('id')||null,renderHTML:a=>a.id?{id:a.id}:{}}};},});
+window._TT={Editor,StarterKit,Color,TextStyle,Underline,CustomHeading,CustomLink,Image};
 document.dispatchEvent(new CustomEvent('tiptap-ready'));
 </script>
 <style>
@@ -356,13 +361,14 @@ async function editArt(id){
 function initEditor(){
   if(window.editor)return;
   if(!window._TT){document.addEventListener('tiptap-ready',initEditor,{once:true});return;}
-  const{Editor,StarterKit,Color,TextStyle,Underline,Link,Image}=window._TT;
+  const{Editor,StarterKit,Color,TextStyle,Underline,CustomHeading,CustomLink,Image}=window._TT;
   window.editor=new Editor({
     element:document.getElementById('tiptap-editor'),
     extensions:[
-      StarterKit.configure({heading:{levels:[2,3,4]}}),
+      StarterKit.configure({heading:false,paragraph:{},codeBlock:{}}),
+      CustomHeading.configure({levels:[2,3,4]}),
       TextStyle,Color,Underline,
-      Link.configure({openOnClick:false,autolink:true}),
+      CustomLink.configure({openOnClick:false,autolink:true}),
       Image.configure({inline:false}),
     ],
     editorProps:{attributes:{style:'min-height:220px;padding:12px;outline:none'}},
