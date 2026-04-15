@@ -528,7 +528,8 @@ function editCat(id,name,slug,sort){
 }
 
 
-function closeHtmlModal(){document.getElementById("html-modal").style.display="none";}
+
+function applyHtmlSource(){if(!window.editor)return;var html=document.getElementById('html-ta')?.value||'';window.editor.commands.setContent(html,false);closeHtmlModal();}function closeHtmlModal(){document.getElementById("html-modal").style.display="none";}
 function openHtmlModal(){if(!window.editor)return;const ta=document.getElementById('html-ta');if(ta)ta.value=window.editor.getHTML();const m=document.getElementById('html-modal');if(m)m.style.display='flex';}
 </script>
 <input type="file" id="qfi" accept="image/*" style="position:fixed;opacity:0;width:1px;height:1px;top:-9999px">
