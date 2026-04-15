@@ -1,22 +1,137 @@
-.ProseMirror{min-height:200px;outline:none;padding:8px;line-height:1.7;font-size:1rem}
-.ProseMirror h2{font-size:1.4rem;font-weight:700;margin:1rem 0 0.5rem}
-.ProseMirror h3{font-size:1.2rem;font-weight:600;margin:0.8rem 0 0.4rem}
-.ProseMirror p{margin:0.4rem 0}
-.ProseMirror ul,.ProseMirror ol{padding-left:1.5rem;margin:0.4rem 0}
-.ProseMirror blockquote{border-left:4px solid var(--rose);padding-left:1rem;color:#666;margin:0.8rem 0}
-.ProseMirror pre{background:#1a1a2e;color:#fff;padding:1rem;border-radius:6px;overflow-x:auto}
-.ProseMirror code{background:#f4f4f4;padding:2px 4px;border-radius:3px;font-family:monospace}
-.ProseMirror img{max-width:100%;border-radius:8px}
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>IvyLife 後台管理</title>
+<!-- TipTap -->
+<script type="module">
+import{Editor}from'https://esm.sh/@tiptap/core@2.1.13';
+import StarterKit from'https://esm.sh/@tiptap/starter-kit@2.1.13';
+import{Color}from'https://esm.sh/@tiptap/extension-color@2.1.13';
+import{TextStyle}from'https://esm.sh/@tiptap/extension-text-style@2.1.13';
+import Underline from'https://esm.sh/@tiptap/extension-underline@2.1.13';
+import{Link}from'https://esm.sh/@tiptap/extension-link@2.1.13';
+import{Image}from'https://esm.sh/@tiptap/extension-image@2.1.13';
+window._TT={Editor,StarterKit,Color,TextStyle,Underline,Link,Image};
+document.dispatchEvent(new CustomEvent('tiptap-ready'));
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--rose:#c8566a;--rose-l:#f2a5b0;--rose-p:#fff0f2;--gold:#c99960;--dark:#2d2020;--gray:#a08085;--bg:#f8f4f5;--bd:rgba(200,86,106,0.12)}
+body{font-family:'Noto Sans TC',system-ui,sans-serif;background:var(--bg);color:var(--dark)}
+.lw{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#fff0f2,#fde8d8)}
+.lb{background:white;border-radius:20px;padding:2.5rem;width:340px;box-shadow:0 20px 60px rgba(200,86,106,0.15);text-align:center}
+.ll{font-size:1.6rem;font-weight:700;margin-bottom:0.3rem}.ll .ivy{color:var(--rose)}.ll .life{color:var(--gold);font-style:italic}
+.ls{font-size:0.82rem;color:var(--gray);margin-bottom:18rem}
+.lb input{width:100%;padding:12px 16px;border:1.5px solid var(--bd);border-radius:10px;font-size:0.95rem;outline:none;font-family:inherit;margin-bottom:1rem}
+.lb input:focus{border-color:var(--rose)}
+.bp{width:100%;padding:12px;background:linear-gradient(135deg,var(--rose),#e07a8a);color:white;border:none;border-radius:10px;font-size:1rem;font-family:inherit;cursor:pointer;font-weight:500}
+.al{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+.sb{background:var(--dark);color:white;padding:1.5rem 0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+.sl{display:flex;align-items:center;gap:8px;padding:0 1.5rem 1.5rem;border-bottom:1px solid rgba(255,255,255,0.08);font-size:1.2rem;font-weight:700}
+.sl .ivy{color:var(--rose-l)}.sl .life{color:var(--gold);font-style:italic}
+.sm{padding:1rem 0;list-style:none;flex:1}
+.sm li button{display:flex;align-items:center;gap:0.7rem;width:100%;padding:0.7rem 1.5rem;color:rgba(255,255,255,0.6);font-size:0.88rem;background:none;border:none;cursor:pointer;font-family:inherit;transition:all 0.2s}
+.sm li.ac button{color:white;background:rgba(200,86,106,0.2);border-left:3px solid var(--rose)}
+.sm li button:hover{color:white;background:rgba(200,86,106,0.1)}
+.sf{padding:0 1.5rem 1.5rem;margin-top:auto}
+.ma{background:var(--bg);overflow-y:auto;height:calc(100vh - 56px)}
+.tb{background:white;border-bottom:1px solid var(--bd);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.tb h1{font-size:1.1rem;font-weight:600}
+.btn{padding:8px 18px;border-radius:8px;font-size:0.85rem;font-family:inherit;cursor:pointer;border:none;font-weight:500;transition:all 0.2s}
+.bo{background:white;color:var(--rose);border:1.5px solid var(--rose-l)!important}
+.br{background:linear-gradient(135deg,var(--rose),#e07a8a);color:white;border:none}
+.bs{padding:5px 12px;font-size:0.78rem}
+.ct{padding:2rem}
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+.sc{background:white;border-radius:12px;padding:1.2rem 1.5rem;border:1px solid var(--bd)}
+.sc .n{font-size:2rem;font-weight:700;color:var(--rose)}.sc .l{font-size:0.78rem;color:var(--gray);margin-top:0.2rem}
+.pn{background:white;border-radius:16px;border:1px solid var(--bd);overflow:clip;margin-bottom:1.5rem}
+.ph{padding:1.2rem 1.5rem;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.ph h2{font-size:0.95rem;font-weight:600}
+.pb{padding:1.5rem}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.fg{display:flex;flex-direction:column;gap:0.4rem;margin-bottom:1rem}
+.fg label{font-size:0.8rem;font-weight:500;color:var(--gray)}
+.fg input,.fg select,.fg textarea{padding:10px 14px;border:1.5px solid var(--bd);border-radius:8px;font-size:0.88rem;outline:none;font-family:inherit;color:var(--dark);background:white;transition:border-color 0.2s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--rose)}
+.fg textarea{resize:vertical;min-height:80px}
+#qe{min-height:400px;font-size:0.92rem}#qe .ProseMirror{min-height:200px;outline:none;padding:12px;line-height:1.7;font-size:1rem;word-break:break-word}
+.ProseMirror h2{font-size:1.35rem;font-weight:700;margin:1rem 0 .4rem}
+.ProseMirror h3{font-size:1.15rem;font-weight:600;margin:.8rem 0 .3rem}
+.ProseMirror p{margin:.3rem 0}
+.ProseMirror ul,.ProseMirror ol{padding-left:1.4rem;margin:.3rem 0}
+.ProseMirror blockquote{border-left:4px solid var(--rose);padding-left:.8rem;color:#555;margin:.6rem 0}
+.ProseMirror pre{background:#1e1e2e;color:#cdd6f4;padding:1rem;border-radius:6px;overflow-x:auto}
+.ProseMirror code{background:#f0f0f0;padding:1px 4px;border-radius:3px}
+.ProseMirror img{max-width:100%;border-radius:8px;display:block;margin:.5rem 0}
 .ProseMirror a{color:var(--rose);text-decoration:underline}
 .ProseMirror-focused{outline:none}
-.tt-toolbar{display:flex;flex-wrap:wrap;gap:4px;padding:6px 8px;background:#fff;border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.08)}
-.tt-btn{padding:3px 7px;border:1px solid #ddd;border-radius:4px;background:#fff;cursor:pointer;font-size:13px;min-width:28px;text-align:center;transition:all .15s}
-.tt-btn:hover{background:#f5f5f5;border-color:#aaa}
-.tt-btn.is-active{background:var(--rose);color:#fff;border-color:var(--rose)}
-.tt-sep{width:1px;background:#ddd;margin:0 2px}
-.tt-select{padding:3px 6px;border:1px solid #ddd;border-radius:4px;font-size:13px;background:#fff;cursor:pointer}
-.tt-color-wrap{position:relative;display:inline-flex}
-.tt-color-input{width:22px;height:22px;padding:0;border:1px solid #ddd;border-radius:4px;cursor:pointer;overflow:hidden}.ql-editor{min-height:350px;font-size:0.95rem;line-height:1.8}#qe .ql-editor img{max-width:100%;height:auto;display:block;margin:8px 0}
+.tt-bar{display:flex;flex-wrap:wrap;gap:3px;padding:6px 8px;background:#fff;border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:100;box-shadow:0 2px 6px rgba(0,0,0,.07);border-radius:8px 8px 0 0}
+.tt-btn{padding:3px 7px;border:1px solid #e0e0e0;border-radius:4px;background:#fff;cursor:pointer;font-size:12px;min-width:26px;text-align:center;line-height:1.6;transition:background .12s}
+.tt-btn:hover{background:#f5f5f5}
+.tt-btn.on{background:var(--rose);color:#fff;border-color:var(--rose)}
+.tt-sep{width:1px;background:#e0e0e0;margin:2px 3px;align-self:stretch}
+.tt-sel{padding:3px 5px;border:1px solid #e0e0e0;border-radius:4px;font-size:12px;background:#fff;cursor:pointer;height:26px}
+.tt-color{width:22px;height:22px;padding:0;border:1px solid #e0e0e0;border-radius:4px;cursor:pointer}<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>IvyLife 後台管理</title>
+<!-- TipTap -->
+<script type="module">
+import{Editor}from'https://esm.sh/@tiptap/core@2.1.13';
+import StarterKit from'https://esm.sh/@tiptap/starter-kit@2.1.13';
+import{Color}from'https://esm.sh/@tiptap/extension-color@2.1.13';
+import{TextStyle}from'https://esm.sh/@tiptap/extension-text-style@2.1.13';
+import Underline from'https://esm.sh/@tiptap/extension-underline@2.1.13';
+import{Link}from'https://esm.sh/@tiptap/extension-link@2.1.13';
+import{Image}from'https://esm.sh/@tiptap/extension-image@2.1.13';
+window._TT={Editor,StarterKit,Color,TextStyle,Underline,Link,Image};
+document.dispatchEvent(new CustomEvent('tiptap-ready'));
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--rose:#c8566a;--rose-l:#f2a5b0;--rose-p:#fff0f2;--gold:#c99960;--dark:#2d2020;--gray:#a08085;--bg:#f8f4f5;--bd:rgba(200,86,106,0.12)}
+body{font-family:'Noto Sans TC',system-ui,sans-serif;background:var(--bg);color:var(--dark)}
+.lw{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#fff0f2,#fde8d8)}
+.lb{background:white;border-radius:20px;padding:2.5rem;width:340px;box-shadow:0 20px 60px rgba(200,86,106,0.15);text-align:center}
+.ll{font-size:1.6rem;font-weight:700;margin-bottom:0.3rem}.ll .ivy{color:var(--rose)}.ll .life{color:var(--gold);font-style:italic}
+.ls{font-size:0.82rem;color:var(--gray);margin-bottom:18rem}
+.lb input{width:100%;padding:12px 16px;border:1.5px solid var(--bd);border-radius:10px;font-size:0.95rem;outline:none;font-family:inherit;margin-bottom:1rem}
+.lb input:focus{border-color:var(--rose)}
+.bp{width:100%;padding:12px;background:linear-gradient(135deg,var(--rose),#e07a8a);color:white;border:none;border-radius:10px;font-size:1rem;font-family:inherit;cursor:pointer;font-weight:500}
+.al{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+.sb{background:var(--dark);color:white;padding:1.5rem 0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+.sl{display:flex;align-items:center;gap:8px;padding:0 1.5rem 1.5rem;border-bottom:1px solid rgba(255,255,255,0.08);font-size:1.2rem;font-weight:700}
+.sl .ivy{color:var(--rose-l)}.sl .life{color:var(--gold);font-style:italic}
+.sm{padding:1rem 0;list-style:none;flex:1}
+.sm li button{display:flex;align-items:center;gap:0.7rem;width:100%;padding:0.7rem 1.5rem;color:rgba(255,255,255,0.6);font-size:0.88rem;background:none;border:none;cursor:pointer;font-family:inherit;transition:all 0.2s}
+.sm li.ac button{color:white;background:rgba(200,86,106,0.2);border-left:3px solid var(--rose)}
+.sm li button:hover{color:white;background:rgba(200,86,106,0.1)}
+.sf{padding:0 1.5rem 1.5rem;margin-top:auto}
+.ma{background:var(--bg);overflow-y:auto;height:calc(100vh - 56px)}
+.tb{background:white;border-bottom:1px solid var(--bd);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.tb h1{font-size:1.1rem;font-weight:600}
+.btn{padding:8px 18px;border-radius:8px;font-size:0.85rem;font-family:inherit;cursor:pointer;border:none;font-weight:500;transition:all 0.2s}
+.bo{background:white;color:var(--rose);border:1.5px solid var(--rose-l)!important}
+.br{background:linear-gradient(135deg,var(--rose),#e07a8a);color:white;border:none}
+.bs{padding:5px 12px;font-size:0.78rem}
+.ct{padding:2rem}
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+.sc{background:white;border-radius:12px;padding:1.2rem 1.5rem;border:1px solid var(--bd)}
+.sc .n{font-size:2rem;font-weight:700;color:var(--rose)}.sc .l{font-size:0.78rem;color:var(--gray);margin-top:0.2rem}
+.pn{background:white;border-radius:16px;border:1px solid var(--bd);overflow:clip;margin-bottom:1.5rem}
+.ph{padding:1.2rem 1.5rem;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.ph h2{font-size:0.95rem;font-weight:600}
+.pb{padding:1.5rem}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.fg{display:flex;flex-direction:column;gap:0.4rem;margin-bottom:1rem}
+.fg label{font-size:0.8rem;font-weight:500;color:var(--gray)}
+.fg input,.fg select,.fg textarea{padding:10px 14px;border:1.5px solid var(--bd);border-radius:8px;font-size:0.88rem;outline:none;font-family:inherit;color:var(--dark);background:white;transition:border-color 0.2s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--rose)}
+.fg textarea{resize:vertical;min-height:80px}
+#qe{min-height:400px;font-size:0.92rem}#qe .ql-editor{min-height:350px;font-size:0.95rem;line-height:1.8}#qe .ql-editor img{max-width:100%;height:auto;display:block;margin:8px 0}
 .ql-toolbar.ql-snow{border-color:var(--bd)!important;border-radius:8px 8px 0 0;position:sticky;top:0;z-index:100;background:white;box-shadow:0 2px 8px rgba(0,0,0,.08)}
 .ql-container.ql-snow{border-color:var(--bd)!important;border-radius:0 0 8px 8px;font-family:inherit}
 .cu-row{display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap}
@@ -118,7 +233,7 @@ input:checked+.sl2:before{transform:translateX(18px)}
 </div>
 <div class="fg"><label>店家地址</label><input type="text" id="esa" placeholder="例：台南市東區東門路一段100號"></div>
 <div class="fg"><label>營業時間</label><input type="text" id="esh" placeholder="例：週二至週日 11:00-21:00（週一公休）"></div>
-<div class="fg"><label>文章內文</label><div id="tt-toolbar-wrap"></div><div id="tiptap-editor" class="pn" style="overflow:clip;padding:0;min-height:250px"></div></div>
+<div class="fg"><label>文章內文</label><div id="tt-editor-wrap" style="border:1px solid var(--bd);border-radius:8px;overflow:clip"><div id="tt-bar"></div><div id="tiptap-editor"></div></div></div>
         <div class="fg" style="margin-top:0.5rem">
           <div style="display:flex;align-items:center;gap:0.7rem">
             <label class="tg"><input type="checkbox" id="epub" checked><span class="sl2"></span></label>
@@ -233,158 +348,88 @@ async function editArt(id){
       const ci=document.getElementById('cpi');if(ci)ci.src=a.cover_image;
       const cw=document.getElementById('cpw');if(cw)cw.style.display='flex';
     }
-    if(window.editor){if(a.content){window.editor.commands.setContent(a.content,false);window.editor.history.clear();}else{window.editor.commands.clearContent();window.editor.history.clear();}}
+    if(window.editor){if(a.content){window.editor.getHTML()=a.content;window.editor.history.clear();}else{window.editor.setContents([]);window.editor.history.clear();}}
   }catch(e){toast('載入失敗：'+e.message,1);}
 }
 
 
 function initEditor(){
-  if(window.editor) return;
-  // TipTap UMD globals
-  const Editor = window.tiptap?.Editor || window.TiptapCore?.Editor;
-  const StarterKit = window.StarterKit || window.TiptapStarterKit?.StarterKit;
-  const Color = window.Color || window.TiptapExtensionColor?.Color;
-  const TextStyle = window.TextStyle || window.TiptapExtensionTextStyle?.TextStyle;
-  const Underline = window.Underline || window.TiptapExtensionUnderline?.Underline;
-  const Link = window.Link || window.TiptapExtensionLink?.Link;
-  const Image = window.Image || window.TiptapExtensionImage?.Image;
-  if(!Editor||!StarterKit){console.error('TipTap not loaded');return;}
-
-  window.editor = new Editor({
-    element: document.getElementById('tiptap-editor'),
-    extensions: [
+  if(window.editor)return;
+  if(!window._TT){document.addEventListener('tiptap-ready',initEditor,{once:true});return;}
+  const{Editor,StarterKit,Color,TextStyle,Underline,Link,Image}=window._TT;
+  window.editor=new Editor({
+    element:document.getElementById('tiptap-editor'),
+    extensions:[
       StarterKit.configure({heading:{levels:[2,3,4]}}),
-      TextStyle,
-      Color,
-      Underline,
-      Link.configure({openOnClick:false,HTMLAttributes:{target:'_blank'}}),
-      Image.configure({inline:false,allowBase64:true}),
+      TextStyle,Color,Underline,
+      Link.configure({openOnClick:false,autolink:true}),
+      Image.configure({inline:false}),
     ],
-    content: '',
-    editorProps:{
-      attributes:{class:'ProseMirror',style:'min-height:250px;padding:12px'},
-    },
-    onUpdate(){updateToolbarState();},
-    onSelectionUpdate(){updateToolbarState();},
+    editorProps:{attributes:{style:'min-height:220px;padding:12px;outline:none'}},
+    onUpdate(){ttUpdateBar()},
+    onSelectionUpdate(){ttUpdateBar()},
   });
-  buildToolbar();
+  ttBuildBar();
 }
 
-function buildToolbar(){
-  const wrap = document.getElementById('tt-toolbar-wrap');
-  if(!wrap||!window.editor) return;
-  const colors = ['#000000','#434343','#666666','#c8566a','#e91e63','#ff4081','#ff0000','#ff6d00','#ff9900','#ffcc00','#00cc44','#008000','#00bcd4','#0099ff','#1155cc','#4a86e8','#3f51b5','#9900ff','#9c27b0','#795548','#ff69b4','#a5d6a7',false];
-  wrap.innerHTML = `
-  <div class="tt-toolbar">
-    <select class="tt-select" id="tt-heading" onchange="setHeading(this.value)">
-      <option value="0">Normal</option>
-      <option value="2">H2</option>
-      <option value="3">H3</option>
-      <option value="4">H4</option>
-    </select>
-    <div class="tt-sep"></div>
-    <button class="tt-btn" id="tt-bold" title="粗體" onclick="editor.chain().focus().toggleBold().run()"><b>B</b></button>
-    <button class="tt-btn" id="tt-italic" title="斜體" onclick="editor.chain().focus().toggleItalic().run()"><i>I</i></button>
-    <button class="tt-btn" id="tt-underline" title="底線" onclick="editor.chain().focus().toggleUnderline().run()"><u>U</u></button>
-    <button class="tt-btn" id="tt-strike" title="刪除線" onclick="editor.chain().focus().toggleStrike().run()"><s>S</s></button>
-    <div class="tt-sep"></div>
-    <div class="tt-color-wrap" title="文字顏色">
-      <span style="font-size:13px;padding:3px 4px;border:1px solid #ddd;border-radius:4px 0 0 4px;background:#fff;display:inline-flex;align-items:center">A</span>
-      <input class="tt-color-input" type="color" id="tt-color" onchange="editor.chain().focus().setColor(this.value).run()" style="border-radius:0 4px 4px 0;border-left:0" title="選色">
-      <select style="width:22px;padding:0;border:1px solid #ddd;border-left:0;border-radius:0 4px 4px 0;font-size:10px;cursor:pointer" onchange="if(this.value)editor.chain().focus().setColor(this.value).run();this.value=''" >
-        ${colors.map(c=>c?'<option value="'+c+'" style="background:'+c+'">  </option>':'<option value="">自訂</option>').join('')}
-      </select>
-    </div>
-    <div class="tt-sep"></div>
-    <button class="tt-btn" id="tt-blockquote" title="引用" onclick="editor.chain().focus().toggleBlockquote().run()">"</button>
-    <button class="tt-btn" id="tt-code" title="程式碼區塊" onclick="editor.chain().focus().toggleCodeBlock().run()">&lt;/&gt;</button>
-    <button class="tt-btn" id="tt-ul" title="無序清單" onclick="editor.chain().focus().toggleBulletList().run()">≡</button>
-    <button class="tt-btn" id="tt-ol" title="有序清單" onclick="editor.chain().focus().toggleOrderedList().run()">1.</button>
-    <div class="tt-sep"></div>
-    <button class="tt-btn" id="tt-link" title="連結" onclick="insertLink()">🔗</button>
-    <button class="tt-btn" id="tt-image" title="插入圖片" onclick="openImagePicker()">🖼</button>
-    <div class="tt-sep"></div>
-    <button class="tt-btn" id="tt-html" title="HTML 原始碼" onclick="openHtmlModal()">HTML</button>
-    <button class="tt-btn" id="tt-clear" title="清除格式" onclick="editor.chain().focus().unsetAllMarks().clearNodes().run()">Tx</button>
-  </div>`;
+function ttBuildBar(){
+  const bar=document.getElementById('tt-bar');
+  if(!bar)return;
+  const cols=['#000','#555','#888','#c8566a','#e53935','#ff6d00','#f9a825','#43a047','#0288d1','#1565c0','#6a1b9a','#fff',false];
+  const colOpts=cols.map(c=>c?'<option value="'+c+'" style="background:'+c+'"> </option>':'<option value="">自訂</option>').join('');
+  bar.innerHTML='<select class="tt-sel" id="tt-h" onchange="ttH(this.value)"><option value="">Normal</option><option value="2">H2</option><option value="3">H3</option><option value="4">H4</option></select><span class="tt-sep"></span><button class="tt-btn" id="ttb-b" title="粗體" onclick="editor.chain().focus().toggleBold().run()"><b>B</b></button><button class="tt-btn" id="ttb-i" title="斜體" onclick="editor.chain().focus().toggleItalic().run()"><i>I</i></button><button class="tt-btn" id="ttb-u" title="底線" onclick="editor.chain().focus().toggleUnderline().run()"><u>U</u></button><button class="tt-btn" id="ttb-s" title="刪除線" onclick="editor.chain().focus().toggleStrike().run()"><s>S</s></button><span class="tt-sep"></span><span style="font-size:12px;padding:3px 2px">A</span><input type="color" class="tt-color" title="文字顏色" onchange="editor.chain().focus().setColor(this.value).run()"><select class="tt-sel" style="width:20px;padding:0" title="快速選色" onchange="if(this.value)editor.chain().focus().setColor(this.value).run();this.value=''"><option value="">▾</option>'+colOpts+'</select><span class="tt-sep"></span><button class="tt-btn" id="ttb-bq" onclick="editor.chain().focus().toggleBlockquote().run()">&quot;</button><button class="tt-btn" id="ttb-code" onclick="editor.chain().focus().toggleCodeBlock().run()">&lt;/&gt;</button><button class="tt-btn" id="ttb-ul" onclick="editor.chain().focus().toggleBulletList().run()">≡</button><button class="tt-btn" id="ttb-ol" onclick="editor.chain().focus().toggleOrderedList().run()">1.</button><span class="tt-sep"></span><button class="tt-btn" title="連結" onclick="ttLink()">🔗</button><button class="tt-btn" title="圖片" onclick="ttImg()">🖼</button><span class="tt-sep"></span><button class="tt-btn" onclick="openHtmlModal()">HTML</button><button class="tt-btn" onclick="editor.chain().focus().clearNodes().unsetAllMarks().run()">Tx</button>';
 }
 
-function setHeading(level){
-  if(!window.editor) return;
-  level = parseInt(level);
-  if(level===0) editor.chain().focus().setParagraph().run();
-  else editor.chain().focus().setHeading({level}).run();
-  updateToolbarState();
-}
-
-function updateToolbarState(){
-  if(!window.editor) return;
-  const btns = {bold:'tt-bold',italic:'tt-italic',underline:'tt-underline',strike:'tt-strike',blockquote:'tt-blockquote',codeBlock:'tt-code',bulletList:'tt-ul',orderedList:'tt-ol'};
-  Object.entries(btns).forEach(([k,id])=>{
-    const el=document.getElementById(id);
-    if(el) el.classList.toggle('is-active', editor.isActive(k));
-  });
-  const sel=document.getElementById('tt-heading');
+function ttUpdateBar(){
+  if(!window.editor)return;
+  const map={bold:'ttb-b',italic:'ttb-i',underline:'ttb-u',strike:'ttb-s',blockquote:'ttb-bq',codeBlock:'ttb-code',bulletList:'ttb-ul',orderedList:'ttb-ol'};
+  Object.entries(map).forEach(function([k,id]){const el=document.getElementById(id);if(el)el.classList.toggle('on',editor.isActive(k));});
+  const sel=document.getElementById('tt-h');
   if(sel){
-    if(editor.isActive('heading',{level:2})) sel.value='2';
-    else if(editor.isActive('heading',{level:3})) sel.value='3';
-    else if(editor.isActive('heading',{level:4})) sel.value='4';
-    else sel.value='0';
+    if(editor.isActive('heading',{level:2}))sel.value='2';
+    else if(editor.isActive('heading',{level:3}))sel.value='3';
+    else if(editor.isActive('heading',{level:4}))sel.value='4';
+    else sel.value='';
   }
 }
 
-function insertLink(){
-  if(!window.editor) return;
-  const url = prompt('請輸入連結網址：','https://');
-  if(!url) return;
-  const {from,to} = editor.state.selection;
-  if(from===to){
-    editor.chain().focus().insertContent('<a href="'+url+'">'+url+'</a>').run();
-  } else {
-    editor.chain().focus().setLink({href:url}).run();
-  }
+function ttH(v){if(!window.editor)return;v?editor.chain().focus().setHeading({level:parseInt(v)}).run():editor.chain().focus().setParagraph().run();}
+
+function ttLink(){
+  if(!window.editor)return;
+  const url=prompt('請輸入連結：','https://');
+  if(!url)return;
+  const sel=editor.state.selection;
+  if(sel.empty)editor.chain().focus().insertContent('<a href="'+url+'">'+url+'</a>').run();
+  else editor.chain().focus().setLink({href:url}).run();
 }
 
-function openImagePicker(){
+function ttImg(){
   const qfi=document.getElementById('qfi');
-  if(!qfi) return;
-  const range=window.editor.state.selection;
-  window._imgRange=range;
+  if(!qfi||!window.editor)return;
   window._masp=document.querySelector('.ma')?.scrollTop||0;
   window._wsp=window.scrollY;
   qfi.value='';
   qfi.onchange=function(){
-    const file=qfi.files[0];
-    if(!file) return;
-    qfi.onchange=null;
+    const file=qfi.files[0];if(!file)return;qfi.onchange=null;
     const ext=file.name.split('.').pop()||'jpg';
-    const fn='cover-'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;
+    const fn='img-'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;
     const xhr=new XMLHttpRequest();
     xhr.open('POST',SB+'/storage/v1/object/ivy-images/'+fn);
     xhr.setRequestHeader('Authorization','Bearer '+K);
     xhr.setRequestHeader('Content-Type',file.type);
-    xhr.upload.onprogress=function(e){if(e.lengthComputable&&ts)ts.textContent='⏳ '+Math.round(e.loaded/e.total*100)+'%';};
     xhr.onload=function(){
       if(xhr.status>=200&&xhr.status<300){
         const url=SB+'/storage/v1/object/public/ivy-images/'+fn;
-        window.editor.chain().focus().setImage({src:url}).run();
-        setTimeout(function(){
-          const imgs=window.editor.view.dom.querySelectorAll('img');
-          if(imgs.length) imgs[imgs.length-1].scrollIntoView({behavior:'smooth',block:'center'});
-          const ma=document.querySelector('.ma');
-          if(ma) ma.scrollTop=window._masp;
-          window.scrollTo(0,window._wsp);
-        },100);
-        if(ts){ts.className='ts';ts.textContent='✅ 圖片上傳成功';}
-      } else {
-        if(ts){ts.className='ts sh';ts.textContent='⚠️ 上傳失敗';}
-      }
+        editor.chain().focus().setImage({src:url}).run();
+        setTimeout(function(){const ma=document.querySelector('.ma');if(ma)ma.scrollTop=window._masp;window.scrollTo(0,window._wsp);},100);
+        if(ts){ts.className='ts';ts.textContent='✅ 上傳成功';}
+      }else{if(ts){ts.className='ts sh';ts.textContent='⚠️ 失敗';}}
     };
     xhr.send(file);
   };
   qfi.click();
 }
-
 
 async function saveArt(){
   const id=document.getElementById('eid')?.value;
@@ -479,21 +524,7 @@ function editCat(id,name,slug,sort){
 
 
 function closeHtmlModal(){document.getElementById("html-modal").style.display="none";}
-function openHtmlModal(){if(!window.editor)return;document.getElementById("html-ta").value=window.editor.getHTML();document.getElementById("html-modal").style.display="flex";}
-function applyHtmlSource(){
-  if(!window.editor)return;
-  const html=document.getElementById('html-ta')?.value||'';
-  window.editor.commands.setContent(html,false);
-  closeHtmlModal();
-}
-
-document.addEventListener('DOMContentLoaded',()=>{
-  if(sessionStorage.getItem('ia')){
-    document.getElementById('lp').style.display='none';
-    document.getElementById('ap').style.display='grid';
-    go('db');
-  }
-});
+function openHtmlModal(){if(!window.editor)return;const ta=document.getElementById('html-ta');if(ta)ta.value=window.editor.getHTML();const m=document.getElementById('html-modal');if(m)m.style.display='flex';});
 </script>
 <input type="file" id="qfi" accept="image/*" style="position:fixed;opacity:0;width:1px;height:1px;top:-9999px">
 <div id="html-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;align-items:center;justify-content:center"><div style="background:white;border-radius:16px;padding:1.5rem;width:90%;max-width:700px;max-height:80vh;display:flex;flex-direction:column;gap:1rem"><div style="display:flex;align-items:center;justify-content:space-between"><h3 style="font-size:1rem;font-weight:600">HTML 原始碼</h3><button onclick="closeHtmlModal()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:#999">x</button></div><p style="font-size:0.8rem;color:#888">貼上 HTML 原始碼（支援痞客邦）</p><textarea id="html-ta" style="flex:1;min-height:250px;border:1.5px solid #e0d0d2;border-radius:8px;padding:.75rem;font-family:monospace;font-size:.78rem;resize:vertical;outline:none" placeholder="在此貼上 HTML..."></textarea><div style="display:flex;gap:.75rem;justify-content:flex-end"><button onclick="closeHtmlModal()" style="padding:9px 18px;border:1.5px solid #e0d0d2;border-radius:8px;cursor:pointer;background:white;font-family:inherit">取消</button><button onclick="applyHtmlSource()" style="padding:9px 18px;background:linear-gradient(135deg,#c8566a,#e07a8a);color:white;border:none;border-radius:8px;cursor:pointer;font-weight:500;font-family:inherit">套用</button></div></div></div>
