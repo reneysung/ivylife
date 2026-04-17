@@ -411,6 +411,17 @@ function ttLink(){
   else editor.chain().focus().setLink({href:url}).run();
 }
 
+function ttImgLink(){
+  if(!window.editor)return;
+  var imgUrl=prompt('請輸入圖片網址 (Image URL)');
+  if(!imgUrl)return;
+  var linkUrl=prompt('請輸入點擊圖片要去的連結 (Link URL)');
+  if(!linkUrl)return;
+  // 插入 HTML: <p><a href><img></a></p>
+  var html='<p><a href="'+linkUrl+'" target="_blank" rel="noopener"><img src="'+imgUrl+'" alt=""></a></p>';
+  window.editor.chain().focus().insertContent(html).run();
+}
+
 function ttImg(){
   const qfi=document.getElementById('qfi');
   if(!qfi||!window.editor)return;
@@ -636,7 +647,7 @@ function openHtmlModal(){if(!window.editor)return;const ta=document.getElementBy
 <button class="tt-btn" id="ttb-ol" title="Ordered list" onclick="editor.chain().focus().toggleOrderedList().run()">1.</button>
 <span class="tt-sep"></span>
 <button class="tt-btn" title="Link" onclick="ttLink()">&#128279;</button>
-<button class="tt-btn" title="Image" onclick="ttImg()">&#128247;</button>
+<button class="tt-btn" title="圖片加連結" onclick="ttImgLink()" style="font-size:11px;padding:2px 4px">📷🔗</button><button class="tt-btn" title="Image" onclick="ttImg()">&#128247;</button>
 <span class="tt-sep"></span>
 <button class="tt-btn" onclick="openHtmlModal()">HTML</button>
 <button class="tt-btn" onclick="editor.chain().focus().clearNodes().unsetAllMarks().run()">Tx</button>
