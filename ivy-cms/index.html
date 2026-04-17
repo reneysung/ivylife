@@ -5,10 +5,22 @@
 <title>IvyLife 後台管理</title>
 <!-- TipTap -->
 <script type="module">
-i
+import{Editor}from'https://esm.sh/@tiptap/core@2.1.13';
+import StarterKit from'https://esm.sh/@tiptap/starter-kit@2.1.13';
+import{Heading}from'https://esm.sh/@tiptap/extension-heading@2.1.13';
+import{Color}from'https://esm.sh/@tiptap/extension-color@2.1.13';
+import{TextStyle}from'https://esm.sh/@tiptap/extension-text-style@2.1.13';
+import Underline from'https://esm.sh/@tiptap/extension-underline@2.1.13';
+import{Link}from'https://esm.sh/@tiptap/extension-link@2.1.13';
+import{Image}from'https://esm.sh/@tiptap/extension-image@2.1.13';
+// Extend Heading to preserve id + style attributes (for TOC anchors)
+const CustomHeading=Heading.extend({addAttributes(){return{...this.parent?.(),id:{default:null,parseHTML:el=>el.getAttribute('id')||null,renderHTML:a=>a.id?{id:a.id}:{}},style:{default:null,parseHTML:el=>el.getAttribute('style')||null,renderHTML:a=>a.style?{style:a.style}:{}}};}});
+// Extend Link to preserve name + id attributes
+const CustomLink=Link.extend({addAttributes(){return{...this.parent?.(),name:{default:null,parseHTML:el=>el.getAttribute('name')||null,renderHTML:a=>a.name?{name:a.name}:{}},id:{default:null,parseHTML:el=>el.getAttribute('id')||null,renderHTML:a=>a.id?{id:a.id}:{}}};}});
+// Extend Image to preserve data-link attribute (for clickable images)
 const CustomImage=Image.extend({addAttributes(){return{...this.parent?.(),dataLink:{default:null,parseHTML:el=>{var p=el.parentElement;if(p&&p.tagName==='A'&&p.getAttribute('href'))return p.getAttribute('href');return el.getAttribute('data-link')||null;},renderHTML:a=>a.dataLink?{'data-link':a.dataLink}:{}}};}});
-window._TT={Editor,StarterKit,Color,TextStyle,Underline,CustomHeading,CustomLink,Image,CustomImage};
-document.dispatchEvent(new CustomEvent('tiptap-ready'));
+window._TT={Editor,StarterKit,Heading,Color,TextStyle,Underline,CustomHeading,CustomLink,CustomImage};
+document.dispatchEvent(new Event('tiptap-ready'));
 </script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
