@@ -272,4 +272,29 @@ init();function stripHtml(h){if(!h)return'';var d=document.createElement('div');
 <!-- LINE 浮動按鈕 -->
 <a href="https://lin.ee/NJME0Xk" target="_blank" rel="noopener" id="line-float"><span id="lfi">LINE</span><span id="lft">聯繫艾薇</span></a>
 <style>#line-float{position:fixed;bottom:24px;right:20px;z-index:9999;display:flex;align-items:center;background:#06C755;border-radius:50px;padding:10px 16px 10px 12px;gap:8px;box-shadow:0 4px 20px rgba(6,199,85,.45);text-decoration:none;transition:transform .2s}#line-float:hover{transform:translateY(-3px)}#lfi{background:white;color:#06C755;font-size:11px;font-weight:900;border-radius:6px;padding:3px 5px;font-family:Arial,sans-serif;flex-shrink:0}#lft{color:#fff;font-size:14px;font-weight:700;white-space:nowrap;font-family:"Noto Sans TC",system-ui,sans-serif}@media(max-width:480px){#lft{display:none}#line-float{padding:10px 12px}}</style>
+
+<script>
+// ivylife-dynamic-nav-loader
+(async function(){
+  try{
+    const r=await fetch('https://zsebcpfblecwumbaxeaz.supabase.co/rest/v1/ivy_categories?select=name,slug&order=sort_order',{headers:{apikey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZWJjcGZibGVjd3VtYmF4ZWF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzczOTUzMjcsImV4cCI6MjA1Mjk3MTMyN30.g0rsqNO6cItp8Qw3ybveVwX2afjTSWtS7WFHL_320jQ',Authorization:'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZWJjcGZibGVjd3VtYmF4ZWF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzczOTUzMjcsImV4cCI6MjA1Mjk3MTMyN30.g0rsqNO6cItp8Qw3ybveVwX2afjTSWtS7WFHL_320jQ'}});
+    const cats=await r.json();
+    const nav=document.getElementById('navLinks');
+    if(!nav||!Array.isArray(cats))return;
+    const existing=new Set([...nav.querySelectorAll('a')].map(a=>{const m=(a.getAttribute('href')||'').match(/cat=([^&]+)/);return m?m[1]:null;}).filter(Boolean));
+    cats.forEach(c=>{
+      if(!existing.has(c.slug)){
+        const li=document.createElement('li');
+        const a=document.createElement('a');
+        a.href='/category?cat='+c.slug;
+        a.textContent=c.name;
+        li.appendChild(a);
+        const lastLi=nav.querySelector('li:last-child');
+        if(lastLi&&lastLi.querySelector('a[href*="about"]'))nav.insertBefore(li,lastLi);
+        else nav.appendChild(li);
+      }
+    });
+  }catch(e){console.warn('nav:',e);}
+})();
+</script>
 </body></html>
