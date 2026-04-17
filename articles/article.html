@@ -173,6 +173,20 @@ async function load(){
           if(m)makeIframe(m[1],el.parentNode,el);
         });
       })();
+
+      // 圖片 data-link 轉 <a> 包裝
+      document.querySelectorAll('#art-body img[data-link]').forEach(function(img){
+        var link=img.getAttribute('data-link');
+        if(!link)return;
+        // 若已包在 <a> 裡就跳過
+        if(img.parentElement&&img.parentElement.tagName==='A')return;
+        var a=document.createElement('a');
+        a.href=link;
+        a.target='_blank';
+        a.rel='noopener noreferrer';
+        img.parentNode.insertBefore(a,img);
+        a.appendChild(img);
+      });
       // Fix TOC: 痞客邦目錄跳轉修復
       // Quill 會刪掉 <a name="xxx"> 錨點，需在前台重建 id
       (function(){
