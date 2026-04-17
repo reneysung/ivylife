@@ -6,49 +6,8 @@
 <!-- TipTap -->
 <script type="module">
 i
-const CustomImage=Image.extend({
-  addAttributes(){
-    return {
-      ...this.parent?.(),
-      dataLink:{
-        default:null,
-        parseHTML:function(el){
-          var p=el.parentElement;
-          if(p&&p.tagName==='A'&&p.getAttribute('href'))return p.getAttribute('href');
-          return el.getAttribute('data-link')||null;
-        },
-        renderHTML:function(a){return a.dataLink?{'data-link':a.dataLink}:{};},
-      },
-    };
-  },
-  renderHTML({HTMLAttributes}){
-    var link=HTMLAttributes['data-link'];
-    if(link){
-      var imgAttrs=Object.assign({},HTMLAttributes);
-      delete imgAttrs['data-link'];
-      return ['a',{href:link,target:'_blank',rel:'noopener noreferrer'},['img',imgAttrs]];
-    }
-    return ['img',HTMLAttributes];
-  },
-  parseHTML(){
-    return [
-      {tag:'a > img[src]',priority:1000},
-      {tag:'img[src]'},
-    ];
-  },
-});mport{Editor}from'https://esm.sh/@tiptap/core@2.1.13';
-import StarterKit from'https://esm.sh/@tiptap/starter-kit@2.1.13';
-import{Heading}from'https://esm.sh/@tiptap/extension-heading@2.1.13';
-import{Color}from'https://esm.sh/@tiptap/extension-color@2.1.13';
-import{TextStyle}from'https://esm.sh/@tiptap/extension-text-style@2.1.13';
-import Underline from'https://esm.sh/@tiptap/extension-underline@2.1.13';
-import{Link}from'https://esm.sh/@tiptap/extension-link@2.1.13';
-import{Image}from'https://esm.sh/@tiptap/extension-image@2.1.13';
-// Extend Heading to preserve id + style attributes (for TOC anchors)
-const CustomHeading=Heading.extend({addAttributes(){return{...this.parent?.(),id:{default:null,parseHTML:el=>el.getAttribute('id')||null,renderHTML:a=>a.id?{id:a.id}:{}},style:{default:null,parseHTML:el=>el.getAttribute('style')||null,renderHTML:a=>a.style?{style:a.style}:{}}};},});
-// Extend Link to preserve name + id attributes (for <a name="anchor">)
-const CustomLink=Link.extend({addAttributes(){return{...this.parent?.(),name:{default:null,parseHTML:el=>el.getAttribute('name')||null,renderHTML:a=>a.name?{name:a.name}:{}},id:{default:null,parseHTML:el=>el.getAttribute('id')||null,renderHTML:a=>a.id?{id:a.id}:{}}};},});
-window._TT={Editor,StarterKit,Color,TextStyle,Underline,CustomHeading,CustomLink,CustomImage};
+const CustomImage=Image.extend({addAttributes(){return{...this.parent?.(),dataLink:{default:null,parseHTML:el=>{var p=el.parentElement;if(p&&p.tagName==='A'&&p.getAttribute('href'))return p.getAttribute('href');return el.getAttribute('data-link')||null;},renderHTML:a=>a.dataLink?{'data-link':a.dataLink}:{}}};}});
+window._TT={Editor,StarterKit,Color,TextStyle,Underline,CustomHeading,CustomLink,Image,CustomImage};
 document.dispatchEvent(new CustomEvent('tiptap-ready'));
 </script>
 <style>
