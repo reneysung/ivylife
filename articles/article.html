@@ -125,11 +125,29 @@ async function load(){
       var coverEl=document.querySelector('.art-cover');
       if(coverEl&&coverEl.getAttribute('src')){
         var cSrc=coverEl.getAttribute('src')||'';
-        var cFn=decodeURIComponent(cSrc.split('/').pop().split('?')[0]);
+        var cFn=decodeURIComponent(cSrc.split('/').pop().split('?')[0]).toLowerCase();
+        // 比對檔名 OR 完整 URL
         document.querySelectorAll('#art-body img').forEach(function(img){
           var s=img.getAttribute('src')||'';
-          var sFn=decodeURIComponent(s.split('/').pop().split('?')[0]);
-          if(sFn&&sFn===cFn) img.remove();
+          var sFn=decodeURIComponent(s.split('/').pop().split('?')[0]).toLowerCase();
+          var match=false;
+          if(sFn&&sFn===cFn)match=true;
+          else if(s===cSrc)match=true;
+          else if(cFn&&sFn&&(sFn.includes(cFn)||cFn.includes(sFn)))match=true;
+          if(match){
+            // 移除 img 和空的 parent
+            var parent=img.parentNode;
+            img.remove();
+            if(parent&&parent.tagName==='P'&&parent.children.length===0&&!parent.textContent.trim()){
+              parent.remove();
+            }
+          }
+        });
+        // 也檢查 figure 包見的 img
+        document.querySelectorAll('#art-body figure').forEach(function(fig){
+          if(fig.children.length===0||(fig.children.length===1&&fig.children[0].tagName==='FIGCAPTION')){
+            fig.remove();
+          }
         });
       }
       // YouTube 連結轉 iframe
