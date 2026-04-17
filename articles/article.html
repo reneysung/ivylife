@@ -132,28 +132,27 @@ async function load(){
           if(sFn&&sFn===cFn) img.remove();
         });
       }
-      // YouTube 連結轉 iframe（<a> 連結 + 純文字 URL）
+      // YouTube 連結轉 iframe
       (function(){
         var ytRe=/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?(?:[\w=&]*&)?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+        function makeIframe(vid,parent,el){
+          var w=document.createElement('div');
+          w.style='position:relative;padding-bottom:56.25%;height:0;margin:20px 0';
+          w.innerHTML='<iframe style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" src="https://www.youtube.com/embed/'+vid+'" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"></iframe>';
+          parent.replaceChild(w,el);
+        }
         // 掃 <a> 標籤
         document.querySelectorAll('#art-body a').forEach(function(a){
           var href=a.getAttribute('href')||'';
           var m=href.match(ytRe);
-          if(m){
-            var w=document.createElement('div');w.className='yt-wrap';
-            w.innerHTML='<iframe class="yt-iframe" src="https://www.youtube.com/embed/'+m[1]+'" frameborder="0" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"></iframe>';
-            a.parentNode.replaceChild(w,a);
-          }
+          if(m){var target=a.parentNode;if(target.tagName==='P'&&target.children.length===1)makeIframe(m[1],target.parentNode,target);else makeIframe(m[1],target,a);}
         });
-        // 掃純文字段落（Quill 存的 URL 是純文字）
-        document.querySelectorAll('#art-body p, #art-body div').forEach(function(el){
+        // 掃純文字段落
+        document.querySelectorAll('#art-body p,#art-body div').forEach(function(el){
+          if(el.children.length>0)return;
           var txt=(el.textContent||'').trim();
           var m=txt.match(ytRe);
-          if(m && el.children.length===0){
-            var w=document.createElement('div');w.className='yt-wrap';
-            w.innerHTML='<iframe class="yt-iframe" src="https://www.youtube.com/embed/'+m[1]+'" frameborder="0" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"></iframe>';
-            el.parentNode.replaceChild(w,el);
-          }
+          if(m)makeIframe(m[1],el.parentNode,el);
         });
       })();
       // Fix TOC: 痞客邦目錄跳轉修復
