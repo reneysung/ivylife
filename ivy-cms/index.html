@@ -72,7 +72,7 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;background:var(--bg);color:
 .ProseMirror img{max-width:100%;border-radius:8px;display:block;margin:.5rem 0}
 .ProseMirror a{color:var(--rose);text-decoration:underline}
 .ProseMirror-focused{outline:none}
-.tt-bar{display:flex;flex-wrap:wrap;gap:3px;padding:6px 8px;background:#fff;border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:100;box-shadow:0 2px 6px rgba(0,0,0,.07);border-radius:8px 8px 0 0}
+#tt-bar{display:flex;flex-wrap:wrap;gap:3px;padding:6px 8px;background:#fff;border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:100;box-shadow:0 2px 6px rgba(0,0,0,.07);border-radius:8px 8px 0 0}
 .tt-btn{padding:3px 7px;border:1px solid #e0e0e0;border-radius:4px;background:#fff;cursor:pointer;font-size:12px;min-width:26px;text-align:center;line-height:1.6;transition:background .12s}
 .tt-btn:hover{background:#f5f5f5}
 .tt-btn.on{background:var(--rose);color:#fff;border-color:var(--rose)}
@@ -238,7 +238,7 @@ input:checked+.sl2:before{transform:translateX(18px)}
 </div>
 <div class="fg"><label>店家地址</label><input type="text" id="esa" placeholder="例：台南市東區東門路一段100號"></div>
 <div class="fg"><label>營業時間</label><input type="text" id="esh" placeholder="例：週二至週日 11:00-21:00（週一公休）"></div>
-<div class="fg"><label>文章內文</label><div id="tt-editor-wrap" style="border:1px solid var(--bd);border-radius:8px;overflow:clip"><div id="tt-bar"></div><div id="tiptap-editor"></div></div></div>
+<div class="fg"><label>文章內文</label><div id="tt-editor-wrap" style="border:1px solid var(--bd);border-radius:8px"><div id="tt-bar"></div><div id="tiptap-editor"></div></div></div>
         <div class="fg" style="margin-top:0.5rem">
           <div style="display:flex;align-items:center;gap:0.7rem">
             <label class="tg"><input type="checkbox" id="epub" checked><span class="sl2"></span></label>
@@ -246,7 +246,7 @@ input:checked+.sl2:before{transform:translateX(18px)}
           </div>
         </div>
         <div style="display:flex;gap:0.8rem;margin-top:1rem">
-          <button class="btn br" onclick="saveArt()">💾 儲存文章</button>
+          <button class="btn" style="background:#f0e8d8;color:#8b6914;border:1px solid #d4b983" onclick="saveAsDraft()">📝 儲存為草稿</button> <button class="btn br" onclick="saveArt()">💾 儲存文章</button>
           <button class="btn bo" onclick="go('ar')">取消</button>
         </div>
       </div></div></div>
@@ -337,6 +337,7 @@ async function initNA(){
   await loadCatSel();
   initEditor();
   if(window.editor){window.editor.commands.clearContent();window.editor.history.clear();}
+  setTimeout(restoreDraft,500);
 }
 
 async function delArt(id){if(!confirm('\u78ba\u5b9a\u8981\u522a\u9664\u9019\u7bc7\u6587\u7ae0\uff1f\u6b64\u52d5\u4f5c\u7121\u6cd5\u5fa9\u539f'))return;try{await sb('/rest/v1/ivy_articles?id=eq.'+id,{method:'DELETE'});toast('\u6587\u7ae0\u5df2\u522a\u9664',1);loadAR();}catch(e){toast('\u522a\u9664\u5931\u6557\uff1a'+e.message,0);}}
@@ -437,6 +438,66 @@ function ttImg(){
   qfi.click();
 }
 
+async function saveAsDraft(){
+  try{
+    const t=document.getElementById('eti')?.value?.trim();
+    const s=document.getElementById('esl')?.value?.trim();
+    if(!t||!s){toast('請填寫標題和Slug',1);return;}
+    // 強制 published=false
+    const pubSwitch=document.getElementById('epub');
+    const origPub=pubSwitch?.checked;
+    if(pubSwitch)pubSwitch.checked=false;
+    await saveArt();
+    if(pubSwitch)pubSwitch.checked=origPub;
+    // 清掉自動暫存
+    try{localStorage.removeItem('ivy-draft-'+s);}catch(e){}
+  }catch(e){toast('儲存失敗：'+e.message,1);}
+}
+function _getDraftKey(){
+  const s=document.getElementById('esl')?.value?.trim();
+  return s?'ivy-draft-'+s:(eid?'ivy-draft-edit-'+eid:'ivy-draft-new');
+}
+function autoSaveDraft(){
+  if(!window.editor)return;
+  try{
+    const data={
+      t:document.getElementById('eti')?.value||'',
+      s:document.getElementById('esl')?.value||'',
+      c:window.editor.getHTML(),
+      cat:document.getElementById('ecat')?.value||'',
+      syn:document.getElementById('esyn')?.value||'',
+      ts:Date.now()
+    };
+    if(!data.t&&!data.c)return;
+    localStorage.setItem(_getDraftKey(),JSON.stringify(data));
+    const ind=document.getElementById('draft-ind');
+    if(ind){ind.textContent='✓ 已自動暫存';ind.style.opacity='1';setTimeout(()=>{if(ind)ind.style.opacity='.5';},2000);}
+  }catch(e){}
+}
+function restoreDraft(){
+  if(eid)return; // 編輯舊文章不 restore
+  try{
+    const key='ivy-draft-new';
+    const raw=localStorage.getItem(key);
+    if(!raw)return;
+    const d=JSON.parse(raw);
+    if(!d.t&&!d.c)return;
+    if(!confirm('找到上次未儲存的草稿，是否恢復？\n標題：'+(d.t||'(無)')))return;
+    if(document.getElementById('eti'))document.getElementById('eti').value=d.t||'';
+    if(document.getElementById('esl'))document.getElementById('esl').value=d.s||'';
+    if(document.getElementById('esyn'))document.getElementById('esyn').value=d.syn||'';
+    if(d.cat&&document.getElementById('ecat'))document.getElementById('ecat').value=d.cat;
+    if(window.editor&&d.c)window.editor.commands.setContent(d.c,false);
+    else if(d.c)document.addEventListener('tiptap-ready',()=>window.editor.commands.setContent(d.c,false),{once:true});
+  }catch(e){}
+}
+// 自動暫存計時器
+if(!window._draftTimer){
+  window._draftTimer=setInterval(function(){
+    const pNa=document.getElementById('p-na');
+    if(pNa&&pNa.style.display!=='none')autoSaveDraft();
+  },30000);
+}
 async function saveArt(){
   const id=document.getElementById('eid')?.value;
   const title=document.getElementById('eti')?.value.trim();
