@@ -5,7 +5,38 @@
 <title>IvyLife 後台管理</title>
 <!-- TipTap -->
 <script type="module">
-import{Editor}from'https://esm.sh/@tiptap/core@2.1.13';
+i
+const CustomImage=Image.extend({
+  addAttributes(){
+    return {
+      ...this.parent?.(),
+      dataLink:{
+        default:null,
+        parseHTML:function(el){
+          var p=el.parentElement;
+          if(p&&p.tagName==='A'&&p.getAttribute('href'))return p.getAttribute('href');
+          return el.getAttribute('data-link')||null;
+        },
+        renderHTML:function(a){return a.dataLink?{'data-link':a.dataLink}:{};},
+      },
+    };
+  },
+  renderHTML({HTMLAttributes}){
+    var link=HTMLAttributes['data-link'];
+    if(link){
+      var imgAttrs=Object.assign({},HTMLAttributes);
+      delete imgAttrs['data-link'];
+      return ['a',{href:link,target:'_blank',rel:'noopener noreferrer'},['img',imgAttrs]];
+    }
+    return ['img',HTMLAttributes];
+  },
+  parseHTML(){
+    return [
+      {tag:'a > img[src]',priority:1000},
+      {tag:'img[src]'},
+    ];
+  },
+});mport{Editor}from'https://esm.sh/@tiptap/core@2.1.13';
 import StarterKit from'https://esm.sh/@tiptap/starter-kit@2.1.13';
 import{Heading}from'https://esm.sh/@tiptap/extension-heading@2.1.13';
 import{Color}from'https://esm.sh/@tiptap/extension-color@2.1.13';
@@ -17,7 +48,7 @@ import{Image}from'https://esm.sh/@tiptap/extension-image@2.1.13';
 const CustomHeading=Heading.extend({addAttributes(){return{...this.parent?.(),id:{default:null,parseHTML:el=>el.getAttribute('id')||null,renderHTML:a=>a.id?{id:a.id}:{}},style:{default:null,parseHTML:el=>el.getAttribute('style')||null,renderHTML:a=>a.style?{style:a.style}:{}}};},});
 // Extend Link to preserve name + id attributes (for <a name="anchor">)
 const CustomLink=Link.extend({addAttributes(){return{...this.parent?.(),name:{default:null,parseHTML:el=>el.getAttribute('name')||null,renderHTML:a=>a.name?{name:a.name}:{}},id:{default:null,parseHTML:el=>el.getAttribute('id')||null,renderHTML:a=>a.id?{id:a.id}:{}}};},});
-window._TT={Editor,StarterKit,Color,TextStyle,Underline,CustomHeading,CustomLink,Image};
+window._TT={Editor,StarterKit,Color,TextStyle,Underline,CustomHeading,CustomLink,CustomImage};
 document.dispatchEvent(new CustomEvent('tiptap-ready'));
 </script>
 <style>
@@ -363,7 +394,7 @@ async function editArt(id){
 function initEditor(){
   if(window.editor)return;
   if(!window._TT){document.addEventListener('tiptap-ready',initEditor,{once:true});return;}
-  const{Editor,StarterKit,Color,TextStyle,Underline,CustomHeading,CustomLink,Image}=window._TT;
+  const{Editor,StarterKit,Color,TextStyle,Underline,CustomHeading,CustomLink,CustomImage}=window._TT;
   window.editor=new Editor({
     element:document.getElementById('tiptap-editor'),
     extensions:[
@@ -371,7 +402,7 @@ function initEditor(){
       CustomHeading.configure({levels:[2,3,4]}),
       TextStyle,Color,Underline,
       CustomLink.configure({openOnClick:false,autolink:true}),
-      Image.configure({inline:false}),
+      CustomImage.configure({inline:false}),
     ],
     editorProps:{attributes:{style:'min-height:220px;padding:12px;outline:none'}},
     onUpdate(){ttUpdateBar()},
@@ -385,38 +416,21 @@ function ttPromptImgLink(img){
   var currentHref='';
   var wrappingA=img.closest('a');
   if(wrappingA)currentHref=wrappingA.getAttribute('href')||'';
+  if(!currentHref)currentHref=img.getAttribute('data-link')||'';
   var url=prompt('設定圖片點擊後要前往的連結網址：\n\n(輸入空白即可移除連結)', currentHref);
   if(url===null)return;
-  // 用 editor API 或 DOM 修改
   var src=img.getAttribute('src')||'';
-  var alt=img.getAttribute('alt')||'';
-  var style=img.getAttribute('style')||'';
-  // 找到該 img 在 editor 裡的 pos，用 chain 置換
-  // 簡單做法：直接替換 editor HTML
-  var currentHtml=window.editor.getHTML();
-  // 把 src 對應的 img 用新 HTML 替換
-  var imgHtml='<img src="'+src+'"'+(alt?' alt="'+alt.replace(/"/g,'&quot;')+'"':'')+(style?' style="'+style.replace(/"/g,'&quot;')+'"':'')+'>';
-  var newImgHtml=url.trim()?'<a href="'+url.trim()+'" target="_blank" rel="noopener noreferrer">'+imgHtml+'</a>':imgHtml;
-  // 取出當前 HTML，找出這張圖 (配對 src)，或包含它的 <a> 整塊，然後替換
-  var parser=new DOMParser();
-  var doc=parser.parseFromString('<div id="root">'+currentHtml+'</div>','text/html');
-  var imgs=doc.querySelectorAll('img');
-  var targetImg=null;
-  for(var i=0;i<imgs.length;i++){
-    if(imgs[i].getAttribute('src')===src){targetImg=imgs[i];break;}
-  }
-  if(!targetImg){toast('找不到圖片，請再試一次',1);return;}
-  var existingA=targetImg.closest('a');
-  var holder=doc.createElement('div');
-  holder.innerHTML=newImgHtml;
-  var newEl=holder.firstChild;
-  if(existingA&&existingA.parentNode){
-    existingA.parentNode.replaceChild(newEl,existingA);
-  }else{
-    targetImg.parentNode.replaceChild(newEl,targetImg);
-  }
-  var root=doc.getElementById('root');
-  window.editor.commands.setContent(root.innerHTML,false);
+  // 用 editor state 找到這張圖片的 position
+  var pos=null;
+  window.editor.state.doc.descendants(function(node,p){
+    if(node.type.name==='image'&&node.attrs.src===src){pos=p;return false;}
+  });
+  if(pos===null){toast('找不到圖片，請再試一次',1);return;}
+  // 更新 attribute
+  var tr=window.editor.state.tr;
+  var node=window.editor.state.doc.nodeAt(pos);
+  tr.setNodeMarkup(pos,undefined,Object.assign({},node.attrs,{dataLink:url.trim()||null}));
+  window.editor.view.dispatch(tr);
   toast(url.trim()?'✅ 已加上連結':'已移除連結');
 }
 // 監聽 editor 裡圖片點擊
