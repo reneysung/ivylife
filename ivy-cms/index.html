@@ -200,7 +200,7 @@ input:checked+.sl2:before{transform:translateX(18px)}
       </div>
     </div>
     <div id="p-ar" style="display:none">
-      <div class="tb"><h1>📝 文章管理</h1><button class="btn br bs" onclick="go('na')">+ 新增文章</button></div>
+      <div class="tb"><h1>📝 文章管理</h1><input id="art-search" type="text" placeholder="搜尋文章標題..." oninput="loadAR()" style="padding:6px 12px;border:1px solid var(--bd);border-radius:6px;font-size:14px;width:220px;margin-left:12px"><button class="btn br bs" onclick="go('na')">+ 新增文章</button></div>
       <div class="ct"><div class="pn">
         <table><thead><tr><th>標題</th><th>分類</th><th>狀態</th><th>日期</th><th>操作</th></tr></thead><tbody id="al2"></tbody></table>
       </div></div>
@@ -262,6 +262,7 @@ const K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6In
 const PW='ivy2024admin';
 let eid=null,q=null;
 
+function toast(msg,err){var el=document.getElementById('ts-toast');if(!el){el=document.createElement('div');el.id='ts-toast';el.style='position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:8px;font-size:14px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.2);transition:opacity .5s;pointer-events:none';document.body.appendChild(el);}el.textContent=msg;el.style.background=err?'#e53935':'#43a047';el.style.color='#fff';el.style.opacity='1';clearTimeout(el._t);el._t=setTimeout(function(){el.style.opacity='0';},2800);}
 function doLogin(){
   const pw=document.getElementById('pwIn').value;
   if(pw===PW){
@@ -298,7 +299,7 @@ async function loadDB(){
     const s=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
     s('st',arts.length);s('sp',arts.filter(a=>a.published).length);s('sd',arts.filter(a=>!a.published).length);s('sc2',cats.length);
     const u=document.getElementById('upd');if(u)u.textContent='\u66f4\u65b0\u65bc '+new Date().toLocaleTimeString('zh-TW');
-    const rec=await sb('/rest/v1/ivy_articles?select=id,title,published,created_at,ivy_categories(name)&order=created_at.desc&limit=10');
+    const rec=await sb('/rest/v1/ivy_articles?select=id,title,published,created_at,ivy_categories(name)&order=created_at.desc&limit=100');
     const el=document.getElementById('rl');if(el)el.innerHTML=rec.map(row).join('');
   }catch(e){toast('\u8f09\u5165\u5931\u6557\uff1a'+e.message,1);}
 }
@@ -306,7 +307,7 @@ async function loadDB(){
 async function loadAR(){
   try{
     const arts=await sb('/rest/v1/ivy_articles?select=id,title,published,created_at,ivy_categories(name)&order=created_at.desc');
-    const el=document.getElementById('al2');if(el)el.innerHTML=arts.map(row).join('');
+    const q=(document.getElementById('art-search')||{}).value||'';const el=document.getElementById('al2');if(el)el.innerHTML=(q?arts.filter(a=>(a.title||'').toLowerCase().includes(q.toLowerCase())):arts).map(row).join('');
   }catch(e){toast('\u8f09\u5165\u5931\u6557\uff1a'+e.message,1);}
 }
 
@@ -353,7 +354,7 @@ async function editArt(id){
       const ci=document.getElementById('cpi');if(ci)ci.src=a.cover_image;
       const cw=document.getElementById('cpw');if(cw)cw.style.display='flex';
     }
-    if(window.editor){if(a.content){window.editor.getHTML()=a.content;window.editor.history.clear();}else{window.editor.setContents([]);window.editor.history.clear();}}
+    if(window.editor){if(a.content){window.editor.commands.setContent(a.content||''  ,false);}else{window.editor.commands.clearContent();}}
   }catch(e){toast('\u8f09\u5165\u5931\u6557\uff1a'+e.message,1);}
 }
 
@@ -494,8 +495,9 @@ async function addCat(){
   const sort=parseInt(document.getElementById('cn-sort')?.value)||1;
   if(!name||!slug){toast('\u8acb\u586b\u5beb\u540d\u7a31\u548cSlug',1);return;}
   const r=await fetch(SB+'/rest/v1/ivy_categories',{method:'POST',headers:{'Content-Type':'application/json',apikey:K,'Authorization':'Bearer '+K,'Prefer':'return=representation'},body:JSON.stringify({name,slug,sort_order:sort})});
-  if(r.ok){document.getElementById('cn-name').value='';document.getElementById('cn-slug').value='';document.getElementById('cn-sort').value='1';toast('\u5206\u985e\u65b0\u589e\u6210\u529f\uff01',0);loadCA();}else toast('\u65b0\u589e\u5931\u6557',1);
+  if(r.ok){document.getElementById('cn-name').value='';document.getElementById('cn-slug').value='';document.getElementById('cn-sort').value='1';toast('\u5206\u985e\u65b0\u589e\u6210\u529f\uff01',0);loadCA();buildNavCats();}else toast('\u65b0\u589e\u5931\u6557',1);
 }
+async function buildNavCats(){const cats=await sb('/rest/v1/ivy_categories?select=id,name,slug&order=sort_order');const nav=document.getElementById('nav-list');if(!nav||!cats)return;cats.forEach(c=>{if(!document.querySelector('#nav-list li[data-cat="'+c.slug+'"]')){const li=document.createElement('li');li.setAttribute('data-cat',c.slug);li.innerHTML='<a href="#">'+c.name+'</a>';nav.appendChild(li);}});}
 async function delCat(id){
   if(!confirm('\u78ba\u5b9a\u522a\u9664\u6b64\u5206\u985e\uff1f'))return;
   const r=await fetch(SB+`/rest/v1/ivy_categories?id=eq.${id}`,{method:'DELETE',headers:{apikey:K,'Authorization':'Bearer '+K}});
