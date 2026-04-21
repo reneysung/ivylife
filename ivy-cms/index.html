@@ -314,7 +314,7 @@ async function loadAR(){
 }
 
 function row(a){
-  return '<tr onclick="editArt('+a.id+')">'
+  return '<tr data-art-id="'+a.id+'" onclick="editArt('+a.id+')">'
     +'<td style="font-weight:500">'+a.title+'</td>'
     +'<td style="font-size:0.78rem;color:#888">'+(a.ivy_categories?.name||'')+'</td>'
     +'<td><span class="bp2 '+(a.published?'pu':'dr')+'">'+(a.published?'\u5df2\u767c\u5e03':'\u8349\u7a3f')+'</span></td>'
@@ -342,7 +342,28 @@ async function initNA(){
   setTimeout(restoreDraft,500);
 }
 
-async function delArt(id){if(!confirm('\u78ba\u5b9a\u8981\u522a\u9664\u9019\u7bc7\u6587\u7ae0\uff1f\u6b64\u52d5\u4f5c\u7121\u6cd5\u5fa9\u539f'))return;try{await sb('/rest/v1/ivy_articles?id=eq.'+id,{method:'DELETE'});toast('\u6587\u7ae0\u5df2\u522a\u9664',1);loadAR();}catch(e){toast('\u522a\u9664\u5931\u6557\uff1a'+e.message,0);}}
+async function delArt(id){
+  if(!confirm('確定要刪除這篇文章？此操作不可撤銷'))return;
+  // Optimistic UI: 立即從列表移除
+  var row=document.querySelector('[data-art-id="'+id+'"]');
+  var parent=row?row.parentElement:null;
+  var nextSibling=row?row.nextSibling:null;
+  if(row)row.remove();
+  toast('✓ 刪除中...');
+  // 背景發送 DELETE
+  try{
+    await sb('/rest/v1/ivy_articles?id=eq.'+id,{method:'DELETE'});
+    toast('文章已刪除');
+  }catch(e){
+    // 失敗則還原列表
+    if(row&&parent){
+      if(nextSibling)parent.insertBefore(row,nextSibling);
+      else parent.appendChild(row);
+    }
+    toast('刪除失敗：'+e.message,1);
+  }
+}
+
 async function editArt(id){
   eid=id;go('na');await loadCatSel();
   try{
