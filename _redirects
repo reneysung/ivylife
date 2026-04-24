@@ -2,7 +2,7 @@
 /article/*  /articles/article?slug=:splat  302
 /ivy-cms  /ivy-cms/index.html  200
 
-# Legacy .html URLs → new /article/slug (222 articles)
+# Legacy .html URLs → new /article/slug (223 articles)
 /airconditioner1.html  /article/airconditioner1  301
 /allyoucaneathotpot1.html  /article/allyoucaneathotpot1  301
 /allyoucaneathotpot2.html  /article/allyoucaneathotpot2  301
@@ -106,6 +106,7 @@
 /furniture8.html  /article/furniture8  301
 /glasses.html  /article/glasses  301
 /glasses1.html  /article/glasses1  301
+/glassesshop03.html  /article/glassesshop03  301
 /glassesshop1.html  /article/glassesshop1  301
 /glassesshop3.html  /article/glassesshop3  301
 /glassesshop4.html  /article/glassesshop4  301
