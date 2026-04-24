@@ -137,7 +137,7 @@
 /Japanesefood.html  /article/Japanesefood  301
 /jewelryshop1.html  /article/jewelryshop1  301
 /jewelryshop2.html  /article/jewelryshop2  301
-/Jifeng%20Furniture1.html  /article/Jifeng%20Furniture1  301
+/Jifeng Furniture1.html  /article/Jifeng Furniture1  301
 /kaohsiung-liuhe-6210.html  /article/kaohsiung-liuhe-6210  301
 /kaohsiung-liuhe-night-market.html  /article/kaohsiung-liuhe-night-market  301
 /kitchendesign.html  /article/kitchendesign  301
@@ -155,7 +155,7 @@
 /musiccentre1.html  /article/musiccentre1  301
 /musiccentre2.html  /article/musiccentre2  301
 /muttonhotpot1.html  /article/muttonhotpot1  301
-/MUYI%20Kitchen%201.html  /article/MUYI%20Kitchen%201  301
+/MUYI Kitchen 1.html  /article/MUYI Kitchen 1  301
 /noodleshop1.html  /article/noodleshop1  301
 /nougat1.html  /article/nougat1  301
 /nutspecialty1.html  /article/nutspecialty1  301
@@ -226,13 +226,3 @@
 /woodenfloor1.html  /article/woodenfloor1  301
 /woodenfloor2.html  /article/woodenfloor2  301
 /woodenfloor4.html  /article/woodenfloor4  301
-
-# Legacy shopx.php?id=N → article (filtered to valid slugs only)
-/shopx.php?id=1  /article/tastyfood01  301
-/shopx.php?id=2  /article/furniture1  301
-/shopx.php?id=3  /article/renovation5  301
-/shopx.php?id=4  /article/ivy-cover-upload-test  301
-/shopx.php?id=7  /article/tainan-cafe-2026  301
-/shopx.php?id=8  /article/kaohsiung-liuhe-night-market  301
-/shopx.php?id=11  /article/kaohsiung-liuhe-6210  301
-/shopx.php?id=241  /article/our-hair-27  301
