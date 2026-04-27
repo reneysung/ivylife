@@ -23,7 +23,7 @@ export async function onRequest(context) {
     const articles = await articlesRes.json();
 
     const catsRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/ivy_categories?select=slug,updated_at`,
+      `${SUPABASE_URL}/rest/v1/ivy_categories?select=slug,created_at`,
       { headers: { apikey: KEY, Authorization: `Bearer ${KEY}` } }
     );
     const categories = catsRes.ok ? await catsRes.json() : [];
@@ -51,7 +51,7 @@ export async function onRequest(context) {
     }
 
     for (const cat of categories) {
-      const lastmod = (cat.updated_at || today).slice(0, 10);
+      const lastmod = (cat.created_at || today).slice(0, 10);
       urls.push(
         `  <url>\n` +
         `    <loc>${BASE_URL}/category/${escape(cat.slug)}</loc>\n` +
