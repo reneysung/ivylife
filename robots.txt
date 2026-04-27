@@ -1,9 +1,10 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://journeylift.com.tw/sitemap.xml
+Sitemap: https://ivylife.com.tw/sitemap.xml
 
 # Block admin
+Disallow: /ivy-cms/
 Disallow: /admin
 Disallow: /admin-v2.html
 Disallow: /tools/
