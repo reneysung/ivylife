@@ -14,7 +14,7 @@ export async function onRequest(context) {
 
   try {
     const articlesRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/ivy_articles?select=slug,updated_at,published_at&published=eq.true&order=updated_at.desc&limit=5000`,
+      `${SUPABASE_URL}/rest/v1/ivy_articles?select=slug,updated_at,created_at&published=eq.true&order=updated_at.desc&limit=5000`,
       { headers: { apikey: KEY, Authorization: `Bearer ${KEY}` } }
     );
     if (!articlesRes.ok) {
@@ -64,7 +64,7 @@ export async function onRequest(context) {
 
     for (const a of articles) {
       if (!a.slug) continue;
-      const lastmod = (a.updated_at || a.published_at || today).slice(0, 10);
+      const lastmod = (a.updated_at || a.created_at || today).slice(0, 10);
       urls.push(
         `  <url>\n` +
         `    <loc>${BASE_URL}/article/${escape(a.slug)}</loc>\n` +
