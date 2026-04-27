@@ -36,7 +36,7 @@
 </div>
 <footer class="footer"><div class="footer-inner">
 <div class="footer-brand"><a class="nav-logo" href="/">Ivy<span>Life</span></a><p>艾薇的生活分享平台</p></div>
-<div><h5>分類</h5><ul><li><a href="/category.html?cat=tastyfood">美食餐廳</a></li><li><a href="/category.html?cat=hotel">飯店民宿</a></li><li><a href="/category.html?cat=beauty">醫學美容</a></li></ul></div>
+<div><h5>分類</h5><ul><li><a href="/category?cat=tastyfood">美食餐廳</a></li><li><a href="/category?cat=hotel">飯店民宿</a></li><li><a href="/category?cat=beauty">醫學美容</a></li></ul></div>
 <div><h5>關於</h5><ul><li><a href="/about.html">關於艾薇</a></li><li><a href="/sitemap.xml">網站地圖</a></li></ul></div>
 </div><div class="footer-bottom"><p>© 2024 IvyLife 艾薇生活</p></div></footer>
 <script src="/js/supabase.js"></script>
@@ -52,7 +52,7 @@ async function loadPage(p=0){
       document.title=c.name+' - IvyLife';
       document.getElementById('metaTitle').textContent=c.name+' - IvyLife';
       document.getElementById('metaDesc').content=c.description||'';
-      document.getElementById('canonical').href='https://ivylife.com.tw/category.html?cat='+catSlug;
+      document.getElementById('canonical').href='https://ivylife.com.tw/category?cat='+catSlug;
       document.getElementById('catIcon').textContent=c.icon||'';
       document.getElementById('catTitle').textContent=c.name;
       document.getElementById('catDesc').textContent=c.description||'';
