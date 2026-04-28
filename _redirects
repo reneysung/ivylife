@@ -1,5 +1,5 @@
 # Main app rewrites
-/article/*  /articles/article?slug=:splat  200
+/article/*  /articles/article?slug=:splat  302
 /ivy-cms  /ivy-cms/index.html  200
 
 # Legacy .html URLs → new /article/slug (223 articles)
