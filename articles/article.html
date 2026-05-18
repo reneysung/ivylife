@@ -36,12 +36,12 @@
 <body>
 <nav class="nav"><div class="nav-inner"><a class="nav-logo" href="/">Ivy<span>Life</span></a>
 <ul class="nav-links" id="navLinks">
-<li><a href="/category.html?cat=tastyfood">美食餐廳</a></li>
-<li><a href="/category.html?cat=hotel">飯店民宿</a></li>
-<li><a href="/category.html?cat=beauty">醫學美容</a></li>
-<li><a href="/category.html?cat=renovation">宅修清潔</a></li>
-<li><a href="/category.html?cat=furniture">設計推薦</a></li>
-<li><a href="/about.html">關於艾薇</a></li>
+<li><a href="/category/tastyfood">美食餐廳</a></li>
+<li><a href="/category/hotel">飯店民宿</a></li>
+<li><a href="/category/beauty">醫學美容</a></li>
+<li><a href="/category/renovation">宅修清潔</a></li>
+<li><a href="/category/furniture">設計推薦</a></li>
+<li><a href="/about">關於艾薇</a></li>
 </ul>
 <div class="nav-hamburger" id="hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')"><span></span><span></span><span></span></div>
 </div></nav>
@@ -86,7 +86,7 @@ async function load(){
     if(data.cover_image) document.getElementById('og-image').content = data.cover_image;
     
     wrap.innerHTML = `
-      <a class="art-back" href="${catSlug?'/category.html?cat='+catSlug:'/'}">← ${catName||'返回首頁'}</a>
+      <a class="art-back" href="${catSlug?'/category/'+catSlug:'/'}">← ${catName||'返回首頁'}</a>
       <h1 class="art-title">${data.title||''}</h1>
       ${catName?`<div><span class="art-cat-badge">${catName}</span></div>`:''}
       ${data.cover_image?`<img class="art-cover" src="${data.cover_image.replace(/\(/g,'%28').replace(/\)/g,'%29').replace(/ /g,'%20')}" alt="${data.title||''}" onerror="this.style.display='none'">`:''}

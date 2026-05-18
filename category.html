@@ -2,23 +2,36 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title id="metaTitle">分類文章 - IvyLife</title>
-<meta name="description" id="metaDesc" content="艾薇生活分類文章">
-<link rel="canonical" id="canonical" href="">
+<title id="metaTitle">分類文章 - IvyLife 艾薇生活</title>
+<meta name="description" id="metaDesc" content="IvyLife 艾薇生活分類文章 — 美食餐廳、飯店民宿、醫學美容、居家設計等台灣在地生活風格內容。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" id="canonical" href="https://ivylife.com.tw/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="IvyLife 艾薇生活分類文章">
+<meta property="og:description" content="IvyLife 艾薇生活分類文章 — 美食、飯店、醫美、居家設計等台灣在地體驗。">
+<meta property="og:image" content="https://ivylife.com.tw/og-default.jpg">
+<meta property="og:site_name" content="IvyLife 艾薇生活">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="IvyLife 艾薇生活分類文章">
+<meta name="twitter:description" content="IvyLife 艾薇生活分類文章 — 美食、飯店、醫美、居家設計等台灣在地體驗。">
+<meta name="twitter:image" content="https://ivylife.com.tw/og-default.jpg">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Ccircle cx='18' cy='18' r='17' fill='%23fff0f2'/%3E%3Cpath d='M18 28C18 28 9 22 9 15C9 11 13 8 18 8C23 8 27 11 27 15C27 22 18 28 18 28Z' fill='%23c8566a'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://zsebcpfblecwumbaxeaz.supabase.co">
 <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 <nav class="nav"><div class="nav-inner"><a class="nav-logo" href="/">Ivy<span>Life</span></a>
 <ul class="nav-links" id="navLinks">
-<li><a href="/category?cat=tastyfood">美食餐廳</a></li>
-<li><a href="/category?cat=hotel">飯店民宿</a></li>
-<li><a href="/category?cat=beauty">醫學美容</a></li>
-<li><a href="/category?cat=renovation">宅修清潔</a></li>
-<li><a href="/category?cat=furniture">設計推薦</a></li>
-<li><a href="/category?cat=lifeproposal">生活提案</a></li>
-<li><a href="/category?cat=carcare">汽車美容</a></li>
-<li><a href="/category?cat=massage">全身按摩</a></li>
-<li><a href="/about.html">關於艾薇</a></li>
+<li><a href="/category/tastyfood">美食餐廳</a></li>
+<li><a href="/category/hotel">飯店民宿</a></li>
+<li><a href="/category/beauty">醫學美容</a></li>
+<li><a href="/category/renovation">宅修清潔</a></li>
+<li><a href="/category/furniture">設計推薦</a></li>
+<li><a href="/category/lifeproposal">生活提案</a></li>
+<li><a href="/category/carcare">汽車美容</a></li>
+<li><a href="/category/massage">全身按摩</a></li>
+<li><a href="/about">關於艾薇</a></li>
 </ul>
 <div class="nav-hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')"><span></span><span></span><span></span></div>
 </div></nav>
@@ -36,9 +49,10 @@
 </div>
 <footer class="footer"><div class="footer-inner">
 <div class="footer-brand"><a class="nav-logo" href="/">Ivy<span>Life</span></a><p>艾薇的生活分享平台</p></div>
-<div><h5>分類</h5><ul><li><a href="/category?cat=tastyfood">美食餐廳</a></li><li><a href="/category?cat=hotel">飯店民宿</a></li><li><a href="/category?cat=beauty">醫學美容</a></li></ul></div>
-<div><h5>關於</h5><ul><li><a href="/about.html">關於艾薇</a></li><li><a href="/sitemap.xml">網站地圖</a></li></ul></div>
-</div><div class="footer-bottom"><p>© 2024 IvyLife 艾薇生活</p></div></footer>
+<div><h5>分類</h5><ul><li><a href="/category/tastyfood">美食餐廳</a></li><li><a href="/category/hotel">飯店民宿</a></li><li><a href="/category/beauty">醫學美容</a></li></ul></div>
+<div><h5>關於</h5><ul><li><a href="/about">關於艾薇</a></li><li><a href="/sitemap.xml">網站地圖</a></li></ul></div>
+</div><div class="footer-bottom"><p>© <span id="year">2026</span> IvyLife 艾薇生活</p></div></footer>
+<script>document.getElementById('year').textContent=new Date().getFullYear();</script>
 <script src="/js/supabase.js"></script>
 <script>
 const PAGE_SIZE=12;let pg=0;
@@ -49,10 +63,10 @@ async function loadPage(p=0){
     const cats=await getCategories();
     const c=cats.find(x=>x.slug===catSlug);
     if(c){
-      document.title=c.name+' - IvyLife';
-      document.getElementById('metaTitle').textContent=c.name+' - IvyLife';
-      document.getElementById('metaDesc').content=c.description||'';
-      document.getElementById('canonical').href='https://ivylife.com.tw/category?cat='+catSlug;
+      document.title=c.name+' - IvyLife 艾薇生活';
+      document.getElementById('metaTitle').textContent=c.name+' - IvyLife 艾薇生活';
+      document.getElementById('metaDesc').content=c.description||(c.name+' 主題文章精選 — 艾薇分享台灣各地'+c.name+'相關體驗。');
+      document.getElementById('canonical').href='https://ivylife.com.tw/category/'+catSlug;
       document.getElementById('catIcon').textContent=c.icon||'';
       document.getElementById('catTitle').textContent=c.name;
       document.getElementById('catDesc').textContent=c.description||'';
@@ -61,7 +75,7 @@ async function loadPage(p=0){
     const as=await getArticles({categorySlug:catSlug,limit:PAGE_SIZE,offset:p*PAGE_SIZE});
     const g=document.getElementById('articleGrid');
     if(!as.length&&p===0){g.innerHTML='<p style="grid-column:1/-1;text-align:center;color:var(--text-light);padding:3rem">此分類尚無文章</p>';return;}
-    g.innerHTML=as.map(a=>'<a class="article-card fade-in" href="/article/'+a.id+'" style="text-decoration:none;color:inherit"><div class="card-img"'+(a.cover_image?' style=\"background-image:url('+a.cover_image+');background-size:cover;background-position:center\"':'')+'>'+(a.cover_image?'':categoryIcon(a.ivy_categories?.name||''))+'</div><div class="card-body"><span class="card-category">'+(a.ivy_categories?.name||'')+'</span><h3 class="card-title">'+a.title+'</h3><p class="card-synopsis">'+(a.synopsis||'')+'</p><span class="card-meta">'+formatDate(a.created_at)+'</span></div></a>').join('');
+    g.innerHTML=as.map(a=>'<a class="article-card fade-in" href="/article/'+(a.slug||a.id)+'" style="text-decoration:none;color:inherit"><div class="card-img"'+(a.cover_image?' style=\"background-image:url('+a.cover_image+');background-size:cover;background-position:center\"':'')+'>'+(a.cover_image?'':categoryIcon(a.ivy_categories?.name||''))+'</div><div class="card-body"><span class="card-category">'+(a.ivy_categories?.name||'')+'</span><h3 class="card-title">'+a.title+'</h3><p class="card-synopsis">'+(a.synopsis||'')+'</p><span class="card-meta">'+formatDate(a.created_at)+'</span></div></a>').join('');
     let pag='';
     if(p>0)pag+='<a href="#" onclick="changePage('+(p-1)+')">‹</a>';
     pag+='<span class="active">'+(p+1)+'</span>';

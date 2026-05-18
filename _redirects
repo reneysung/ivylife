@@ -1,5 +1,7 @@
 # Main app rewrites
-/article/*  /articles/article?slug=:splat  302
+# /article/{slug} handled by functions/article/[slug].js (SSR meta)
+# /category/{slug} handled by functions/category/[slug].js (SSR meta)
+# /category?cat=X 舊 URL 繼續走 category.html (JS-driven，內部把 canonical 改寫成 /category/{slug})
 /ivy-cms  /ivy-cms/index.html  200
 
 # Legacy .html URLs → new /article/slug (223 articles)

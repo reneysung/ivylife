@@ -14,7 +14,7 @@ export async function onRequest(context) {
 
   try {
     const articlesRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/ivy_articles?select=slug,updated_at,created_at&published=eq.true&order=updated_at.desc&limit=5000`,
+      `${SUPABASE_URL}/rest/v1/ivy_articles?select=slug,updated_at,created_at,cover_image,title,category_id&published=eq.true&order=updated_at.desc&limit=5000`,
       { headers: { apikey: KEY, Authorization: `Bearer ${KEY}` } }
     );
     if (!articlesRes.ok) {
@@ -23,7 +23,7 @@ export async function onRequest(context) {
     const articles = await articlesRes.json();
 
     const catsRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/ivy_categories?select=slug,created_at`,
+      `${SUPABASE_URL}/rest/v1/ivy_categories?select=id,slug,created_at`,
       { headers: { apikey: KEY, Authorization: `Bearer ${KEY}` } }
     );
     const categories = catsRes.ok ? await catsRes.json() : [];
@@ -31,6 +31,16 @@ export async function onRequest(context) {
     const today = new Date().toISOString().slice(0, 10);
     const escape = s => String(s).replace(/[&<>"']/g, c =>
       ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c]));
+
+    // Per-category lastmod = latest article in that category
+    const catLastMod = {};
+    for (const a of articles) {
+      if (!a.category_id) continue;
+      const lm = (a.updated_at || a.created_at || today).slice(0, 10);
+      if (!catLastMod[a.category_id] || lm > catLastMod[a.category_id]) {
+        catLastMod[a.category_id] = lm;
+      }
+    }
 
     const staticPages = [
       { loc: '/',         priority: '1.0', changefreq: 'daily' },
@@ -51,7 +61,7 @@ export async function onRequest(context) {
     }
 
     for (const cat of categories) {
-      const lastmod = (cat.created_at || today).slice(0, 10);
+      const lastmod = catLastMod[cat.id] || (cat.created_at || today).slice(0, 10);
       urls.push(
         `  <url>\n` +
         `    <loc>${BASE_URL}/category/${escape(cat.slug)}</loc>\n` +
@@ -65,19 +75,25 @@ export async function onRequest(context) {
     for (const a of articles) {
       if (!a.slug) continue;
       const lastmod = (a.updated_at || a.created_at || today).slice(0, 10);
-      urls.push(
+      let entry =
         `  <url>\n` +
         `    <loc>${BASE_URL}/article/${escape(a.slug)}</loc>\n` +
         `    <lastmod>${lastmod}</lastmod>\n` +
         `    <changefreq>monthly</changefreq>\n` +
-        `    <priority>0.8</priority>\n` +
-        `  </url>`
-      );
+        `    <priority>0.8</priority>`;
+      if (a.cover_image && /^https?:\/\//i.test(a.cover_image)) {
+        entry += `\n    <image:image>\n` +
+          `      <image:loc>${escape(a.cover_image)}</image:loc>` +
+          (a.title ? `\n      <image:title>${escape(a.title)}</image:title>` : '') +
+          `\n    </image:image>`;
+      }
+      entry += `\n  </url>`;
+      urls.push(entry);
     }
 
     const xml =
       `<?xml version="1.0" encoding="UTF-8"?>\n` +
-      `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+      `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n` +
       urls.join('\n') + '\n' +
       `</urlset>\n`;
 
