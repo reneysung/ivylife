@@ -26,20 +26,20 @@ export async function onRequest(context) {
       { headers: { apikey: KEY, Authorization: `Bearer ${KEY}` } }
     );
     if (!apiResp.ok) {
-      return context.env.ASSETS.fetch(new Request(`${new URL(context.request.url).origin}/articles/article.html?slug=${encodeURIComponent(slug)}`, context.request));
+      return context.env.ASSETS.fetch(new Request(`${new URL(context.request.url).origin}/articles/article?slug=${encodeURIComponent(slug)}`, context.request));
     }
     const rows = await apiResp.json();
     const article = rows && rows[0];
 
     if (!article) {
-      const notFound = await context.env.ASSETS.fetch(new Request(`${new URL(context.request.url).origin}/articles/article.html?slug=${encodeURIComponent(slug)}`, context.request));
+      const notFound = await context.env.ASSETS.fetch(new Request(`${new URL(context.request.url).origin}/articles/article?slug=${encodeURIComponent(slug)}`, context.request));
       return new Response(await notFound.text(), {
         status: 404,
         headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=300' },
       });
     }
 
-    const templateResp = await context.env.ASSETS.fetch(new Request(`${new URL(context.request.url).origin}/articles/article.html`, context.request));
+    const templateResp = await context.env.ASSETS.fetch(new Request(`${new URL(context.request.url).origin}/articles/article`, context.request));
     let html = await templateResp.text();
 
     const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

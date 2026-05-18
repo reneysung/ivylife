@@ -26,7 +26,7 @@ export async function onRequest(context) {
     const cat = cats[0];
 
     if (!cat) {
-      const templateResp = await context.env.ASSETS.fetch(new Request(`${new URL(context.request.url).origin}/category.html`, context.request));
+      const templateResp = await context.env.ASSETS.fetch(new Request(`${new URL(context.request.url).origin}/category`, context.request));
       return new Response(await templateResp.text(), {
         status: 404,
         headers: { 'Content-Type': 'text/html; charset=utf-8' },
@@ -35,7 +35,7 @@ export async function onRequest(context) {
 
     const articles = artResp.ok ? await artResp.json() : [];
 
-    const templateResp = await context.env.ASSETS.fetch(new Request(`${new URL(context.request.url).origin}/category.html`, context.request));
+    const templateResp = await context.env.ASSETS.fetch(new Request(`${new URL(context.request.url).origin}/category`, context.request));
     let html = await templateResp.text();
 
     const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
