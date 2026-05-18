@@ -119,7 +119,7 @@ export async function onRequest(context) {
       }).join('\n');
       html = html.replace(
         /<div id="articleGrid"[^>]*>[\s\S]*?<\/div>\s*<div class="pagination"/,
-        `<div id="articleGrid" class="articles-grid">${cardsHtml}</div><div class="pagination"`
+        `<div id="articleGrid" class="articles-grid" data-ssr="1">${cardsHtml}</div><div class="pagination"`
       );
     }
 

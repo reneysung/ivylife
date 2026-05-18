@@ -138,6 +138,11 @@ ${localBusinessLd ? `<script type="application/ld+json">${JSON.stringify(localBu
 
     html = html.replace('</head>', headInject + '\n</head>');
 
+    // Inline article data so client JS can skip a Supabase round-trip
+    // (also fixes "loading…" flash on slow connections).
+    const inlineDataTag = `<script id="__ssr_article" type="application/json">${JSON.stringify(article).replace(/<\/script/gi, '<\\/script')}</script>`;
+    html = html.replace('</body>', inlineDataTag + '\n</body>');
+
     return new Response(html, {
       status: 200,
       headers: {

@@ -58,7 +58,26 @@
 const PAGE_SIZE=12;let pg=0;
 async function loadPage(p=0){
   const params=new URLSearchParams(window.location.search);
-  const catSlug=params.get('cat')||'';
+  // Support both /category?cat=X and /category/X
+  const pathMatch=window.location.pathname.match(/^\/category\/([^/?#]+)/);
+  const catSlug=params.get('cat')||(pathMatch?decodeURIComponent(pathMatch[1]):'');
+  // If SSR already rendered cards (CF Pages Function path), skip the re-fetch on first page
+  const grid=document.getElementById('articleGrid');
+  if(p===0 && grid && grid.getAttribute('data-ssr')==='1'){
+    // Still update title/meta from category data, but don't blow away the SSR cards
+    try{
+      const cats=await getCategories();
+      const c=cats.find(x=>x.slug===catSlug);
+      if(c){
+        document.title=c.name+' - IvyLife 艾薇生活';
+        document.getElementById('breadCat').textContent=c.name;
+        document.getElementById('catIcon').textContent=c.icon||'';
+        document.getElementById('catTitle').textContent=c.name;
+        document.getElementById('catDesc').textContent=c.description||(c.name+' 主題文章精選 — 艾薇分享台灣各地'+c.name+'相關體驗。');
+      }
+    }catch(e){}
+    return;
+  }
   try{
     const cats=await getCategories();
     const c=cats.find(x=>x.slug===catSlug);

@@ -11,6 +11,9 @@
 <meta property="og:description" id="og-desc" content="">
 <meta property="og:image" id="og-image" content="https://ivylife.com.tw/og-default.jpg">
 <meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://zsebcpfblecwumbaxeaz.supabase.co">
 <link rel="stylesheet" href="/css/style.css">
 <style>
 .art-wrap{max-width:780px;margin:0 auto;padding:2rem 1.5rem 4rem}
@@ -68,7 +71,13 @@ async function load(){
   const wrap = document.getElementById('art-wrap');
   if(!slug){ wrap.innerHTML='<div class="error-state"><h2>找不到文章</h2><p><a href="/">回首頁</a></p></div>'; return; }
   try{
-    const data = await getArticleBySlug(slug);
+    // Prefer inline SSR data (set by functions/article/[slug].js) over a fresh Supabase round-trip
+    let data = null;
+    const ssrEl = document.getElementById('__ssr_article');
+    if (ssrEl) {
+      try { data = JSON.parse(ssrEl.textContent); } catch(_) {}
+    }
+    if (!data) data = await getArticleBySlug(slug);
     if(!data){
       wrap.innerHTML='<div class="error-state"><h2>文章不存在</h2><p><a href="/">回首頁</a></p></div>';
       return;
