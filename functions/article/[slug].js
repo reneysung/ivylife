@@ -43,11 +43,20 @@ export async function onRequest(context) {
     let html = await templateResp.text();
 
     const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-    const stripHtml = s => String(s == null ? '' : s).replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+    // 先解 HTML 實體（&nbsp; &amp; &#39; …），再去標籤、收斂空白；避免實體殘留被 esc() 二次編碼成 &amp;nbsp;
+    const decodeEntities = s => String(s == null ? '' : s)
+      .replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"').replace(/&#0?39;|&apos;/g, "'")
+      .replace(/&#(\d+);/g, (_, n) => { try { return String.fromCodePoint(+n); } catch (_) { return ''; } })
+      .replace(/&amp;/g, '&');
+    const stripHtml = s => decodeEntities(String(s == null ? '' : s).replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim();
+    // 按「字元」截斷（Array.from 不切斷 surrogate pair），並去掉尾端 U+FFFD 亂碼 / 落單 surrogate
+    const safeTrunc = (s, n) => Array.from(String(s == null ? '' : s)).slice(0, n).join('')
+      .replace(/[�]+$/g, '').replace(/[\uD800-\uDBFF]$/g, '').trim();
 
     const canonicalUrl = `${SITE}/article/${slug}`;
-    const title = (article.meta_title || article.title || 'IvyLife 艾薇生活').slice(0, 80);
-    const description = (article.meta_description || stripHtml(article.synopsis) || stripHtml(article.content).slice(0, 155) || 'IvyLife 艾薇生活的文章').slice(0, 200);
+    const title = safeTrunc(article.meta_title || article.title || 'IvyLife 艾薇生活', 80);
+    const description = safeTrunc(stripHtml(article.meta_description) || stripHtml(article.synopsis) || stripHtml(article.content) || 'IvyLife 艾薇生活的文章', 155);
     const image = article.cover_image || `${SITE}/og-default.jpg`;
     const cat = article.ivy_categories || {};
     const pageTitle = `${title} - IvyLife 艾薇生活`;
@@ -94,7 +103,6 @@ export async function onRequest(context) {
 
     const headInject = `
 <meta name="robots" content="index, follow">
-<meta name="keywords" content="${esc([article.keywords, article.city, cat.name, 'IvyLife', '艾薇生活'].filter(Boolean).join(','))}">
 <meta property="og:type" content="article">
 <meta property="og:url" content="${esc(canonicalUrl)}">
 <meta property="og:site_name" content="IvyLife 艾薇生活">
@@ -142,6 +150,22 @@ ${localBusinessLd ? `<script type="application/ld+json">${JSON.stringify(localBu
     // (also fixes "loading…" flash on slow connections).
     const inlineDataTag = `<script id="__ssr_article" type="application/json">${JSON.stringify(article).replace(/<\/script/gi, '<\\/script')}</script>`;
     html = html.replace('</body>', inlineDataTag + '\n</body>');
+
+    // SSR 可見正文：把 H1 + 內文寫進 #art-wrap，讓不執行 JS 的爬蟲 / AI bot 也讀得到內容（AEO）。
+    // client JS 載入後會用 __ssr_article 重新渲染並做圖片/連結後處理，整段覆蓋此內容，故對真人無影響。
+    const pubDateStr = String(article.published_at || article.created_at || '').slice(0, 10);
+    const coverSrc = article.cover_image ? article.cover_image.replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/ /g, '%20') : '';
+    const ssrContent = String(article.content || '').replace(/<script[\s\S]*?<\/script\s*>/gi, '');
+    const ssrBody = `
+      <a class="art-back" href="${cat.slug ? '/category/' + esc(cat.slug) : '/'}">← ${esc(cat.name || '返回首頁')}</a>
+      <h1 class="art-title">${esc(article.title || '')}</h1>
+      ${cat.name ? `<div><span class="art-cat-badge">${esc(cat.name)}</span></div>` : ''}
+      ${coverSrc ? `<img class="art-cover" src="${esc(coverSrc)}" alt="${esc(article.title || '')}" onerror="this.style.display='none'">` : ''}
+      <div class="art-meta">${pubDateStr ? `<span>📅 ${esc(pubDateStr)}</span>` : ''}${cat.name ? `<span>📁 ${esc(cat.name)}</span>` : ''}</div>
+      ${article.synopsis ? `<p class="art-synopsis">${esc(stripHtml(article.synopsis))}</p>` : ''}
+      <div class="art-content" id="art-body">${ssrContent}</div>
+      <div class="art-footer-line">感謝閱讀 · 艾薇生活</div>`;
+    html = html.replace('<div class="loading-state"><p>載入中…</p></div>', ssrBody);
 
     return new Response(html, {
       status: 200,

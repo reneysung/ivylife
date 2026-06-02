@@ -9,6 +9,11 @@ export async function onRequest(context) {
   const url = new URL(context.request.url);
   const path = url.pathname;
 
+  // trailing-slash 收斂：/foo/ → 301 /foo（避免 /article/x 與 /article/x/ 重複網頁；root / 不動，保留 query）
+  if (path.length > 1 && path.endsWith('/')) {
+    return Response.redirect(url.origin + path.replace(/\/+$/, '') + url.search, 301);
+  }
+
   // 鬼 URL pattern：站內錯誤連結（缺 https:）造成的偽路徑、以及不存在的 PHP/ASPX 探測路徑
   const ghostPatterns = [
     /^\/www\./i,            // /www.facebook.com/... /www.anywhere.com/...

@@ -104,6 +104,11 @@ export async function onRequest(context) {
       /<link\s+rel="canonical"\s+id="canonical"[^>]*>/,
       `<link rel="canonical" id="canonical" href="${esc(canonicalUrl)}">`
     );
+    // SSR H1：把靜態「分類文章」換成實際分類名，讓不執行 JS 的爬蟲讀到正確標題
+    html = html.replace(
+      /<h1 id="catTitle">[^<]*<\/h1>/,
+      `<h1 id="catTitle">${esc(cat.name)}</h1>`
+    );
 
     html = html.replace('</head>', headInject + '\n</head>');
 
