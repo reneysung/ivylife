@@ -49,9 +49,9 @@ export async function onRequest(context) {
       .replace(/&quot;/g, '"').replace(/&#0?39;|&apos;/g, "'")
       .replace(/&#(\d+);/g, (_, n) => { try { return String.fromCodePoint(+n); } catch (_) { return ''; } })
       .replace(/&amp;/g, '&');
-    // 去標籤 → 解實體 → 再去一次標籤（處理 synopsis 內雙重編碼的 &lt;div…&gt;）
+    // 去標籤 → 解實體 → 再去標籤 → 去尾端被截斷的不完整標籤（synopsis 在 DB 被截成 300 字、結尾常卡半截 <div style="te，無結尾 > 故 /<[^>]+>/ 抓不到）
     const stripHtml = s => decodeEntities(String(s == null ? '' : s).replace(/<[^>]+>/g, ''))
-      .replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+      .replace(/<[^>]+>/g, '').replace(/<[^>]*$/, '').replace(/\s+/g, ' ').trim();
     // 按「字元」截斷（Array.from 不切斷 surrogate pair），並去掉尾端 U+FFFD 亂碼 / 落單 surrogate
     const safeTrunc = (s, n) => Array.from(String(s == null ? '' : s)).slice(0, n).join('')
       .replace(/[�]+$/g, '').replace(/[\uD800-\uDBFF]$/g, '').trim();
