@@ -9,8 +9,10 @@ export async function onRequest(context) {
   const url = new URL(context.request.url);
   const path = url.pathname;
 
-  // trailing-slash 收斂：/foo/ → 301 /foo（避免 /article/x 與 /article/x/ 重複網頁；root / 不動，保留 query）
-  if (path.length > 1 && path.endsWith('/')) {
+  // trailing-slash 收斂：/article/x/ 與 /category/x/ → 301 去斜線（避免重複網頁）
+  // ⚠️ 只限這兩個 Pages Function 內容路由：靜態目錄（/ivy-cms/、/tools/…含 index.html）由 CF Pages 原生加回斜線，
+  //    若一律去斜線會與 CF 308 互打成無限重定向迴圈（後台會打不開）。
+  if (path.endsWith('/') && (path.startsWith('/article/') || path.startsWith('/category/'))) {
     return Response.redirect(url.origin + path.replace(/\/+$/, '') + url.search, 301);
   }
 
