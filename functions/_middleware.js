@@ -16,6 +16,33 @@ export async function onRequest(context) {
     return Response.redirect(url.origin + path.replace(/\/+$/, '') + url.search, 301);
   }
 
+  // ── 後台保護：Basic Auth + service_role key 注入 ──
+  // /ivy-cms*、/admin.html、/admin-v2.html 需登入；未設定 ADMIN_PASS 一律擋（fail-closed）。
+  // 登入後才把頁面內的 __SB_SERVICE_KEY__ 佔位符換成 env 金鑰 → 金鑰不進 git、匿名者拿不到。
+  const isAdmin = path === '/ivy-cms' || path.startsWith('/ivy-cms/') ||
+                  path === '/admin' || path === '/admin.html' || path === '/admin-v2.html';
+  if (isAdmin) {
+    if (!checkAdminAuth(context.request, context.env)) {
+      return new Response('需要登入', {
+        status: 401,
+        headers: {
+          'WWW-Authenticate': 'Basic realm="IvyLife Admin", charset="UTF-8"',
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': 'no-store',
+        },
+      });
+    }
+    const res = await context.next();
+    const ct = res.headers.get('Content-Type') || '';
+    if (ct.includes('text/html') && context.env.SB_SERVICE_KEY) {
+      const html = (await res.text()).split('__SB_SERVICE_KEY__').join(context.env.SB_SERVICE_KEY);
+      const headers = new Headers(res.headers);
+      headers.set('Cache-Control', 'no-store');
+      return new Response(html, { status: res.status, headers });
+    }
+    return res;
+  }
+
   // 鬼 URL pattern：站內錯誤連結（缺 https:）造成的偽路徑、以及不存在的 PHP/ASPX 探測路徑
   const ghostPatterns = [
     /^\/www\./i,            // /www.facebook.com/... /www.anywhere.com/...
@@ -47,4 +74,21 @@ export async function onRequest(context) {
 
   // 不是鬼 URL，繼續走原本的路由邏輯
   return context.next();
+}
+
+// Basic Auth 檢查；未設定 ADMIN_PASS 時一律回 false（fail-closed），避免設定遺漏導致後台裸奔。
+// 只比對「密碼」，帳號可任意填 —— 避免帳號值的編碼/設定不一致把人鎖在外面（單一管理者工具，密碼即足夠）。
+function checkAdminAuth(request, env) {
+  const pass = env.ADMIN_PASS;
+  if (!pass) return false;
+  const h = request.headers.get('Authorization') || '';
+  if (!h.startsWith('Basic ')) return false;
+  let decoded;
+  try {
+    const bin = atob(h.slice(6));
+    decoded = new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0))); // 正確還原 UTF-8（密碼含中文也 OK）
+  } catch (e) { return false; }
+  const i = decoded.indexOf(':');
+  if (i < 0) return false;
+  return decoded.slice(i + 1) === pass;
 }
