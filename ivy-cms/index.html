@@ -169,7 +169,7 @@ input:checked+.sl2:before{transform:translateX(18px)}
 .fc.half{width:calc(50% - 8px)}.fg{margin-bottom:14px}.fg>.lb{display:block}.fg.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}.fg.two>div{margin-bottom:0}.fg{margin-bottom:14px}.fg>.lb{display:block}.fg.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}.fg.two>div{margin-bottom:0}#p-ca .tb{overflow-x:auto}#p-ca table{width:100%;min-width:400px;border-collapse:collapse}#p-ca table th,#p-ca table td{padding:8px 12px;text-align:left;border-bottom:1px solid #eee;white-space:nowrap;word-break:normal}#p-ca table th{background:var(--rose);color:white;font-weight:600}
 </style></head>
 <body>
-<div id="lp" class="lw">
+<div id="lp" class="lw" style="display:none">
   <div class="lb">
     <div class="ll"><span class="ivy">Ivy</span><span class="life">Life</span></div>
     <div class="ls">後台管理系統</div>
@@ -265,23 +265,16 @@ input:checked+.sl2:before{transform:translateX(18px)}
 <script>
 const SB='https://zsebcpfblecwumbaxeaz.supabase.co';
 const K='__SB_SERVICE_KEY__'; // 由 Pages middleware 於登入後注入 env.SB_SERVICE_KEY（金鑰不進 git）
-const PW='ivy2024admin';
+// 第二道登入已移除（弱密碼下架）：本頁改由 Cloudflare Pages middleware 的 Basic Auth 保護
 let eid=null,q=null;
 
 function toast(msg,err){var el=document.getElementById('ts-toast');if(!el){el=document.createElement('div');el.id='ts-toast';el.style='position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:8px;font-size:14px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.2);transition:opacity .5s;pointer-events:none';document.body.appendChild(el);}el.textContent=msg;el.style.background=err?'#e53935':'#43a047';el.style.color='#fff';el.style.opacity='1';clearTimeout(el._t);el._t=setTimeout(function(){el.style.opacity='0';},2800);}
-function doLogin(){
-  const pw=document.getElementById('pwIn').value;
-  if(pw===PW){
-    sessionStorage.setItem('ia','1');
-    document.getElementById('lp').style.display='none';
-    document.getElementById('ap').style.display='grid';
-    go('db');
-  } else {
-    const el=document.getElementById('pwIn');
-    el.style.borderColor='#ef4444';el.value='';el.placeholder='\u5bc6\u78bc\u932f\u8aa4\uff0c\u8acb\u91cd\u8a66';
-    setTimeout(()=>{el.style.borderColor='';el.placeholder='\u8acb\u8f38\u5165\u7ba1\u7406\u54e1\u5bc6\u78bc';},1500);
-  }
+function enterAdmin(){
+  var lp=document.getElementById('lp');if(lp)lp.style.display='none';
+  var ap=document.getElementById('ap');if(ap)ap.style.display='grid';
+  try{go('db');}catch(e){}
 }
+function doLogin(){enterAdmin();}
 function logout(){sessionStorage.removeItem('ia');location.reload();}
 
 async function sb(path,opts={}){
@@ -658,6 +651,8 @@ function editCat(id,name,slug,sort){
 
 function applyHtmlSource(){if(!window.editor)return;var html=document.getElementById('html-ta')?.value||'';window.editor.commands.setContent(html,false);closeHtmlModal();}function closeHtmlModal(){document.getElementById("html-modal").style.display="none";}
 function openHtmlModal(){if(!window.editor)return;const ta=document.getElementById('html-ta');if(ta)ta.value=window.editor.getHTML();const m=document.getElementById('html-modal');if(m)m.style.display='flex';}
+// 進站即顯示後台（Basic Auth 已在前面擋過，無需頁面內第二道登入）
+enterAdmin();
 </script>
 <input type="file" id="qfi" accept="image/*" style="position:fixed;opacity:0;width:1px;height:1px;top:-9999px">
 <div id="html-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;align-items:center;justify-content:center"><div style="background:white;border-radius:16px;padding:1.5rem;width:90%;max-width:700px;max-height:80vh;display:flex;flex-direction:column;gap:1rem"><div style="display:flex;align-items:center;justify-content:space-between"><h3 style="font-size:1rem;font-weight:600">HTML 原始碼</h3><button onclick="closeHtmlModal()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:#999">x</button></div><p style="font-size:0.8rem;color:#888">貼上 HTML 原始碼（支援痞客邦）</p><textarea id="html-ta" style="flex:1;min-height:250px;border:1.5px solid #e0d0d2;border-radius:8px;padding:.75rem;font-family:monospace;font-size:.78rem;resize:vertical;outline:none" placeholder="在此貼上 HTML..."></textarea><div style="display:flex;gap:.75rem;justify-content:flex-end"><button onclick="closeHtmlModal()" style="padding:9px 18px;border:1.5px solid #e0d0d2;border-radius:8px;cursor:pointer;background:white;font-family:inherit">取消</button><button onclick="applyHtmlSource()" style="padding:9px 18px;background:linear-gradient(135deg,#c8566a,#e07a8a);color:white;border:none;border-radius:8px;cursor:pointer;font-weight:500;font-family:inherit">套用</button></div></div></div>
