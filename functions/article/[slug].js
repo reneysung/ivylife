@@ -43,6 +43,7 @@ export async function onRequest(context) {
     let html = await templateResp.text();
 
     const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const ivThumb = (u, w) => (!u || u.indexOf('/storage/v1/object/public/') < 0) ? u : u.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') + (u.indexOf('?') < 0 ? '?' : '&') + 'width=' + (w || 600) + '&quality=62';
     // 先解 HTML 實體（&nbsp; &amp; &#39; …），再去標籤、收斂空白；避免實體殘留被 esc() 二次編碼成 &amp;nbsp;
     const decodeEntities = s => String(s == null ? '' : s)
       .replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
@@ -156,7 +157,7 @@ ${localBusinessLd ? `<script type="application/ld+json">${JSON.stringify(localBu
     // SSR 可見正文：把 H1 + 內文寫進 #art-wrap，讓不執行 JS 的爬蟲 / AI bot 也讀得到內容（AEO）。
     // client JS 載入後會用 __ssr_article 重新渲染並做圖片/連結後處理，整段覆蓋此內容，故對真人無影響。
     const pubDateStr = String(article.published_at || article.created_at || '').slice(0, 10);
-    const coverSrc = article.cover_image ? article.cover_image.replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/ /g, '%20') : '';
+    const coverSrc = article.cover_image ? ivThumb(article.cover_image, 1200).replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/ /g, '%20') : '';
     const ssrContent = String(article.content || '').replace(/<script[\s\S]*?<\/script\s*>/gi, '');
     const ssrBody = `
       <a class="art-back" href="${cat.slug ? '/category/' + esc(cat.slug) : '/'}">← ${esc(cat.name || '返回首頁')}</a>

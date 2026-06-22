@@ -68,6 +68,13 @@ function formatDate(s) {
   });
 }
 
+// 把 Supabase 原圖網址轉成縮圖端點（卡片只需小圖，瀏覽器自動拿 WebP）；外站圖（痞客邦/blogger）原樣回傳
+function ivThumb(u, w) {
+  if (!u || u.indexOf('/storage/v1/object/public/') < 0) return u;
+  return u.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') +
+    (u.indexOf('?') < 0 ? '?' : '&') + 'width=' + (w || 600) + '&quality=62';
+}
+
 function categoryIcon(n) {
   var map = {
     '美食餐廣': '🍜',

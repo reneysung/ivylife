@@ -94,7 +94,7 @@ async function loadPage(p=0){
     const as=await getArticles({categorySlug:catSlug,limit:PAGE_SIZE,offset:p*PAGE_SIZE});
     const g=document.getElementById('articleGrid');
     if(!as.length&&p===0){g.innerHTML='<p style="grid-column:1/-1;text-align:center;color:var(--text-light);padding:3rem">此分類尚無文章</p>';return;}
-    g.innerHTML=as.map(a=>'<a class="article-card fade-in" href="/article/'+(a.slug||a.id)+'" style="text-decoration:none;color:inherit"><div class="card-img"'+(a.cover_image?' style=\"background-image:url('+a.cover_image+');background-size:cover;background-position:center\"':'')+'>'+(a.cover_image?'':categoryIcon(a.ivy_categories?.name||''))+'</div><div class="card-body"><span class="card-category">'+(a.ivy_categories?.name||'')+'</span><h3 class="card-title">'+a.title+'</h3><p class="card-synopsis">'+(a.synopsis||'')+'</p><span class="card-meta">'+formatDate(a.created_at)+'</span></div></a>').join('');
+    g.innerHTML=as.map(a=>'<a class="article-card fade-in" href="/article/'+(a.slug||a.id)+'" style="text-decoration:none;color:inherit"><div class="card-img"'+(a.cover_image?' style=\"background-image:url('+ivThumb(a.cover_image,600)+');background-size:cover;background-position:center\"':'')+'>'+(a.cover_image?'':categoryIcon(a.ivy_categories?.name||''))+'</div><div class="card-body"><span class="card-category">'+(a.ivy_categories?.name||'')+'</span><h3 class="card-title">'+a.title+'</h3><p class="card-synopsis">'+(a.synopsis||'')+'</p><span class="card-meta">'+formatDate(a.created_at)+'</span></div></a>').join('');
     let pag='';
     if(p>0)pag+='<a href="#" onclick="changePage('+(p-1)+')">‹</a>';
     pag+='<span class="active">'+(p+1)+'</span>';

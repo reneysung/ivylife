@@ -88,9 +88,10 @@ function fmtDate(s) {
   return d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0');
 }
 
+function ivThumb(u,w){if(!u||u.indexOf('/storage/v1/object/public/')<0)return u;return u.replace('/storage/v1/object/public/','/storage/v1/render/image/public/')+(u.indexOf('?')<0?'?':'&')+'width='+(w||600)+'&quality=62';}
 function cardHtml(a) {
   var _ci=a.cover_image||(a.content||'').match(/<img[^>]+src=["'](https?:[^"'>]+)["']/)?.[1]||'';const img = _ci
-    ? '<img class="card-img" src="' + _ci + '" alt="' + a.title + '" loading="lazy">'
+    ? '<img class="card-img" src="' + ivThumb(_ci,600) + '" alt="' + a.title + '" loading="lazy">'
     : '<div class="card-img">' + (a.emoji || '📝') + '</div>';
   return '<a class="card" href="/articles/' + a.slug + '">' +
     img +

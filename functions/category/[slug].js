@@ -40,6 +40,7 @@ export async function onRequest(context) {
 
     const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const stripHtml = s => String(s == null ? '' : s).replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+    const ivThumb = (u, w) => (!u || u.indexOf('/storage/v1/object/public/') < 0) ? u : u.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') + (u.indexOf('?') < 0 ? '?' : '&') + 'width=' + (w || 600) + '&quality=62';
 
     const canonicalUrl = `${SITE}/category/${slug}`;
     const title = `${cat.name} - IvyLife 艾薇生活`;
@@ -118,7 +119,7 @@ export async function onRequest(context) {
         const date = a.created_at ? new Date(a.created_at).toLocaleDateString('zh-TW') : '';
         const synopsis = stripHtml(a.synopsis).slice(0, 80);
         const thumb = a.cover_image
-          ? `<img src="${esc(a.cover_image)}" alt="${esc(a.title)}" loading="lazy" style="width:100%;height:100%;object-fit:cover">`
+          ? `<img src="${esc(ivThumb(a.cover_image, 600))}" alt="${esc(a.title)}" loading="lazy" style="width:100%;height:100%;object-fit:cover">`
           : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:2rem">${esc(cat.icon || '📝')}</div>`;
         return `<a class="article-card" href="/article/${esc(a.slug)}" style="text-decoration:none;color:inherit"><div class="card-img">${thumb}</div><div class="card-body"><span class="card-category">${esc(cat.name)}</span><h3 class="card-title">${esc(a.title)}</h3><p class="card-synopsis">${esc(synopsis)}</p><span class="card-meta">${esc(date)}</span></div></a>`;
       }).join('\n');
