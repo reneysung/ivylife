@@ -158,7 +158,9 @@ ${localBusinessLd ? `<script type="application/ld+json">${JSON.stringify(localBu
     // client JS 載入後會用 __ssr_article 重新渲染並做圖片/連結後處理，整段覆蓋此內容，故對真人無影響。
     const pubDateStr = String(article.published_at || article.created_at || '').slice(0, 10);
     const coverSrc = article.cover_image ? ivThumb(article.cover_image, 1200).replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/ /g, '%20') : '';
-    const ssrContent = String(article.content || '').replace(/<script[\s\S]*?<\/script\s*>/gi, '');
+    const ssrContent = String(article.content || '')
+      .replace(/<script[\s\S]*?<\/script\s*>/gi, '')
+      .replace(/<img(?![^>]*\balt=)/gi, `<img alt="${esc(article.title || '')}" `); // 補內文圖 alt（只補沒有的）
     const ssrBody = `
       <a class="art-back" href="${cat.slug ? '/category/' + esc(cat.slug) : '/'}">← ${esc(cat.name || '返回首頁')}</a>
       <h1 class="art-title">${esc(article.title || '')}</h1>

@@ -127,6 +127,8 @@ const KEY='sb_publishable_L2DOfeM0cAJqwlVCr1LwtA_jE9MBNDn';
 async function sbGet(p){const r=await fetch(SB+'/rest/v1/'+p,{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}});return r.json();}
 function esc(s){return s?s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
 function ivThumb(u,w){if(!u||u.indexOf('/storage/v1/object/public/')<0)return u;return u.replace('/storage/v1/object/public/','/storage/v1/render/image/public/')+(u.indexOf('?')<0?'?':'&')+'width='+(w||600)+'&quality=62';}
+// 補內文圖 alt（只補沒有的）：用文章標題當描述性 fallback，利 SEO 圖片搜尋與無障礙
+function imgAlt(html,alt){var a=String(alt||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');return String(html||'').replace(/<img(?![^>]*\balt=)/gi,'<img alt="'+a+'" ');}
 function fmtDate(s){return s?new Date(s).toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric'}):'';}
 const slug=(new URLSearchParams(location.search)).get('slug')||decodeURIComponent(location.pathname.split('/article/')[1]?.replace(/\/$/,'')||'');
 const _isId=/^\d+$/.test(slug);async function loadArticle(){
@@ -152,7 +154,7 @@ const _isId=/^\d+$/.test(slug);async function loadArticle(){
     headline:a.title,description:md,image:a.cover_image||'',
     datePublished:a.created_at,dateModified:a.updated_at||a.created_at,
     author:{'@type':'Person',name:'艾薇'},
-    publisher:{'@type':'Organization',name:'IvyLife 艾薇生活',logo:{'@type':'ImageObject',url:'https://glowing-pixie-fc3fe2.netlify.app/logo.svg'}},
+    publisher:{'@type':'Organization',name:'IvyLife 艾薇生活',logo:{'@type':'ImageObject',url:'https://ivylife.com.tw/favicon.png'}},
     mainEntityOfPage:{'@type':'WebPage','@id':url}
   };
   if(a.store_name)ld.mentions={'@type':'LocalBusiness',name:a.store_name,address:a.store_address||'',telephone:a.store_phone||'',openingHours:a.store_hours||''};
@@ -165,7 +167,7 @@ const _isId=/^\d+$/.test(slug);async function loadArticle(){
   const rel=await sbGet('ivy_articles?select=*,ivy_categories(name,slug,icon)&category_id=eq.'+a.category_id+'&slug=neq.'+slug+'&published=eq.true&limit=4&order=created_at.desc');
   const relHtml=rel.length?'<div class="related"><h2>🔗 相關文章</h2><div class="related-grid">'+rel.slice(0,4).map(r=>'<a href="/article/'+r.slug+'" class="related-card"><div class="related-thumb">'+(r.cover_image?'<img src="'+esc(ivThumb(r.cover_image,400))+'" alt="'+esc(r.title)+'" loading="lazy">':'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:1.5rem">'+(r.ivy_categories?.icon||'📝')+'</div>')+'</div><div><div class="related-cat">'+(r.ivy_categories?.name||'')+'</div><div class="related-title">'+esc(r.title)+'</div></div></a>').join('')+'</div></div>':'';
   const shareHtml='<div class="share-bar"><span class="share-label">分享：</span><a class="share-btn" href="https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url)+'" target="_blank" rel="noopener">📘 Facebook</a><a class="share-btn" href="https://line.me/R/msg/text/?'+encodeURIComponent(a.title+' '+url)+'" target="_blank" rel="noopener">💬 LINE</a><button class="share-btn" onclick="navigator.clipboard.writeText(location.href).then(()=>alert('\u9023\u7d50\u5df2\u8907\u88fd\uff01'))">🔗 複製連結</button></div>';
-  document.getElementById('artBody').innerHTML='<a href="'+(a.ivy_categories?'/category?cat='+a.ivy_categories.slug:'/')+'" class="back-link">← '+(a.ivy_categories?.name||'返回')+'</a><div class="art-meta">'+(a.ivy_categories?'<a href="/category?cat='+a.ivy_categories.slug+'" class="cat-badge">'+a.ivy_categories.name+'</a>':'')+(a.city?'<span class="city-badge">📍 '+esc(a.city)+'</span>':'')+'<span class="art-date">🗓️ '+fmtDate(a.created_at)+'</span></div><h1 class="art-title">'+esc(a.title)+'</h1>'+(a.synopsis?'<div class="art-synopsis">'+esc(a.synopsis)+'</div>':'')+'<div class="art-content">'+(a.content||'')+'</div>'+storeCard+kwHtml+shareHtml+relHtml;
+  document.getElementById('artBody').innerHTML='<a href="'+(a.ivy_categories?'/category?cat='+a.ivy_categories.slug:'/')+'" class="back-link">← '+(a.ivy_categories?.name||'返回')+'</a><div class="art-meta">'+(a.ivy_categories?'<a href="/category?cat='+a.ivy_categories.slug+'" class="cat-badge">'+a.ivy_categories.name+'</a>':'')+(a.city?'<span class="city-badge">📍 '+esc(a.city)+'</span>':'')+'<span class="art-date">🗓️ '+fmtDate(a.created_at)+'</span></div><h1 class="art-title">'+esc(a.title)+'</h1>'+(a.synopsis?'<div class="art-synopsis">'+esc(a.synopsis)+'</div>':'')+'<div class="art-content">'+imgAlt(a.content||'',a.title)+'</div>'+storeCard+kwHtml+shareHtml+relHtml;
 }
 function notFound(){document.getElementById('artBody').innerHTML='<div class="not-found"><h2>😕 找不到文章</h2><p>這篇文章不存在或已被移除</p><br><a href="/" style="color:var(--rose)">← 回首頁</a></div>';}
 loadArticle();

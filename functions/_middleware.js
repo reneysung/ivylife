@@ -9,6 +9,11 @@ export async function onRequest(context) {
   const url = new URL(context.request.url);
   const path = url.pathname;
 
+  // www → non-www 301：正規網域為 ivylife.com.tw（與 sitemap / canonical 一致），收斂重複內容
+  if (url.hostname === 'www.ivylife.com.tw') {
+    return Response.redirect('https://ivylife.com.tw' + path + url.search, 301);
+  }
+
   // trailing-slash 收斂：/article/x/ 與 /category/x/ → 301 去斜線（避免重複網頁）
   // ⚠️ 只限這兩個 Pages Function 內容路由：靜態目錄（/ivy-cms/、/tools/…含 index.html）由 CF Pages 原生加回斜線，
   //    若一律去斜線會與 CF 308 互打成無限重定向迴圈（後台會打不開）。
