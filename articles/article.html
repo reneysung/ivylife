@@ -93,12 +93,13 @@ async function load(){
     document.getElementById('og-title').content = data.title;
     document.getElementById('og-desc').content = data.meta_description||data.synopsis||'';
     if(data.cover_image) document.getElementById('og-image').content = data.cover_image;
-    
+    // Supabase 圖走縮圖端點（render/image + width）→ 出小 WebP；外站圖原樣
+    function RIMG(u,w){if(!u||u.indexOf('/storage/v1/object/public/')<0)return u;return u.replace('/storage/v1/object/public/','/storage/v1/render/image/public/')+(u.indexOf('?')<0?'?':'&')+'width='+w+'&quality=62';}
     wrap.innerHTML = `
       <a class="art-back" href="${catSlug?'/category/'+catSlug:'/'}">← ${catName||'返回首頁'}</a>
       <h1 class="art-title">${data.title||''}</h1>
       ${catName?`<div><span class="art-cat-badge">${catName}</span></div>`:''}
-      ${data.cover_image?`<img class="art-cover" src="${data.cover_image.replace(/\(/g,'%28').replace(/\)/g,'%29').replace(/ /g,'%20')}" alt="${data.title||''}" onerror="this.style.display='none'">`:''}
+      ${data.cover_image?`<img class="art-cover" src="${RIMG(data.cover_image,1200).replace(/\(/g,'%28').replace(/\)/g,'%29').replace(/ /g,'%20')}" alt="${data.title||''}" loading="eager" onerror="this.style.display='none'">`:''}
       
       <div class="art-meta">
         ${pubDate?`<span>📅 ${pubDate}</span>`:''}
@@ -160,6 +161,13 @@ async function load(){
           }
         });
       }
+      // 內文圖最佳化：Supabase 走縮圖端點 + 補 alt / lazy（只補沒有的）
+      document.querySelectorAll('#art-body img').forEach(function(img){
+        var s=img.getAttribute('src')||'';
+        if(s.indexOf('/storage/v1/object/public/')>-1) img.setAttribute('src', RIMG(s,800));
+        if(!img.getAttribute('alt')) img.setAttribute('alt', data.title||'');
+        if(!img.getAttribute('loading')){ img.setAttribute('loading','lazy'); img.setAttribute('decoding','async'); }
+      });
       // YouTube 連結轉 iframe
       (function(){
         var ytRe=/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?(?:[\w=&]*&)?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
