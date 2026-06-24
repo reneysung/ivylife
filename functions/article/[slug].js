@@ -160,6 +160,7 @@ ${localBusinessLd ? `<script type="application/ld+json">${JSON.stringify(localBu
     const coverSrc = article.cover_image ? ivThumb(article.cover_image, 1200).replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/ /g, '%20') : '';
     const ssrContent = String(article.content || '')
       .replace(/<script[\s\S]*?<\/script\s*>/gi, '')
+      .replace(/(<img[^>]*\bsrc=")([^"]+)"/gi, (m, p, u) => p + (u.indexOf('/storage/v1/object/public/') > -1 ? u.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') + (u.indexOf('?') < 0 ? '?' : '&') + 'width=800&quality=62' : u) + '"') // Supabase 內文圖走縮圖端點
       .replace(/<img(?![^>]*\balt=)/gi, `<img alt="${esc(article.title || '')}" `) // 補內文圖 alt（只補沒有的）
       .replace(/<img(?![^>]*\bloading=)/gi, '<img loading="lazy" decoding="async" '); // 長文懶載入，省初始載入
     const ssrBody = `
