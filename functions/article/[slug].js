@@ -160,7 +160,8 @@ ${localBusinessLd ? `<script type="application/ld+json">${JSON.stringify(localBu
     const coverSrc = article.cover_image ? ivThumb(article.cover_image, 1200).replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/ /g, '%20') : '';
     const ssrContent = String(article.content || '')
       .replace(/<script[\s\S]*?<\/script\s*>/gi, '')
-      .replace(/<img(?![^>]*\balt=)/gi, `<img alt="${esc(article.title || '')}" `); // 補內文圖 alt（只補沒有的）
+      .replace(/<img(?![^>]*\balt=)/gi, `<img alt="${esc(article.title || '')}" `) // 補內文圖 alt（只補沒有的）
+      .replace(/<img(?![^>]*\bloading=)/gi, '<img loading="lazy" decoding="async" '); // 長文懶載入，省初始載入
     const ssrBody = `
       <a class="art-back" href="${cat.slug ? '/category/' + esc(cat.slug) : '/'}">← ${esc(cat.name || '返回首頁')}</a>
       <h1 class="art-title">${esc(article.title || '')}</h1>
