@@ -126,9 +126,9 @@ const SB='https://zsebcpfblecwumbaxeaz.supabase.co';
 const KEY='sb_publishable_L2DOfeM0cAJqwlVCr1LwtA_jE9MBNDn';
 async function sbGet(p){const r=await fetch(SB+'/rest/v1/'+p,{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}});return r.json();}
 function esc(s){return s?s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
-function ivThumb(u,w){if(!u||u.indexOf('/storage/v1/object/public/')<0)return u;return u.replace('/storage/v1/object/public/','/storage/v1/render/image/public/')+(u.indexOf('?')<0?'?':'&')+'width='+(w||600)+'&quality=62';}
+function ivThumb(u,w){if(!u||u.indexOf('/storage/v1/object/public/')<0)return u;return u.replace('/storage/v1/object/public/','/storage/v1/render/image/public/')+(u.indexOf('?')<0?'?':'&')+'width='+(w||600)+'&resize=contain&quality=62';}
 // 內文圖：補 alt（標題當 fallback）+ 補 loading=lazy（只補沒有的）→ 長文不再一次載入幾十張全尺寸圖
-function imgAlt(html,alt){var a=String(alt||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');return String(html||'').replace(/(<img[^>]*\bsrc=")([^"]+)"/gi,function(m,p,u){return p+(u.indexOf('/storage/v1/object/public/')>-1?u.replace('/storage/v1/object/public/','/storage/v1/render/image/public/')+(u.indexOf('?')<0?'?':'&')+'width=800&quality=62':u)+'"';}).replace(/<img(?![^>]*\balt=)/gi,'<img alt="'+a+'" ').replace(/<img(?![^>]*\bloading=)/gi,'<img loading="lazy" decoding="async" ');}
+function imgAlt(html,alt){var a=String(alt||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');return String(html||'').replace(/(<img[^>]*\bsrc=")([^"]+)"/gi,function(m,p,u){return p+(u.indexOf('/storage/v1/object/public/')>-1?u.replace('/storage/v1/object/public/','/storage/v1/render/image/public/')+(u.indexOf('?')<0?'?':'&')+'width=800&resize=contain&quality=62':u)+'"';}).replace(/<img(?![^>]*\balt=)/gi,'<img alt="'+a+'" ').replace(/<img(?![^>]*\bloading=)/gi,'<img loading="lazy" decoding="async" ');}
 function fmtDate(s){return s?new Date(s).toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric'}):'';}
 const slug=(new URLSearchParams(location.search)).get('slug')||decodeURIComponent(location.pathname.split('/article/')[1]?.replace(/\/$/,'')||'');
 const _isId=/^\d+$/.test(slug);async function loadArticle(){

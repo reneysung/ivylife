@@ -303,7 +303,7 @@ function renderPagination(){
 function goPage(n){curPage=n;renderPage();document.getElementById("latest").scrollIntoView({behavior:"smooth",block:"start"});}
 function fmtDate(s){return s?new Date(s).toLocaleDateString("zh-TW"):"";}
 function esc(s){if(!s)return "";return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");}
-function ivThumb(u,w){if(!u||u.indexOf("/storage/v1/object/public/")<0)return u;return u.replace("/storage/v1/object/public/","/storage/v1/render/image/public/")+(u.indexOf("?")<0?"?":"&")+"width="+(w||600)+"&quality=62";}
+function ivThumb(u,w){if(!u||u.indexOf("/storage/v1/object/public/")<0)return u;return u.replace("/storage/v1/object/public/","/storage/v1/render/image/public/")+(u.indexOf("?")<0?"?":"&")+"width="+(w||600)+"&resize=contain&quality=62";}
 init();function stripHtml(h){if(!h)return'';var d=document.createElement('div');d.innerHTML=h;return(d.textContent||d.innerText||'').trim();}
 </script>
 

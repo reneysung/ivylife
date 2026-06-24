@@ -94,7 +94,7 @@ async function load(){
     document.getElementById('og-desc').content = data.meta_description||data.synopsis||'';
     if(data.cover_image) document.getElementById('og-image').content = data.cover_image;
     // Supabase 圖走縮圖端點（render/image + width）→ 出小 WebP；外站圖原樣
-    function RIMG(u,w){if(!u||u.indexOf('/storage/v1/object/public/')<0)return u;return u.replace('/storage/v1/object/public/','/storage/v1/render/image/public/')+(u.indexOf('?')<0?'?':'&')+'width='+w+'&quality=62';}
+    function RIMG(u,w){if(!u||u.indexOf('/storage/v1/object/public/')<0)return u;return u.replace('/storage/v1/object/public/','/storage/v1/render/image/public/')+(u.indexOf('?')<0?'?':'&')+'width='+w+'&resize=contain&quality=62';}
     wrap.innerHTML = `
       <a class="art-back" href="${catSlug?'/category/'+catSlug:'/'}">← ${catName||'返回首頁'}</a>
       <h1 class="art-title">${data.title||''}</h1>

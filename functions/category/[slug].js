@@ -40,7 +40,7 @@ export async function onRequest(context) {
 
     const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const stripHtml = s => String(s == null ? '' : s).replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
-    const ivThumb = (u, w) => (!u || u.indexOf('/storage/v1/object/public/') < 0) ? u : u.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') + (u.indexOf('?') < 0 ? '?' : '&') + 'width=' + (w || 600) + '&quality=62';
+    const ivThumb = (u, w) => (!u || u.indexOf('/storage/v1/object/public/') < 0) ? u : u.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') + (u.indexOf('?') < 0 ? '?' : '&') + 'width=' + (w || 600) + '&resize=contain&quality=62';
 
     const canonicalUrl = `${SITE}/category/${slug}`;
     const title = `${cat.name} - IvyLife 艾薇生活`;

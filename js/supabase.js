@@ -72,7 +72,7 @@ function formatDate(s) {
 function ivThumb(u, w) {
   if (!u || u.indexOf('/storage/v1/object/public/') < 0) return u;
   return u.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') +
-    (u.indexOf('?') < 0 ? '?' : '&') + 'width=' + (w || 600) + '&quality=62';
+    (u.indexOf('?') < 0 ? '?' : '&') + 'width=' + (w || 600) + '&resize=contain&quality=62';
 }
 
 function categoryIcon(n) {

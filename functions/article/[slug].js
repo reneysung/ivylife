@@ -43,7 +43,7 @@ export async function onRequest(context) {
     let html = await templateResp.text();
 
     const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-    const ivThumb = (u, w) => (!u || u.indexOf('/storage/v1/object/public/') < 0) ? u : u.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') + (u.indexOf('?') < 0 ? '?' : '&') + 'width=' + (w || 600) + '&quality=62';
+    const ivThumb = (u, w) => (!u || u.indexOf('/storage/v1/object/public/') < 0) ? u : u.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') + (u.indexOf('?') < 0 ? '?' : '&') + 'width=' + (w || 600) + '&resize=contain&quality=62';
     // 先解 HTML 實體（&nbsp; &amp; &#39; …），再去標籤、收斂空白；避免實體殘留被 esc() 二次編碼成 &amp;nbsp;
     const decodeEntities = s => String(s == null ? '' : s)
       .replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
@@ -160,7 +160,7 @@ ${localBusinessLd ? `<script type="application/ld+json">${JSON.stringify(localBu
     const coverSrc = article.cover_image ? ivThumb(article.cover_image, 1200).replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/ /g, '%20') : '';
     const ssrContent = String(article.content || '')
       .replace(/<script[\s\S]*?<\/script\s*>/gi, '')
-      .replace(/(<img[^>]*\bsrc=")([^"]+)"/gi, (m, p, u) => p + (u.indexOf('/storage/v1/object/public/') > -1 ? u.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') + (u.indexOf('?') < 0 ? '?' : '&') + 'width=800&quality=62' : u) + '"') // Supabase 內文圖走縮圖端點
+      .replace(/(<img[^>]*\bsrc=")([^"]+)"/gi, (m, p, u) => p + (u.indexOf('/storage/v1/object/public/') > -1 ? u.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') + (u.indexOf('?') < 0 ? '?' : '&') + 'width=800&resize=contain&quality=62' : u) + '"') // Supabase 內文圖走縮圖端點
       .replace(/<img(?![^>]*\balt=)/gi, `<img alt="${esc(article.title || '')}" `) // 補內文圖 alt（只補沒有的）
       .replace(/<img(?![^>]*\bloading=)/gi, '<img loading="lazy" decoding="async" '); // 長文懶載入，省初始載入
     const ssrBody = `
