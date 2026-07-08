@@ -468,29 +468,39 @@ function ttLink(){
   else editor.chain().focus().setLink({href:url}).run();
 }
 
+// \u524d\u7aef\u628a\u4e0a\u50b3\u5716\u8f49\u6210 WebP\uff08\u6700\u5927\u5bec\u5ea6 maxW\u3001\u54c1\u8cea q\uff09\u2192 \u65b0\u4e0a\u50b3\u4e5f\u512a\u5316\u3001\u8207\u5df2\u642c\u9077 R2 \u5716\u4e00\u81f4
+function toWebpBlob(file,maxW,q){
+  return new Promise(function(resolve,reject){
+    const img=new Image();
+    img.onload=function(){
+      let w=img.naturalWidth||img.width,h=img.naturalHeight||img.height;
+      if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
+      const c=document.createElement('canvas');c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      c.toBlob(function(b){b?resolve(b):reject(new Error('toBlob failed'));},'image/webp',q||0.72);
+    };
+    img.onerror=function(){reject(new Error('image load failed'));};
+    img.src=URL.createObjectURL(file);
+  });
+}
 function ttImg(){
   const qfi=document.getElementById('qfi');
   if(!qfi||!window.editor)return;
   window._masp=document.querySelector('.ma')?.scrollTop||0;
   window._wsp=window.scrollY;
   qfi.value='';
-  qfi.onchange=function(){
+  qfi.onchange=async function(){
     const file=qfi.files[0];if(!file)return;qfi.onchange=null;
-    const ext=file.name.split('.').pop()||'jpg';
-    const fn='img-'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;
-    const xhr=new XMLHttpRequest();
-    xhr.open('POST',SB+'/storage/v1/object/ivy-images/'+fn);
-    xhr.setRequestHeader('Authorization','Bearer '+K);
-    xhr.setRequestHeader('Content-Type',file.type);
-    xhr.onload=function(){
-      if(xhr.status>=200&&xhr.status<300){
-        const url=SB+'/storage/v1/object/public/ivy-images/'+fn;
-        editor.chain().focus().setImage({src:url}).run();
-        setTimeout(function(){const ma=document.querySelector('.ma');if(ma)ma.scrollTop=window._masp;window.scrollTo(0,window._wsp);},100);
-        if(ts){ts.className='ts';ts.textContent='\u2705 \u4e0a\u50b3\u6210\u529f';}
-      }else{if(ts){ts.className='ts sh';ts.textContent='\u26a0\ufe0f \u5931\u6557';}}
-    };
-    xhr.send(file);
+    const fn='img-'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.webp';
+    try{
+      const blob=await toWebpBlob(file,1200,0.72);
+      const r=await fetch('/ivy-cms/r2-upload?fn='+encodeURIComponent(fn),{method:'POST',headers:{'Content-Type':'image/webp'},body:blob});
+      if(!r.ok)throw new Error(await r.text());
+      const url=(await r.json()).url;
+      editor.chain().focus().setImage({src:url}).run();
+      setTimeout(function(){const ma=document.querySelector('.ma');if(ma)ma.scrollTop=window._masp;window.scrollTo(0,window._wsp);},100);
+      if(ts){ts.className='ts';ts.textContent='\u2705 \u4e0a\u50b3\u6210\u529f';}
+    }catch(e){if(ts){ts.className='ts sh';ts.textContent='\u26a0\ufe0f \u5931\u6557';}}
   };
   qfi.click();
 }
@@ -588,12 +598,12 @@ async function uploadCover(e){
   const cs=document.getElementById('cps'),ci=document.getElementById('cpi'),cw=document.getElementById('cpw');
   if(ci)ci.src=URL.createObjectURL(file);if(cw)cw.style.display='flex';
   if(cs){cs.textContent='\u23eb \u4e0a\u50b3\u4e2d...';cs.style.color='#888';}
-  const ext=file.name.split('.').pop()||'jpg';
-  const fn='cover-'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;
+  const fn='cover-'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.webp';
   try{
-    const r=await fetch(SB+'/storage/v1/object/ivy-images/'+fn,{method:'POST',headers:{'apikey':K,'Authorization':'Bearer '+K,'Content-Type':file.type},body:file});
+    const blob=await toWebpBlob(file,1200,0.72);
+    const r=await fetch('/ivy-cms/r2-upload?fn='+encodeURIComponent(fn),{method:'POST',headers:{'Content-Type':'image/webp'},body:blob});
     if(!r.ok){const t=await r.text();throw new Error(t);}
-    const ec=document.getElementById('ecov');if(ec)ec.value=SB+'/storage/v1/object/public/ivy-images/'+fn;
+    const ec=document.getElementById('ecov');if(ec)ec.value=(await r.json()).url;
     if(cs){cs.textContent='\u2705 \u4e0a\u50b3\u6210\u529f';cs.style.color='#4caf50';}
   }catch(err){if(cs){cs.textContent='\u274c \u4e0a\u50b3\u5931\u6557';cs.style.color='#ef4444';}}
   e.target.value='';
