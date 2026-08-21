@@ -234,7 +234,19 @@ function init(){
   Promise.all([
     sbFetch("ivy_categories?order=sort_order.asc"),
     sbFetch("ivy_articles?select=*,ivy_categories(name,slug,icon)&order=created_at.desc&published=eq.true")
-  ]).then(function(res){allCats=res[0];allArts=res[1];buildCats();buildFtCats();buildKw();applyFilter();});
+  ]).then(function(res){
+    allCats=res[0];allArts=res[1];
+    buildCats();buildFtCats();buildKw();
+    // 從網址帶入關鍵字篩選（文章頁的關鍵字標籤會連過來）
+    var urlKw=new URLSearchParams(location.search).get("kw");
+    if(urlKw){
+      curKw=urlKw.trim();
+      document.querySelectorAll(".kw-chip").forEach(function(c){c.classList.toggle("active",c.dataset.kw===curKw);});
+      var sec=document.getElementById("kwSection");
+      if(sec)sec.scrollIntoView({behavior:"smooth",block:"start"});
+    }
+    applyFilter();
+  });
 }
 function buildCats(){
   var w=document.getElementById("catPills");

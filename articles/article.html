@@ -129,7 +129,7 @@ async function load(){
       if(data.keywords){
         var khtml=data.keywords.split(",").map(function(k){
           var t=k.trim();
-          return "<a class=\"art-kw-tag\" href=\"/index.html?kw="+encodeURIComponent(t)+"\">" +t+"</a>";
+          return "<a class=\"art-kw-tag\" href=\"/?kw="+encodeURIComponent(t)+"\">" +t+"</a>";
         }).join("");
         c+="<div class=\"art-keywords\">" +khtml+"</div>";
       }
