@@ -86,7 +86,7 @@ async function load(){
     }
     const catName = data.ivy_categories?.name || '';
     const catSlug = data.ivy_categories?.slug || '';
-    const pubDate = formatDate(data.published_at||data.created_at);
+    const pubDate = formatDate(data.created_at);
     
     // SEO meta
     document.getElementById('page-title').textContent = (data.meta_title||data.title)+' - IvyLife';
