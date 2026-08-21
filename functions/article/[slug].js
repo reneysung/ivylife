@@ -80,8 +80,8 @@ export async function onRequest(context) {
       headline: article.title,
       description: description,
       image: image,
-      datePublished: article.published_at || article.created_at,
-      dateModified: article.updated_at || article.published_at || article.created_at,
+      datePublished: article.created_at,
+      dateModified: article.updated_at || article.created_at,
       author: { '@type': 'Person', name: '艾薇', url: `${SITE}/about` },
       publisher: {
         '@type': 'Organization',
@@ -110,8 +110,8 @@ export async function onRequest(context) {
 <meta property="og:url" content="${esc(canonicalUrl)}">
 <meta property="og:site_name" content="IvyLife 艾薇生活">
 <meta property="og:locale" content="zh_TW">
-<meta property="article:published_time" content="${esc(article.published_at || article.created_at || '')}">
-<meta property="article:modified_time" content="${esc(article.updated_at || article.published_at || article.created_at || '')}">
+<meta property="article:published_time" content="${esc(article.created_at || '')}">
+<meta property="article:modified_time" content="${esc(article.updated_at || article.created_at || '')}">
 ${cat.name ? `<meta property="article:section" content="${esc(cat.name)}">` : ''}
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(title)}">
@@ -156,7 +156,7 @@ ${localBusinessLd ? `<script type="application/ld+json">${JSON.stringify(localBu
 
     // SSR 可見正文：把 H1 + 內文寫進 #art-wrap，讓不執行 JS 的爬蟲 / AI bot 也讀得到內容（AEO）。
     // client JS 載入後會用 __ssr_article 重新渲染並做圖片/連結後處理，整段覆蓋此內容，故對真人無影響。
-    const pubDateStr = String(article.published_at || article.created_at || '').slice(0, 10);
+    const pubDateStr = String(article.created_at || '').slice(0, 10);
     const coverSrc = article.cover_image ? ivThumb(article.cover_image, 1200).replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/ /g, '%20') : '';
     const ssrContent = String(article.content || '')
       .replace(/<script[\s\S]*?<\/script\s*>/gi, '')
