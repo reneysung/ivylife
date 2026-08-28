@@ -289,15 +289,29 @@ async function saveArt(){
   }catch(e){toast('儲存失敗：'+e.message,1);}
 }
 
+function toJpegBlob(file,maxW,q){
+  return new Promise(function(resolve,reject){
+    const img=new Image();
+    img.onload=function(){
+      let w=img.naturalWidth||img.width,h=img.naturalHeight||img.height;
+      if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
+      const c=document.createElement('canvas');c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      c.toBlob(function(b){b?resolve(b):reject(new Error('toBlob failed'));},'image/jpeg',q||0.85);
+    };
+    img.onerror=function(){reject(new Error('image load failed'));};
+    img.src=URL.createObjectURL(file);
+  });
+}
 async function uploadCover(e){
   const file=e.target.files?.[0];if(!file)return;
   const cs=document.getElementById('cps'),ci=document.getElementById('cpi'),cw=document.getElementById('cpw');
   if(ci)ci.src=URL.createObjectURL(file);if(cw)cw.style.display='flex';
   if(cs){cs.textContent='⏫ 上傳中...';cs.style.color='#888';}
-  const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
-  const fn='cover-'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;
+  const fn='cover-'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.jpg';
   try{
-    const r=await fetch('/ivy-cms/r2-upload?fn='+encodeURIComponent(fn),{method:'POST',headers:{'Content-Type':file.type||'application/octet-stream'},body:file});
+    const blob=await toJpegBlob(file,1200,0.85);
+    const r=await fetch('/ivy-cms/r2-upload?fn='+encodeURIComponent(fn),{method:'POST',headers:{'Content-Type':'image/jpeg'},body:blob});
     if(!r.ok){const t=await r.text();throw new Error(t);}
     const ec=document.getElementById('ecov');if(ec)ec.value=(await r.json()).url;
     if(cs){cs.textContent='✅ 上傳成功';cs.style.color='#4caf50';}
