@@ -469,7 +469,7 @@ function ttLink(){
 }
 
 // \u524d\u7aef\u628a\u4e0a\u50b3\u5716\u8f49\u6210 WebP\uff08\u6700\u5927\u5bec\u5ea6 maxW\u3001\u54c1\u8cea q\uff09\u2192 \u65b0\u4e0a\u50b3\u4e5f\u512a\u5316\u3001\u8207\u5df2\u642c\u9077 R2 \u5716\u4e00\u81f4
-function toWebpBlob(file,maxW,q){
+function toWebpBlob(file,maxW,q,type){
   return new Promise(function(resolve,reject){
     const img=new Image();
     img.onload=function(){
@@ -477,7 +477,7 @@ function toWebpBlob(file,maxW,q){
       if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
       const c=document.createElement('canvas');c.width=w;c.height=h;
       c.getContext('2d').drawImage(img,0,0,w,h);
-      c.toBlob(function(b){b?resolve(b):reject(new Error('toBlob failed'));},'image/webp',q||0.72);
+      c.toBlob(function(b){b?resolve(b):reject(new Error('toBlob failed'));},type||'image/webp',q||0.72);
     };
     img.onerror=function(){reject(new Error('image load failed'));};
     img.src=URL.createObjectURL(file);
@@ -598,10 +598,10 @@ async function uploadCover(e){
   const cs=document.getElementById('cps'),ci=document.getElementById('cpi'),cw=document.getElementById('cpw');
   if(ci)ci.src=URL.createObjectURL(file);if(cw)cw.style.display='flex';
   if(cs){cs.textContent='\u23eb \u4e0a\u50b3\u4e2d...';cs.style.color='#888';}
-  const fn='cover-'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.webp';
+  const fn='cover-'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.jpg';
   try{
-    const blob=await toWebpBlob(file,1200,0.72);
-    const r=await fetch('/ivy-cms/r2-upload?fn='+encodeURIComponent(fn),{method:'POST',headers:{'Content-Type':'image/webp'},body:blob});
+    const blob=await toWebpBlob(file,1200,0.85,'image/jpeg');
+    const r=await fetch('/ivy-cms/r2-upload?fn='+encodeURIComponent(fn),{method:'POST',headers:{'Content-Type':'image/jpeg'},body:blob});
     if(!r.ok){const t=await r.text();throw new Error(t);}
     const ec=document.getElementById('ecov');if(ec)ec.value=(await r.json()).url;
     if(cs){cs.textContent='\u2705 \u4e0a\u50b3\u6210\u529f';cs.style.color='#4caf50';}
