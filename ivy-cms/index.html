@@ -491,10 +491,10 @@ function ttImg(){
   qfi.value='';
   qfi.onchange=async function(){
     const file=qfi.files[0];if(!file)return;qfi.onchange=null;
-    const fn='img-'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.webp';
+    const fn='img-'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.jpg';
     try{
-      const blob=await toWebpBlob(file,1200,0.72);
-      const r=await fetch('/ivy-cms/r2-upload?fn='+encodeURIComponent(fn),{method:'POST',headers:{'Content-Type':'image/webp'},body:blob});
+      const blob=await toWebpBlob(file,1200,0.85,'image/jpeg');
+      const r=await fetch('/ivy-cms/r2-upload?fn='+encodeURIComponent(fn),{method:'POST',headers:{'Content-Type':'image/jpeg'},body:blob});
       if(!r.ok)throw new Error(await r.text());
       const url=(await r.json()).url;
       editor.chain().focus().setImage({src:url}).run();
