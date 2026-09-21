@@ -99,6 +99,30 @@ export async function onRequest(context) {
       return json({ id, processed: urls.length, migrated: settled.filter(r => r.ok).length, failed: settled.filter(r => !r.ok).length, remaining, results: settled });
     }
 
+    // ── 本機抓圖流程（痞客邦擋 CF IP，故從 Reney 的 Mac 下載後 POST 進來）──
+    // put：body=圖片 bytes，query src(原URL)+id → 存 R2、回 R2 網址（R2 金鑰留 CF）
+    if (action === 'put') {
+      const src = params.get('src');
+      if (!src) return json({ error: 'src required' }, 400);
+      const body = await request.arrayBuffer();
+      if (!body.byteLength) return json({ error: 'empty body' }, 400);
+      const key = r2Key(src);
+      await env.IVY_IMAGES.put(key, body, { httpMetadata: { contentType: request.headers.get('Content-Type') || 'image/jpeg', cacheControl: 'public, max-age=31536000' } });
+      return json({ ok: true, key, to: IMG_BASE + '/' + key });
+    }
+    // patch：body=JSON {原URL:新URL,...}，query id → 讀 content、逐一取代、PATCH（service key 留 CF）
+    if (action === 'patch') {
+      const id = params.get('id');
+      if (!id) return json({ error: 'id required' }, 400);
+      const map = await request.json();
+      const arts = await sbGet(env, 'ivy_articles?select=id,content&id=eq.' + encodeURIComponent(id));
+      if (!arts.length) return json({ error: 'not found' }, 404);
+      let content = arts[0].content || ''; let replaced = 0;
+      for (const k of Object.keys(map || {})) { if (content.includes(k)) { content = content.split(k).join(map[k]); replaced++; } }
+      if (replaced) await sbPatchContent(env, id, content);
+      return json({ ok: true, replaced, remaining: (content.match(PIXNET_RE) || []).length });
+    }
+
     return new Response(CONSOLE_HTML, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
   } catch (e) {
     return json({ error: String(e && e.message || e).slice(0, 200) }, 500);
