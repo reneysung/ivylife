@@ -5,6 +5,42 @@
 // 注意：這個 middleware 會在所有其他 Pages Functions / _redirects / 靜態檔案之前執行
 // 如果路徑不符合鬼 URL pattern，呼叫 context.next() 讓下游正常處理
 
+// 全站安全標頭（Phase 4）：原 `_headers` 檔只套到靜態檔、SSR Function 頁（/category /article）拿不到，
+// 改在此 middleware 統一補（涵蓋靜態 + SSR + 後台）。CSP 允許清單＝實查的外部來源：
+// 圖=R2+Supabase render 縮圖+痞客邦內文圖(pimg/pic)+Blogger+YouTube 縮圖；字型=Google Fonts；
+// script=自站+inline+CF Analytics beacon；fetch=Supabase REST+CF Analytics；frame=YouTube。
+const CSP = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'self'",
+  "object-src 'none'",
+  "img-src 'self' data: https://img.ivylife.com.tw https://zsebcpfblecwumbaxeaz.supabase.co https://pimg.1px.tw https://pic.pimg.tw https://blogger.googleusercontent.com https://i.ytimg.com https://img.youtube.com",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' https://fonts.gstatic.com",
+  "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com",
+  "connect-src 'self' https://zsebcpfblecwumbaxeaz.supabase.co https://cloudflareinsights.com",
+  "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com",
+].join('; ');
+
+// 後台(/ivy-cms 等)豁免 CSP（載 Quill from cdn.quilljs.com + 跨網域上傳，套嚴格 CSP 會壞編輯器；
+// 且已 Basic Auth 只放 Reney）→ 後台改給更嚴的 X-Frame DENY + noindex + no-store。
+function applySecurity(headers, path) {
+  const admin = path === '/ivy-cms' || path.startsWith('/ivy-cms/') ||
+                path === '/admin' || path === '/admin.html' || path === '/admin-v2.html';
+  headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  headers.set('X-Frame-Options', admin ? 'DENY' : 'SAMEORIGIN');
+  headers.set('X-Content-Type-Options', 'nosniff');
+  headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), browsing-topics=()');
+  if (admin) {
+    headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+    headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+  } else {
+    headers.set('Content-Security-Policy', CSP);
+  }
+}
+
 export async function onRequest(context) {
   const url = new URL(context.request.url);
   const path = url.pathname;
@@ -28,24 +64,24 @@ export async function onRequest(context) {
                   path === '/admin' || path === '/admin.html' || path === '/admin-v2.html';
   if (isAdmin) {
     if (!checkAdminAuth(context.request, context.env)) {
-      return new Response('需要登入', {
-        status: 401,
-        headers: {
-          'WWW-Authenticate': 'Basic realm="IvyLife Admin", charset="UTF-8"',
-          'Content-Type': 'text/plain; charset=utf-8',
-          'Cache-Control': 'no-store',
-        },
+      const h401 = new Headers({
+        'WWW-Authenticate': 'Basic realm="IvyLife Admin", charset="UTF-8"',
+        'Content-Type': 'text/plain; charset=utf-8',
       });
+      applySecurity(h401, path);
+      return new Response('需要登入', { status: 401, headers: h401 });
     }
     const res = await context.next();
     const ct = res.headers.get('Content-Type') || '';
     if (ct.includes('text/html') && context.env.SB_SERVICE_KEY) {
       const html = (await res.text()).split('__SB_SERVICE_KEY__').join(context.env.SB_SERVICE_KEY);
       const headers = new Headers(res.headers);
-      headers.set('Cache-Control', 'no-store');
+      applySecurity(headers, path);
       return new Response(html, { status: res.status, headers });
     }
-    return res;
+    const out = new Response(res.body, res);
+    applySecurity(out.headers, path);
+    return out;
   }
 
   // 鬼 URL pattern：站內錯誤連結（缺 https:）造成的偽路徑、以及不存在的 PHP/ASPX 探測路徑
@@ -77,8 +113,11 @@ export async function onRequest(context) {
     }
   }
 
-  // 不是鬼 URL，繼續走原本的路由邏輯
-  return context.next();
+  // 不是鬼 URL，繼續走原本的路由邏輯；回應統一補安全標頭（涵蓋靜態頁 + SSR Function 頁）
+  const res = await context.next();
+  const out = new Response(res.body, res);
+  applySecurity(out.headers, path);
+  return out;
 }
 
 // Basic Auth 檢查；未設定 ADMIN_PASS 時一律回 false（fail-closed），避免設定遺漏導致後台裸奔。
