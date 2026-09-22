@@ -167,7 +167,7 @@ ${localBusinessLd ? `<script type="application/ld+json">${JSON.stringify(localBu
       <a class="art-back" href="${cat.slug ? '/category/' + esc(cat.slug) : '/'}">← ${esc(cat.name || '返回首頁')}</a>
       <h1 class="art-title">${esc(article.title || '')}</h1>
       ${cat.name ? `<div><span class="art-cat-badge">${esc(cat.name)}</span></div>` : ''}
-      ${coverSrc ? `<img class="art-cover" src="${esc(coverSrc)}" alt="${esc(article.title || '')}" onerror="this.style.display='none'">` : ''}
+      ${coverSrc ? `<img class="art-cover" src="${esc(coverSrc)}" alt="${esc(article.title || '')}" loading="eager" fetchpriority="high" onerror="this.style.display='none'">` : ''}
       <div class="art-meta">${pubDateStr ? `<span>📅 ${esc(pubDateStr)}</span>` : ''}${cat.name ? `<span>📁 ${esc(cat.name)}</span>` : ''}</div>
       ${article.synopsis ? `<p class="art-synopsis">${esc(stripHtml(article.synopsis))}</p>` : ''}
       <div class="art-content" id="art-body">${ssrContent}</div>

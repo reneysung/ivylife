@@ -16,11 +16,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://zsebcpfblecwumbaxeaz.supabase.co">
+<link rel="preconnect" href="https://img.ivylife.com.tw">
 <link rel="stylesheet" href="/css/style.css">
 <style>
 .art-wrap{max-width:780px;margin:0 auto;padding:2rem 1.5rem 4rem}
 .art-keywords{display:flex;flex-wrap:wrap;gap:6px;margin-top:1.5rem}.art-kw-tag{background:#f9f0f2;color:#c8566a;border-radius:50px;padding:4px 12px;font-size:0.78rem;text-decoration:none}.art-kw-tag:hover{background:#c8566a;color:white}
-.art-cover{width:100%;max-height:450px;object-fit:cover;border-radius:12px;margin-bottom:2rem;display:block}.yt-wrap{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;margin:1.2rem 0;border-radius:8px}.yt-iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+.art-cover{width:100%;aspect-ratio:16/10;max-height:450px;object-fit:cover;background:#f5eef0;border-radius:12px;margin-bottom:2rem;display:block}.yt-wrap{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;margin:1.2rem 0;border-radius:8px}.yt-iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
 .art-cat-badge{display:inline-block;font-size:0.78rem;color:var(--rose-deep,#c9697a);font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.6rem;background:rgba(242,160,147,0.1);padding:0.2rem 0.7rem;border-radius:20px}
 .art-title{font-family:var(--font-serif,serif);font-size:clamp(1.6rem,4vw,2.4rem);font-weight:600;line-height:1.3;margin-bottom:1rem;color:var(--text-dark,#2c2c2c)}
 .art-meta{font-size:0.82rem;color:var(--text-light,#888);margin-bottom:1.5rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center}
@@ -29,7 +30,7 @@
 .art-content h2{font-family:var(--font-serif,serif);font-size:1.35rem;font-weight:600;margin:2rem 0 0.8rem;color:var(--text-dark,#2c2c2c)}
 .art-content h3{font-size:1.15rem;font-weight:600;margin:1.5rem 0 0.6rem;color:var(--text-dark,#2c2c2c)}
 .art-content p{margin-bottom:1.2rem}
-.art-content img{display:block;max-width:100%;max-height:560px;width:auto;margin:1.5rem auto;border-radius:8px}.art-content img+p{text-align:center;font-size:.85rem;color:#9a9a9a;font-style:italic;margin-top:-.6rem}
+.art-content img{display:block;max-width:100%;max-height:560px;width:auto;margin:1.5rem auto;border-radius:8px;background:#f5eef0}.art-content img+p{text-align:center;font-size:.85rem;color:#9a9a9a;font-style:italic;margin-top:-.6rem}
 .art-back{display:inline-flex;align-items:center;gap:0.4rem;color:var(--rose-deep,#c9697a);text-decoration:none;font-size:0.85rem;margin-bottom:1.5rem;opacity:0.8}
 .art-back:hover{opacity:1;text-decoration:underline}
 .loading-state,.error-state{text-align:center;padding:4rem 2rem;color:var(--text-light,#888)}
@@ -101,7 +102,7 @@ async function load(){
       <a class="art-back" href="${catSlug?'/category/'+catSlug:'/'}">← ${catName||'返回首頁'}</a>
       <h1 class="art-title">${data.title||''}</h1>
       ${catName?`<div><span class="art-cat-badge">${catName}</span></div>`:''}
-      ${data.cover_image?`<img class="art-cover" src="${RIMG(data.cover_image,1200).replace(/\(/g,'%28').replace(/\)/g,'%29').replace(/ /g,'%20')}" alt="${data.title||''}" loading="eager" onerror="this.style.display='none'">`:''}
+      ${data.cover_image?`<img class="art-cover" src="${RIMG(data.cover_image,1200).replace(/\(/g,'%28').replace(/\)/g,'%29').replace(/ /g,'%20')}" alt="${data.title||''}" loading="eager" fetchpriority="high" onerror="this.style.display='none'">`:''}
       
       <div class="art-meta">
         ${pubDate?`<span>📅 ${pubDate}</span>`:''}
