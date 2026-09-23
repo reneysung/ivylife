@@ -17,13 +17,16 @@ import{TextStyle}from'https://esm.sh/@tiptap/extension-text-style@2.1.13';
 import Underline from'https://esm.sh/@tiptap/extension-underline@2.1.13';
 import{Link}from'https://esm.sh/@tiptap/extension-link@2.1.13';
 import{Image}from'https://esm.sh/@tiptap/extension-image@2.1.13';
+import{Bold}from'https://esm.sh/@tiptap/extension-bold@2.1.13';
 // Extend Heading to preserve id + style attributes (for TOC anchors)
 const CustomHeading=Heading.extend({addAttributes(){return{...this.parent?.(),id:{default:null,parseHTML:el=>el.getAttribute('id')||null,renderHTML:a=>a.id?{id:a.id}:{}},style:{default:null,parseHTML:el=>el.getAttribute('style')||null,renderHTML:a=>a.style?{style:a.style}:{}}};}});
 // Extend Link to preserve name + id attributes
 const CustomLink=Link.extend({addAttributes(){return{...this.parent?.(),name:{default:null,parseHTML:el=>el.getAttribute('name')||null,renderHTML:a=>a.name?{name:a.name}:{}},id:{default:null,parseHTML:el=>el.getAttribute('id')||null,renderHTML:a=>a.id?{id:a.id}:{}}};}});
 // Extend Image to preserve data-link attribute (for clickable images)
 const CustomImage=Image.extend({addAttributes(){return{...this.parent?.(),dataLink:{default:null,parseHTML:el=>{var p=el.parentElement;if(p&&p.tagName==='A'&&p.getAttribute('href'))return p.getAttribute('href');return el.getAttribute('data-link')||null;},renderHTML:a=>a.dataLink?{'data-link':a.dataLink}:{}}};}});
-window._TT={Editor,StarterKit,Heading,Color,TextStyle,Underline,CustomHeading,CustomLink,CustomImage};
+// Extend Bold to preserve inline style (讓 <strong style="color:..."> 標重的顏色 round-trip 不掉)
+const CustomBold=Bold.extend({addAttributes(){return{...this.parent?.(),style:{default:null,parseHTML:el=>el.getAttribute('style')||null,renderHTML:a=>a.style?{style:a.style}:{}}};}});
+window._TT={Editor,StarterKit,Heading,Color,TextStyle,Underline,CustomHeading,CustomLink,CustomImage,CustomBold};
 document.dispatchEvent(new Event('tiptap-ready'));
 </script>
 <style>
@@ -383,12 +386,13 @@ async function editArt(id){
 function initEditor(){
   if(window.editor)return;
   if(!window._TT){document.addEventListener('tiptap-ready',initEditor,{once:true});return;}
-  const{Editor,StarterKit,Color,TextStyle,Underline,CustomHeading,CustomLink,CustomImage}=window._TT;
+  const{Editor,StarterKit,Color,TextStyle,Underline,CustomHeading,CustomLink,CustomImage,CustomBold}=window._TT;
   window.editor=new Editor({
     element:document.getElementById('tiptap-editor'),
     extensions:[
-      StarterKit.configure({heading:false,paragraph:{},codeBlock:{}}),
+      StarterKit.configure({heading:false,bold:false,paragraph:{},codeBlock:{}}),
       CustomHeading.configure({levels:[2,3,4]}),
+      CustomBold,
       TextStyle,Color,Underline,
       CustomLink.configure({openOnClick:false,autolink:true}),
       CustomImage.configure({inline:false}),
